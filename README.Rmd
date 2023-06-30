@@ -24,7 +24,7 @@ The goal of COMET is to ...
 
 You can install the development version of COMET like so:
 
-``` {r}
+```{r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("PaulGunsalus/COMET")
 ```
