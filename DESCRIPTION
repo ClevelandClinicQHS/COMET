@@ -1,0 +1,26 @@
+Package: COMET
+Type: Package
+Title: Simulates The United States Lung Transplant Process
+Version: 0.0.0.9101
+Authors@R: c(person("Gunsalus", "Paul", email = "gunsalp@ccf.org", role = c("aut","cre")),
+             person("Swiler", "Mark", email = "swilerm@ccf.org", role = "ctb"),
+             person("Rose", "Johnie", email = "rosej15@ccf.org", role = "aut"),
+             person("Dalton", "Jarrod", email = "daltonj@ccf.org", role = "aut"))
+Description: Computational Open-source Model for Transplantation 'COMET'
+  Provides an open source simulation to model the united states lung allocation process, within synthetic candidate and donor populations
+License: What license is it under?
+Encoding: UTF-8
+LazyData: true
+RoxygenNote: 7.2.3
+LinkingTo: Rcpp
+Imports:
+    rlang,
+    purrr,
+    dplyr (>= 1.1.0),
+    stringr,
+    Rcpp,
+    RcppEigen,
+    splines,
+    tidyr (>= 1.3.0)
+Depends: 
+    R (>= 4.2.0)
