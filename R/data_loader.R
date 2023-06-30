@@ -151,6 +151,23 @@
 #   ## other arguments
 #   internal = TRUE,
 #   overwrite = TRUE)
+
+# ## I think I want to put some candidates, donors and matches
+# ## it would make sense
+# cands <- COMET::gen_and_spawn_candidates(days = 14) |>
+#   dplyr::slice_sample(n = 100) |>
+#   dplyr::arrange(c_id) |>
+#   dplyr::mutate(c_id = 1:100) |>
+#   dplyr::mutate(days_on_waitlist =  16 - listing_day)
+#
+# #
+# dons <- COMET::gen_and_spawn_donors(days = 3) |>
+#   dplyr::slice_sample(n = 10) |>
+#   dplyr::arrange(d_id) |>
+#   dplyr::mutate(d_id = 1:10)
+#
+# usethis::use_data(cands, dons, overwrite = TRUE)
+
 #
 # # save( accpt_centers,
 # #       accpt_coef,

@@ -1583,7 +1583,6 @@ generate_params <- function(characteristic, desired = "random"){
 #' @param ... other arguments for FUN
 #'
 #' @return a vector a randomly sampled values within the limits
-#' @export
 #'
 #' @examples
 #' y <- rsamp(rnorm, limits = c(0,5), n = 100, mean = 0, mean = 3)

@@ -26,7 +26,6 @@ acceptance_prob <- function(matched_data, dons, cands){
 
   odds <- inv_log(mm)
 
-
   probs <- mutate(matched_data,
                   pred = odds[, 1],
                   accept = rbinom(n = length(odds), size = 1, prob = odds)

@@ -105,7 +105,7 @@
 # library(COMET)
 # library(survival)
 # library(tidyverse)
-# rs0 <- readRDS("/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs1.RDS")
+# # rs0 <- readRDS("/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs6.RDS")
 # # # # # # # #
 # # # # # # # # #rs1 <- rs2
 # # # # # # ct1 <- map(rs1, concat)
@@ -357,6 +357,10 @@
 # pt3l <- bind_rows(day0, pt3l)
 #
 # write_csv(pt3l, file = "/proj/DaltonLab/projects/lungTx/p0054/data_raw/sp2_ptx_cas_recal365.csv")
+#
+# wl_cas23_survrates_rec365_dx <- as_tibble(wl3dx)
+# wl_cas23_survrates_rec365 <- as_tibble(wl3l)
+# post_tx_cas23_survrates_rec365 <- as_tibble(pt3l)
 #
 #
 # ################### Removal probability
