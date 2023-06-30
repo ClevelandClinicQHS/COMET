@@ -17,8 +17,8 @@
 #'
 #' @examples
 #'
-#' r1 <- run_simulation2(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1, match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
-#' r2 <- run_simulation2(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1, match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
+#' r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1, match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
+#' r2 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1, match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
 run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, post_tx_update_freq = 1,
                            match_alg = match_cas(), extra_days = 0,
                            ...,
