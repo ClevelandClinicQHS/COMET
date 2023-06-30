@@ -26,7 +26,7 @@ You can install the development version of COMET like so:
 
 ``` {r}
 # install.packages("devtools")
-# devtools::install_github("PaulGunsalus/COMET")
+devtools::install_github("PaulGunsalus/COMET")
 ```
 
 ## The rest to be added later
