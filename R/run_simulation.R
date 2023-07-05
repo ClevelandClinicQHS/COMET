@@ -36,7 +36,7 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
   match_f <- match_alg
   # m1 <- paste(quote(match_las))
   m1 <- dplyr::quo_name(enquo(match_alg))
-  lu_f <- if(grepl("las", m1)){calculate_las}else{calculate_cas_nodist}
+  lu_f <- if(grepl("las", m1)){calculate_las}else{calculate_sub_cas}
 
   if(is.numeric(can_start)){
 
@@ -107,7 +107,6 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
         dplyr::slice_sample(n = x, weight_by = (lu_score^(-3)))
 
       q1o <- sample(1:x, x, prob = q1lu$lu_score)
-      # nld <- sort(-round(rgamma(n = x, shape = 0.6816127092994521685654, rate = 0.0017683888980645867499)))
 
       q2 <- q1lu[q1o,] |>
         dplyr::select(-listing_day) |>
@@ -118,25 +117,8 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
         tidyr::unnest(cols = c(data, listing_day)) |>
         dplyr::arrange(listing_day) |>
         dplyr::relocate(listing_day, .after = c_id) |>
-        # dplyr::mutate(listing_day2 = sort(-round(rgamma(n = x, shape = 0.6816127092994521685654, rate = 0.0017683888980645867499)), decreasing = TRUE)) |>
         dplyr::mutate(c_id = -dplyr::n() + dplyr::row_number()-1) |>
-        # dplyr::mutate(c_id = -dplyr::row_number()) |>
-        # dplyr::mutate(p600 = listing_day < -730,
-        #               p300 = listing_day < -365 & !p600) |>
-        # dplyr::left_join(remov_df4, by = dplyr::join_by(dx_grp, p300, p600)) |>
         dplyr::arrange(c_id) |>
-        # dplyr::rowwise() |>
-        # dplyr::mutate(#hy_removal_day = ceiling(rsamp(rweibull, n = 1, limits = c(((-listing_day)+1), Inf), shape = shapes, scale = scales)),
-        #               # hy_removal_day = dplyr::if_else(p300,
-        #               #                          ceiling(rsamp(rweibull, n = 1, limits = c(((-listing_day)+1)-300, Inf), shape = shapes, scale = scales))+300,
-        #               #                          ceiling(rsamp(rweibull, n = 1, limits = c(((-listing_day)+1), Inf), shape = shapes, scale = scales))
-        #   #                          )
-        #   hy_removal_day = dplyr::case_when(p600 ~ ceiling(rsamp(rweibull, n = 1, limits = c(((-listing_day)+1)-730, Inf), shape = shapes, scale = scales))+730,
-        #                                     p300 ~ ceiling(rsamp(rweibull, n = 1, limits = c(((-listing_day)+1)-365, Inf), shape = shapes, scale = scales))+365,
-        #                                     .default = ceiling(rsamp(rweibull, n = 1, limits = c(((-listing_day)+1), Inf), shape = shapes, scale = scales))
-        #   )
-                      # ) |>
-        # dplyr::ungroup() |>
         dplyr::select(-c(lu_score, dx_weight))
 
 
@@ -194,9 +176,9 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
   # match_args <- match_args[lapply(match_args, length)>0]
   # match_args <- purrr::prepend(purrr::prepend(match_args, list(head(dl, 5))), list(old_candidates))
   all_matches <- match_f(old_candidates, head(dl, 5), ...) |>
-    tidyr::unnest(cols = data) |>
-    dplyr::filter(d_id == -Inf) |>
-    tidyr::nest()
+    # tidyr::unnest(cols = data) |>
+    dplyr::filter(d_id == -Inf) #|>
+    # tidyr::nest()
   # all_matches <- do.call(match_f, match_args) %>% dplyr::nest_by(d_id) %>% dplyr::filter(d_id == -Inf)
 
   iter0 <- list(

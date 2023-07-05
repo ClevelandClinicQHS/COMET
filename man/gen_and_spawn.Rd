@@ -154,8 +154,6 @@ gen_and_spawn_candidates(desired = "random", days, return_params = FALSE)
 \item{ar_mat_beta}{other Group A, diseases}
 
 \item{dr_mat_beta}{other Group D, disesase}
-
-\item{dx_mat_beta}{diangosis group}
 }
 \value{
 dataset of donors

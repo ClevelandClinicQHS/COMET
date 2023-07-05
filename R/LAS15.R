@@ -1,5 +1,6 @@
 #' @rdname calc_las
 #'
+#' @param ci cardiac index
 #' @param cvp central venous pressure (mmHg)
 #' @param bili_50 bilirubin increase of 50\% (0 or 1)
 #' @param fvc forced vital capapcity (\%)

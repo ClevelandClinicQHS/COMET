@@ -2,9 +2,15 @@
 % Please edit documentation in R/extra_las.R
 \name{trunc_days}
 \alias{trunc_days}
+\alias{trunc_days.coxph}
+\alias{trunc_days.character}
 \title{Truncated Survival days}
 \usage{
 trunc_days(object, ...)
+
+\method{trunc_days}{coxph}(object, cand_data, cap = NA, wl = TRUE)
+
+\method{trunc_days}{character}(object, cand_data, cap = NA, wl = TRUE)
 }
 \arguments{
 \item{object}{survival object (only coxph models currently are accepted)}
@@ -12,7 +18,15 @@ trunc_days(object, ...)
 \item{cand_data}{candidate data}
 
 \item{cap}{cap for truncation survival}
+
+\item{wl}{TRUE (waitlist) or FALSE (post_transplant)}
+}
+\value{
+a dateset of candidates, linear predictor and mean survival
 }
 \description{
 Truncated Survival days
+}
+\examples{
+trunc_days("LAS21", cands, 365, TRUE)
 }

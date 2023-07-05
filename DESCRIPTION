@@ -1,7 +1,7 @@
 Package: COMET
 Type: Package
 Title: Simulates The United States Lung Transplant Process
-Version: 0.0.0.9101
+Version: 0.0.0.9102
 Authors@R: c(person("Gunsalus", "Paul", email = "gunsalp@ccf.org", role = c("aut","cre")),
              person("Swiler", "Mark", email = "swilerm@ccf.org", role = "ctb"),
              person("Rose", "Johnie", email = "rosej15@ccf.org", role = "aut"),

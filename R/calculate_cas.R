@@ -1,6 +1,10 @@
 #' Calculate continuous distribution
 #'
 #' @param data dataset of patients containing covaraites for las calculations and other continuous distribution factors
+#' @param wl_model model to use in waitlist component of the CAS
+#' @param post_tx_model model to use in the post-transplant component of the CAS
+#' @param wl_cap number of days to cap the waitlist component CAS score at CAS
+#' @param post_tx_cap number of days to cap the post transplant component of the CAS
 #' @param wl_weight weight applied to waitlist model
 #' @param post_tx_weight weight applied to post transplant model
 #' @param bio_weight weight applied to biologoical measures (height, abo (blood), and hla)

@@ -14,7 +14,8 @@ match_las(
   wl_weight = NA,
   wl_cap = NA,
   post_tx_weight = NA,
-  post_tx_cap = NA
+  post_tx_cap = NA,
+  checks = TRUE
 )
 
 match_cas(
@@ -29,7 +30,13 @@ match_cas(
   bio_weight = NA,
   peds_weight = NA,
   pld_weight = NA,
-  efficiency_weight = NA
+  efficiency_weight = NA,
+  abo_weight = NA,
+  height_weight = NA,
+  cpra_weight = NA,
+  cost_weight = NA,
+  distance_weight = NA,
+  checks = TRUE
 )
 }
 \arguments{
@@ -49,6 +56,8 @@ match_cas(
 
 \item{post_tx_cap}{cap of post-transplatn survival in days}
 
+\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
+
 \item{bio_weight}{weight for biological compoent (divided evenly for blood type, hieght, and pra)}
 
 \item{peds_weight}{weight for pediatric patient}
@@ -56,6 +65,16 @@ match_cas(
 \item{pld_weight}{weight for prior living donor}
 
 \item{efficiency_weight}{weight for travel efficiency}
+
+\item{abo_weight}{weight for blood type compatability (if not specified will default to 1/3 of bio weight)}
+
+\item{height_weight}{weight for height compatability (if not specified will default to 1/3 of bio weight)}
+
+\item{cpra_weight}{weight for cpra compatability (if not specified will default to 1/3 of bio weight)}
+
+\item{cost_weight}{weight given for cost part of CAS (if not specified is half of efficiency weight)}
+
+\item{distance_weight}{weight given for distance part of CAS (if not specified is half of efficiency weight)}
 }
 \value{
 a nested tibble of donors and candidates
@@ -64,8 +83,6 @@ a nested tibble of donors and candidates
 LAS/CAS Matching
 }
 \examples{
-cands <- spawn_and_gen_candidates(days = 100)
-dons <- spawn_and_gen_donors(days = 2)
-match_las <- match_las(cands, dons, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
-match_cas <- match_cas(cands, dons, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight =.25, post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
+match_las(cands, dons, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
+match_cas(cands, dons, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight =.25, post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
 }

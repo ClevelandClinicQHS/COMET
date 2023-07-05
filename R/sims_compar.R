@@ -36,7 +36,7 @@
 # # sp_cas <- map(0:729, ~spec_day(r5, .x), .progress= TRUE)
 # # sp_las <- map(0:729, ~spec_day(r2, .x), .progress= TRUE)
 # #
-# # dl_cas <- map(sp_cas, calculate_cas_nodist, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = .25, post_tx_weight = .25, bio_weight = .15, peds_weight = .2, pld_weight = .1, wl_cap = 365,
+# # dl_cas <- map(sp_cas, calculate_sub_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = .25, post_tx_weight = .25, bio_weight = .15, peds_weight = .2, pld_weight = .1, wl_cap = 365,
 # #     post_tx_cap = 1825, .progress = TRUE)
 # #
 # # dl_las <- map(sp_las, ~(calculate_las(.x, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 2, post_tx_weight = 1, wl_cap = 365,

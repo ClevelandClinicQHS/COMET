@@ -55,8 +55,6 @@ get_surv_data <- function(object, ...){
   UseMethod("get_surv_data")
 }
 
-
-#########
 #' Creating complete survival estimates
 #'
 #' expand and fill in the data.frame from start to finish. No more missing days
@@ -116,7 +114,6 @@ create_surv_rates <- function(object, cap = NA, ignore = FALSE){
     fill(surv, .direction = "down") |>
     filter(time >= 0) |>
     filter(time <= cap) |>
-    # cap_survrates(Days = time, cap = cap) |>
     ungroup()
 
   options(warn = dW)
@@ -132,16 +129,19 @@ create_surv_rates <- function(object, cap = NA, ignore = FALSE){
 #' @param cand_data candidate data
 #' @param cap cap for truncation survival
 #'
-#' @return
+#' @return a dateset of candidates, linear predictor and mean survival
 #' @export
+#' @name trunc_days
 #'
 #' @examples
+#' trunc_days("LAS21", cands, 365, TRUE)
 trunc_days <- function(object, ...){
   UseMethod("trunc_days")
 }
 
-#' Title
+
 #' @export
+#' @rdname trunc_days
 trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE){
 
   surv <- create_surv_rates(object, cap = cap)
@@ -156,27 +156,23 @@ trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE){
 
     surv1 <- nest_by(surv, !!sym(str1)) |>
       left_join(data_n, by = str1) |>
-      mutate(expected = list(sum_loop_c(data.y$lp, data.x$surv))) |>
+      mutate(expected = list(mean_survival(data.y$lp, data.x$surv))) |>
       unnest(cols = c(data.y, expected)) |>
       ungroup() |>
       select(c_id, expected) |>
       arrange(c_id)
 
   }else{
-    surv1 <- mutate(cand_data, expected = sum_loop_c(lp, surv$surv)) |>
+    surv1 <- mutate(cand_data, expected = mean_survival(lp, surv$surv)) |>
       select(c_id, expected)
   }
   return(surv1)
 }
 
-#' Title
-#'
+
 #' @param wl TRUE (waitlist) or FALSE (post_transplant)
-#'
-#' @return
+#' @rdname trunc_days
 #' @export
-#'
-#' @examples
 trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE){
 
   model <- match.arg(toupper(object), c("LAS15", "LAS21", "CAS23"))
@@ -196,7 +192,6 @@ trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE){
          }
   )
   }else{
-  # post_tx_model <- match.arg(toupper(post_tx_model), c("LAS15", "LAS21", "CAS23"))
   switch(model,
          LAS15 = {
            surv <- post_tx_las15_survrates
@@ -212,16 +207,12 @@ trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE){
          }
   )
   }
-  # post_tx_surv <- cap_survrates(post_tx_surv, cap = post_tx_cap)
-  # post_tx <- post_tx_f(data) |>
-  #   expected_days(surv_rates = post_tx_surv$Survival, lp = lp_post_tx)
+
   if(is.na(cap)){cap <- max(surv$Days)}
 
-  # surv <- cap_survrates(surv, cap = cap)
   surv <- filter(surv, Days <= cap)
   surv1 <- f1(cand_data) |>
-    mutate(expected = sum_loop_c(lp, surv$Survival))
-    # expected_days(surv_rates = surv$Survival, lp = lp)
+    mutate(expected = mean_survival(lp, surv$Survival))
   return(surv1)
 }
 

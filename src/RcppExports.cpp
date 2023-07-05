@@ -10,21 +10,21 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// sum_loop_c
-NumericVector sum_loop_c(NumericVector x, NumericVector y);
-RcppExport SEXP _COMET_sum_loop_c(SEXP xSEXP, SEXP ySEXP) {
+// mean_survival
+NumericVector mean_survival(NumericVector lp, NumericVector surv_rates);
+RcppExport SEXP _COMET_mean_survival(SEXP lpSEXP, SEXP surv_ratesSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(sum_loop_c(x, y));
+    Rcpp::traits::input_parameter< NumericVector >::type lp(lpSEXP);
+    Rcpp::traits::input_parameter< NumericVector >::type surv_rates(surv_ratesSEXP);
+    rcpp_result_gen = Rcpp::wrap(mean_survival(lp, surv_rates));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_COMET_sum_loop_c", (DL_FUNC) &_COMET_sum_loop_c, 2},
+    {"_COMET_mean_survival", (DL_FUNC) &_COMET_mean_survival, 2},
     {NULL, NULL, 0}
 };
 

@@ -8,21 +8,24 @@ calculate_cas_dist(
   match_data,
   efficiency_weight = NA,
   cost_weight = NA,
-  distance_weight = NA
+  distance_weight = NA,
+  checks = TRUE
 )
 }
 \arguments{
 \item{match_data}{dataset of patients containing covaraites for las calculations and other continuous distribution factors}
 
-\item{efficienty_weight}{weight given for efficiency (cost and distance)}
+\item{efficiency_weight}{weight given for efficiency (cost and distance)}
+
+\item{cost_weight}{weight given for cost part of CAS (if not specified is half of efficiency weight)}
+
+\item{distance_weight}{weight given for distance part of CAS (if not specified is half of efficiency weight)}
+
+\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
 }
 \value{
 a dataset complete with the efficient/distance metric
 }
 \description{
 Calculate continuous distribution
-}
-\examples{
-## will add real examples later
-## This needs to be thought out, only the distance changes with the donors
 }

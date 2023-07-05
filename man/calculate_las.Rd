@@ -11,7 +11,8 @@ calculate_las(
   wl_cap = NA,
   post_tx_cap = NA,
   wl_weight = NA,
-  post_tx_weight = NA
+  post_tx_weight = NA,
+  checks = TRUE
 )
 }
 \arguments{
@@ -28,6 +29,8 @@ calculate_las(
 \item{wl_weight}{relative weight of waitlist mortality}
 
 \item{post_tx_weight}{relative weight of post-transplant mortality}
+
+\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
 }
 \value{
 a dataset of candidates and their LAS score on a 0 to 1 scale
@@ -36,6 +39,6 @@ a dataset of candidates and their LAS score on a 0 to 1 scale
 Calcualate LAS scores
 }
 \examples{
-cands <- gen_and_spawn_candidates(days = 100)
-las_scores <- calculate_las(cands, wl_model = "LAS21", post_tx_model = "LAS21")
+calculate_las(cands, wl_model = "LAS21", post_tx_model = "LAS21", wl_cap = 365, post_tx_cap = 365,
+wl_weigth = 2, post_tx_weight = 1)
 }

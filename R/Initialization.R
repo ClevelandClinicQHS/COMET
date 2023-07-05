@@ -196,7 +196,6 @@ gen_and_spawn_donors <- function(desired = "random", days, return_params = FALSE
 #' @param daily_lambdas_center lambda per candidate center
 #' @param sex_thetas theta paramter to assign sex
 #' @param race_mat_beta beta matrix for race multinomial
-#' @param dx_mat_beta diangosis group
 #' @param abo_mat_beta blood type
 #' @param age_params age
 #' @param hgt_params height

@@ -20,5 +20,6 @@ a dataset of candidates that have been transplanted with their respective donors
 Transplant Candidates
 }
 \examples{
-## Will add later
+mz <- match_las(cands, dons, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365)
+transplant_candidates(mz)
 }
