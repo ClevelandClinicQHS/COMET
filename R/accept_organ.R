@@ -8,6 +8,8 @@
 #' @importFrom dplyr left_join
 #' @importFrom dplyr select
 #' @importFrom dplyr mutate
+#' @importFrom stats rbinom
+#' @importFrom stats model.matrix
 #'
 #' @return matched_data with acceptance probabilities
 acceptance_prob <- function(matched_data, dons, cands){
