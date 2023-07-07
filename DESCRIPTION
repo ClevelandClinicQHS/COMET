@@ -1,14 +1,13 @@
 Package: COMET
 Type: Package
-Title: Simulates The United States Lung Transplant Process
+Title: Computational Open-source Model for Transplantation 'COMET'
 Version: 0.0.0.9102
-Authors@R: c(person("Gunsalus", "Paul", email = "gunsalp@ccf.org", role = c("aut","cre")),
-             person("Swiler", "Mark", email = "swilerm@ccf.org", role = "ctb"),
-             person("Rose", "Johnie", email = "rosej15@ccf.org", role = "aut"),
-             person("Dalton", "Jarrod", email = "daltonj@ccf.org", role = "aut"))
-Description: Computational Open-source Model for Transplantation 'COMET'
-  Provides an open source simulation to model the united states lung allocation process, within synthetic candidate and donor populations
-License: What license is it under?
+Authors@R: c(person("Gunsalus", "Paul", email = "gunsalp@ccf.org", role = c("aut","cre"), comment = c(ORCID = "0000-0001-6976-9094")),
+             person("Swiler", "Mark", email = "swilerm@ccf.org", role = "ctb", comment = c(ORCID = "0000-0001-7070-671X")),
+             person("Rose", "Johnie", email = "rosej15@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-7458-9303")),
+             person("Dalton", "Jarrod", email = "daltonj@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-8336-1212")))
+Description: Provides an open source simulation to model the united states lung allocation process within synthetic candidate and donor populations
+License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.2.3

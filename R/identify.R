@@ -10,6 +10,8 @@
 #' @param cap cap for suvival estiamte
 #' @param date date
 #'
+#' @importFrom stats setNames
+#'
 #' @return A list of candidates who were Alive, Dead, new_char for new characteristics and removed if on waiting list
 #' @export
 #'
@@ -125,7 +127,7 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, step_size, pre
                lp_f <- calc_wl_cas23
              },
              CAS23 = {
-               surv_rt <- wl_cas23_survrates
+               surv_rt <- wl_cas23_survratesS
                lp_f <- calc_wl_cas23
              },
              LAS15 = {

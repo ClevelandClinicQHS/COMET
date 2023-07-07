@@ -12,6 +12,9 @@
 #' @param return_params TRUE or FALSE see the paramters used for generating donors and candidates
 #' @param include_matches TRUE or FALSE, whether or not the include the donor and candidates matches
 #'
+#' @importFrom stats rgamma
+#' @importFrom utils head
+#'
 #' @return list of full donors and candidates simluated at beginning and final datasets, who's left on waitlist, transplanted, death on both and discarded donors
 #' @export
 #'

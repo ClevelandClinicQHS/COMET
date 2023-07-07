@@ -87,6 +87,8 @@ eval_simulation <- function(COMET, group = NULL){
 #'
 #' @param COMET a COMET object
 #'
+#' @importFrom stats median
+#'
 #' @return a tibble of daily counts and mean and median las per COMET
 #' @export
 daily_count_las <- function(COMET, LAS_FUN = calculate_las, ...){

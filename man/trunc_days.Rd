@@ -8,12 +8,14 @@
 \usage{
 trunc_days(object, ...)
 
-\method{trunc_days}{coxph}(object, cand_data, cap = NA, wl = TRUE)
+\method{trunc_days}{coxph}(object, cand_data, cap = NA, wl = TRUE, ...)
 
-\method{trunc_days}{character}(object, cand_data, cap = NA, wl = TRUE)
+\method{trunc_days}{character}(object, cand_data, cap = NA, wl = TRUE, ...)
 }
 \arguments{
 \item{object}{survival object (only coxph models currently are accepted)}
+
+\item{...}{arguement given from other methods}
 
 \item{cand_data}{candidate data}
 

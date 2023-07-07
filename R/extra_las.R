@@ -126,8 +126,7 @@ create_surv_rates <- function(object, cap = NA, ignore = FALSE){
 #' Truncated Survival days
 #'
 #' @param object survival object (only coxph models currently are accepted)
-#' @param cand_data candidate data
-#' @param cap cap for truncation survival
+#' @param ... arguement given from other methods
 #'
 #' @return a dateset of candidates, linear predictor and mean survival
 #' @export
@@ -141,8 +140,13 @@ trunc_days <- function(object, ...){
 
 
 #' @export
+#'
+#' @param cand_data candidate data
+#' @param cap cap for truncation survival
+#' @param wl boolean for waitlist or not
+#'
 #' @rdname trunc_days
-trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE){
+trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE, ...){
 
   surv <- create_surv_rates(object, cap = cap)
   lp <- predict(object, newdata = cand_data, type = "lp")
@@ -173,7 +177,7 @@ trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE){
 #' @param wl TRUE (waitlist) or FALSE (post_transplant)
 #' @rdname trunc_days
 #' @export
-trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE){
+trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE, ...){
 
   model <- match.arg(toupper(object), c("LAS15", "LAS21", "CAS23"))
   if(wl){
