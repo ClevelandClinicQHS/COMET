@@ -30,6 +30,7 @@
 #' @importFrom dplyr between
 #' @importFrom dplyr filter
 #' @importFrom dplyr join_by
+#' @importFrom dplyr arrange
 #'
 #' @examples
 #' ## The functions will use the internal cands and dons stored in the package
@@ -57,26 +58,25 @@ height_screen <- function(cands, dons){
            d_upper = hgt_in + d_upper) |>
     rename(hgt_in_c = hgt_in)
 
-  don_x <- rename(dons, hgt_in_d = hgt_in) |>
-    select(d_id, hgt_in_d, don_org)
-
-  # s_match <- fuzzy_left_join(cand_x, don_x, by = c("s_lower" = "hgt_in_d", "s_upper" = "hgt_in_d"), match_fun = list(`<=`, `>=`))
-  # d_match <- fuzzy_left_join(cand_x, don_x, by = c("d_lower" = "hgt_in_d", "d_upper" = "hgt_in_d"), match_fun = list(`<=`, `>=`))
+  don_x <- select(dons, d_id, hgt_in_d = hgt_in, don_org)
 
   s_match <- inner_join(don_x, cand_x, by = join_by(between(hgt_in_d, s_lower, s_upper)))
   d_match <- inner_join(don_x, cand_x, by = join_by(between(hgt_in_d, d_lower, d_upper)))
+
+  # s_match <- inner_join(cand_x, don_x, by = join_by(between(hgt_in_d, s_lower, s_upper)))
+  # d_match <- inner_join(cand_x, don_x, by = join_by(between(hgt_in_d, d_lower, d_upper)))
 
   ## Just as a checker
   height_match <- bind_rows(s_match, d_match) |>
     distinct(c_id, d_id, .keep_all = TRUE) |>
     mutate(match_single = between(hgt_in_d, s_lower, s_upper),
            match_double = between(hgt_in_d, d_lower, d_upper)) |>
-    # ungroup() %>%
     ## if one only one lung must match a single
     filter(don_org == "DLU" |(match_single & don_org %in% c("LUL", "LUR"))) |>
     ## if the candidate is only a double transplant, make sure they match with double lungs
     filter(!(!match_double & surg_type == "D")) |>
-    select(c_id, d_id, match_single, match_double)
+    select(c_id, d_id, match_single, match_double) |>
+    arrange(c_id, d_id)
 
     return(height_match)
 
@@ -87,17 +87,6 @@ height_screen <- function(cands, dons){
 #' @rdname screen
 #' @export
 abo_screen <- function(cands, dons){
-
-  # abo_match_df <- data.frame(abo = c("A","B","AB", "O"),
-  #                            match = c("A|AB","B|AB","AB","O|A|B|AB"))
-  # ## merges it to the donor dataset
-  # don_x <- left_join(dons, abo_match_df, by = "abo")
-  #
-  #
-  # abo_match <- regex_inner_join(cands, don_x,
-  #                               by = c(abo = "match")) %>%
-  #   mutate(abo_exact = (abo.x == abo.y)) %>%
-  #   select(c_id, d_id, abo_exact)
 
   don_x <- inner_join(dons, abo_match_df, by = "abo", multiple = "all")
 
@@ -126,23 +115,9 @@ pra_screen <- function(cands, dons){
 #' @rdname screen
 count_screen <- function(cands, dons){
 
-  # count_match_df <- data.frame(surg_type = c("E","S","D"),
-  #                              ## Either can be matched to either
-  #                              ## a single can be matched to a double, but only accept 1
-  #                              ## double can only accept 2
-  #                              match = c("DLU|LUR|LUL","LUR|LUL|DLU","DLU"))
-  #
-  # ## merges it to the donor dataset
-  # cand_x <- left_join(cands, count_match_df, by = "surg_type")
-  #
-  # count_match <- regex_inner_join(dons, cand_x,
-  #                                 by = c(don_org = "match")) %>%
-  #   select(c_id, d_id)
+  don_x <- inner_join(dons, count_match_df, by = "don_org", relationship = "many-to-many")
 
-
-  don_x <- inner_join(dons, count_match_df, by = "don_org", multiple = "all")
-
-  count_match <- inner_join(don_x, cands, by = join_by(match == surg_type), multiple = "all") |>
+  count_match <- inner_join(cands, don_x, by = join_by(surg_type == match), relationship = "many-to-many") |>
     select(c_id, d_id)
 
   return(count_match)

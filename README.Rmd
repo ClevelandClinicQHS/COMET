@@ -58,6 +58,9 @@ r2 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post
 ```{r comparison of simualtions}
 # eval_simulation()
 # see how many were transplanted, donor count, waitlist deaths
+eval_simulation(r1)
+
+eval_simulation(r1, group = dx_grp)
 
 ```
 
@@ -81,11 +84,13 @@ abo_screen(syn_cands, syn_dons)
 ## returns abo_exact abo compatible organs since that is a tie breaker in the LAS
 
 ## Ensure double with double, singles may take a double if only is assigned or either can
-# count_screen()
+count_screen(syn_cands, syn_dons)
 
 ## Distance calculation 
+las_dist_calc(syn_cands, syn_dons)
 
 ## matching
+
 
 ## ranking
 
@@ -101,6 +106,8 @@ calculate_sub_cas(syn_cands, wl_model = "LAS15", post_tx_model = "LAS15", wl_cap
                   abo_weight = 0.10, height_weight = 0.05, cpra_weight = 0)
 
 ## updating patients
+
+
 
 ## transplanting
 
