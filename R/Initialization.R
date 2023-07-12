@@ -26,6 +26,7 @@
 #' @importFrom stats rbinom
 #' @importFrom stats rnorm
 #' @importFrom stats rbinom
+#' @importFrom stats rpois
 spawn_donors <- function(days, daily_lambdas_center, sex_thetas,
                          race_mat_beta, hgt_params, abo_mat_beta, age_params, cod_mat_beta,
                          smoke_hist_mat_beta, don_org_odds, dcd_params, don_util_odds){
@@ -253,6 +254,7 @@ gen_and_spawn_donors <- function(desired = "random", days, return_params = FALSE
 #' @importFrom dplyr relocate
 #' @importFrom stats rgamma
 #' @importFrom stats rbinom
+#' @importFrom stats rpois
 spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_beta, #dx_mat_beta,
                              abo_mat_beta,
                              age_params,  hgt_params, wgt_params, wgt_params_c, diab_params,
@@ -798,7 +800,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
 
   ## I might store this elsewhere
   rtc <- function(n, df, sigma=1, mean=0){
-    y <- rt(n=n, df = df) * sigma + mean
+    y <- stats::rt(n=n, df = df) * sigma + mean
     return(y)
   }
 

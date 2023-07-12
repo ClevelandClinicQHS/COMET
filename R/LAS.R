@@ -18,8 +18,9 @@
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr select
 #' @importFrom tidyr unnest
+#' @importFrom methods is
 #'
-#' @return a dataset of candidates and their LAS score on a 0 to 1 scale
+#' @return a dataset of candidates and their LAS score on a 0 to 1 scale. To get LAS/CAS score simply multiply by 100.
 #' @export
 #'
 #' @examples
@@ -39,10 +40,10 @@ calculate_las <- function(wl_data, wl_model = NULL, post_tx_model = NULL,  wl_ca
       checkmate::checkChoice(wl_model, c("LAS15","LAS21", "CAS23"))
     )
 
-    if((!is.character(wl_model) & !class(wl_model) == "coxph")){
+    if((!is.character(wl_model) & !is(wl_model, "coxph"))){
       stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
     }
-    if((!is.character(post_tx_model) & !class(post_tx_model) == "coxph")){
+    if((!is.character(post_tx_model) & !is(post_tx_model, "coxph"))){
       stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
     }
   }
@@ -95,7 +96,7 @@ custom_scale <- function(x, min, max){
 #' @importFrom dplyr mutate
 #' @importFrom dplyr select
 #'
-#' @return a dataset with the added variable las_0_100 which is a score 0
+#' @return a dataset with the added variable ly_score which is a score 0-1.
 scale_pre_post <- function(data, pre, post, pre_weight = NA, post_weight = NA, pre_cap = NA, post_cap = NA){
 
   ## max number for the las i.e living the whole Post transplant and dying immediately
