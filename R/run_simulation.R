@@ -20,8 +20,13 @@
 #'
 #' @examples
 #'
-#' r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1, match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
-#' r2 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1, match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
+#' r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+#'  match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
+#'   wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
+#' r2 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+#'  match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
+#'  wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
+#'  bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
 run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, post_tx_update_freq = 1,
                            match_alg = match_cas(), extra_days = 0,
                            ...,
@@ -162,7 +167,7 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
 
   waitlist_death_d <- cl |>
     dplyr::filter(c_id == -Inf) |>
-    dplyr::mutate(death_day = NA_real_, days_on_waitlist = NA_real_)
+    dplyr::mutate(death_day = NA_real_, days_on_waitlist = NA_real_, removal_day = NA_real_)
 
   post_tx_death_d <- cl |>
     dplyr::filter(c_id == -Inf) |>
@@ -171,7 +176,7 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
   discarded_donors <- dl |>
     dplyr::filter(d_id == -Inf) |>
     dplyr::select(d_id) |>
-    dplyr::mutate(discard_day = NA_real_)
+    dplyr::mutate(discard_day = NA_real_, offers = NA_integer_)
 
   ## add matches
 
@@ -210,7 +215,7 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
     )
     #### progress bar
     if(i %in% qs){
-      print(glue::glue(names(qs)[which(i == qs)], " done"))
+      cat(paste0(names(qs)[max(which(i == qs))], " done "))
     }
   }
   ## Timing

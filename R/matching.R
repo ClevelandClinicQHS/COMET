@@ -22,8 +22,11 @@
 #' @importFrom tidyr nest
 #'
 #' @examples
-#' match_las(cands, dons, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
-#' match_cas(cands, dons, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight =.25, post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
+#' match_las(cands, dons, wl_model = "LAS15", post_tx_model = "LAS15",
+#'  wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
+#' match_cas(cands, dons, wl_model = "CAS23", post_tx_model = "CAS23",
+#'  wl_weight =.25, post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,
+#'  bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
 match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight = NA, wl_cap = NA, post_tx_weight = NA, post_tx_cap = NA, checks = TRUE){
 
   hm <- height_screen(cands, dons)

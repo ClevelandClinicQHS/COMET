@@ -54,6 +54,7 @@ update_patients <- function(patients, model = NULL, elapsed_time, step_size, pre
 #' @importFrom dplyr across
 #' @importFrom tidyr contains
 #' @importFrom rlang sym
+#' @importFrom methods is
 #'
 #' @name update
 #'
@@ -88,7 +89,7 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, step_size, pre
 
   ela_str <- as_label(enquo(elapsed_time))
 
-  if(class(model) == "coxph"){
+  if(is(model, "coxph")){
 
     if(any(str_detect(names(model$xlevels), "strata"))){
       stop("stratified coxph not supported yet")

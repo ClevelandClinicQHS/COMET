@@ -30,7 +30,7 @@ scale_pre_post(
 \item{post_cap}{cap on post-transplant survival}
 }
 \value{
-a dataset with the added variable las_0_100 which is a score 0
+a dataset with the added variable ly_score which is a score 0-1.
 }
 \description{
 Pre and Post Survival Scaling

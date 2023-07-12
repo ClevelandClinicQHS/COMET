@@ -33,7 +33,7 @@ calculate_las(
 \item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
 }
 \value{
-a dataset of candidates and their LAS score on a 0 to 1 scale
+a dataset of candidates and their LAS score on a 0 to 1 scale. To get LAS/CAS score simply multiply by 100.
 }
 \description{
 Calcualate LAS scores

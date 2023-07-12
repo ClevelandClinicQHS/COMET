@@ -15,7 +15,3 @@ a complete tibble of all the COMET's list, along with survival information
 \description{
 Simulation Evaluation Helps
 }
-\examples{
-concat(c1)
-## will add later
-}

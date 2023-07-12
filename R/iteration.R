@@ -229,7 +229,28 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
     mutate(organs_discard = organs_avl - organs_rec) |>
     filter(organs_discard > 0 |is.na(organs_discard)) |>
     select(d_id, don_org, organs_discard) |>
-    mutate(discard_day = date)
+    mutate(discard_day = date) |>
+    left_join(matches, by = c("d_id", "don_org")) |>
+    mutate(offers = sapply(data, nrow)) |>
+    select(-data)
+
+  # return(dead_donors)
+
+  if(nrow(dead_donors) >=1){
+    of2 <- sapply(dead_donors$offers, function(x) ifelse(is.null(x), 0, as.numeric(x)))
+    if(any(of2 == 0)){
+     dead_donors$offers <- of2
+    }
+  }else{
+    dead_donors$offers <- as.numeric(c())
+  }
+
+  # if(nrow(dead_donors) == 0L){
+  #   dead_donors$offers <- as.numeric(c())
+  #   dead_donors$offers <- as.numeric(dead_donors$offers)
+  # }
+
+  # offers <- vector(NA)
 
   # }else{
   #

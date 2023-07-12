@@ -29,9 +29,12 @@
 #' @importFrom dplyr sym
 #' @importFrom tidyr unnest
 #' @importFrom dplyr between
+#' @importFrom methods is
 #'
 #' @examples
-#' calculate_subcas(data = cands, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = .25, post_tx_weight = .25, bio_weight = .15, peds_weight = .2, pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
+#' calculate_subcas(data = syn_cands, wl_model = "CAS23", post_tx_model = "CAS23",
+#'  wl_weight = .25, post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
+#'   pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
 calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = NA, post_tx_weight = NA, bio_weight = NA,
                                  peds_weight = NA, pld_weight = NA, wl_cap = NA, post_tx_cap = NA, abo_weight = NA, height_weight = NA, cpra_weight = NA, checks = TRUE){
 
@@ -53,10 +56,10 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
     if(is.na(bio_weight3)){
       stop("cpra_weight is missing")
     }
-    if((!is.character(wl_model) & !class(wl_model) == "coxph")){
+    if((!is.character(wl_model) & !is(wl_model, "coxph"))){
       stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
     }
-    if((!is.character(post_tx_model) & !class(post_tx_model) == "coxph")){
+    if((!is.character(post_tx_model) & !is(post_tx_model, "coxph"))){
       stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
     }
   }

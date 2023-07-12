@@ -2,20 +2,15 @@
 #'
 #' @section Initialization components:
 #' \itemize{
-#' \item \code{\link{agent_gen}}
-#' \item \code{\link{hosp_sjoin}}
-#' \item \code{\link{trait_assign}}
+#' \item \code{\link{gen_and_spawn_candidates}}
+#' \item \code{\link{gen_and_spawn_donors}}
 #'}
 #'
 #' @section Iterative components:
 #' \itemize{
-#' \item \code{\link{age_can}}
-#' \item \code{\link{age_lung}}
-#' \item \code{\link{proc_lung}}
-#' \item \code{\link{operation}}
-#' \item \code{\link{match_rank}}
-#' \item \code{\link{offer}}
-#' \item \code{\link{follow_up}}
+#' \item \code{\link{transplant_candidates}}
+#' \item \code{\link{update_patients}}
+#' \item \code{\link{match_cas}}
 #'}
 #' @section Families:
 #' In addition to the partition of the simulation into initialization and iterative aspects,
