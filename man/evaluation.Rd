@@ -58,6 +58,8 @@ concat2(
 
 \item{enroll_date}{last date to enroll for simulation}
 
+\item{max_data}{end date for find daily las_count (default is maximum listing day of COMEt)}
+
 \item{censor_date}{last date to censor individuals post-transplant}
 }
 \value{

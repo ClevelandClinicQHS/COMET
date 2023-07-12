@@ -16,6 +16,8 @@
 #'
 #' @export
 #'
+#' @export
+#'
 #' @examples
 #' \dontrun{
 #' r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
@@ -75,6 +77,7 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
 #'
 #' @param min_date start date for daily las count
 #' @param max_date end date for find daily las_count (default is maximum listing day of COMEt)
+#' @param max_data end date for find daily las_count (default is maximum listing day of COMEt)
 #' @param LAS_FUN function to calculate LAS/CAS score
 #' @param ... arguments pased to LAS_FUN
 #'
