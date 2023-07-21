@@ -9,6 +9,8 @@
 #'
 #' @importFrom tidyr unnest
 #' @importFrom dplyr filter
+#' @importFrom dplyr mutate
+#' @importFrom dplyr ungroup
 #' @importFrom dplyr slice_head
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr bind_rows
@@ -16,7 +18,7 @@
 #' @examples
 #' mz <- match_las(syn_cands, syn_dons, wl_model = "LAS15", post_tx_model = "LAS15",
 #'  wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365)
-#' transplant_candidates(mz)
+#' transplant_candidates(mz, rec_ids = NA, max_offer = NA)
 transplant_candidates <- function(matches, rec_ids, max_offer = NA){
 
   rec_ids <- rec_ids
@@ -25,17 +27,17 @@ transplant_candidates <- function(matches, rec_ids, max_offer = NA){
 
   for(i in 1:nrow(matches)){
 
+    ## prevent candidates from getting transplanted twice
     d_of_org <- matches$data[[i]] |> filter(!(c_id  %in% rec_ids))
 
     d_org <- matches$don_org[i]
 
     if(d_org != "DLU"){
-      # d_of_org <- filter(d_of_org, surg_type != "D" & accept_single == 1)
+
       d_of_org <- filter(d_of_org, surg_type != "D")
     }
 
     if(nrow(d_of_org) == 0){next}
-
 
     #### maximum number of offers to look at
     if(!is.na(max_offer)){
@@ -44,7 +46,6 @@ transplant_candidates <- function(matches, rec_ids, max_offer = NA){
         slice_head(n = max_o)
     }
 
-    ## If accept_double and accept_single are the variables
     if(any(d_of_org$accept == 1)){
 
       d_of_org <- filter(d_of_org, accept == 1)
@@ -52,34 +53,10 @@ transplant_candidates <- function(matches, rec_ids, max_offer = NA){
       of_x <- min(which(d_of_org$accept == 1))
 
       tx_o0 <- d_of_org[of_x, ]
-      # if(d_org == "DLU"){
-      #
-      #   while(tx_o0$surg_type == "S"){
-      #     d_of_org <- filter(d_of_org, c_id != tx_o0$c_id)
-      #     if(nrow(d_of_org)==0){
-      #       tx_o0 <- NULL
-      #       break
-      #     }
-      #     of_x <- min(which(d_of_org$accept == 1))
-      #     if(is.infinite(of_x)){
-      #       tx_o0 <- d_of_org[of_x, ]
-      #       break
-      #     }
-      #     tx_o0 <- d_of_org[of_x, ]
-      #   }
-      # }
 
       if(is.null(tx_o0$c_id)){next}
       if(is.na(tx_o0$c_id)){next}
 
-      # if(tx_o0$surg_type == "S" & accept_single != 1){
-      #
-      # }
-      ## Need to make if the person is a single, they can match for a single
-      ## and say for either or double, that they match a double
-
-
-      ## If accept_double and accept_single are the variables
       while((tx_o0$surg_type %in% c("S","E") & !tx_o0$match_single) | (tx_o0$surg_type %in% c("E","D") & !tx_o0$match_double)){
 
         if(tx_o0$surg_type %in% c("E","D") & tx_o0$match_double){break}
@@ -92,35 +69,7 @@ transplant_candidates <- function(matches, rec_ids, max_offer = NA){
           break
         }
 
-        ## hold version
-        # if(tx_o0$surg_type == "S"){
-        #   if(all(d_of_org$accept_single == 0)){
-        #     tx_o0 <- NULL
-        #     break
-        #   }
-        #   of_x <- min(which(d_of_org$accept_single == 1))
-        # }else{
-        #   if(all(d_of_org$accept_double == 0)){
-        #     tx_o0 <- NULL
-        #     break
-        #   }
-        #   of_x <- min(which(d_of_org$accept_double == 1))
-        # }
-
         of_x <- min(which(d_of_org$accept == 1))
-        # if(tx_o0$surg_type == "S"){
-        #   if(all(d_of_org$accept == 0)){
-        #     tx_o0 <- NULL
-        #     break
-        #   }
-        #   of_x <- min(which(d_of_org$accept == 1))
-        # }else{
-        #   if(all(d_of_org$accept == 0)){
-        #     tx_o0 <- NULL
-        #     break
-        #   }
-        #   of_x <- min(which(d_of_org$accept == 1))
-        # }
 
         tx_o0 <- d_of_org[of_x, ]
       }
@@ -132,7 +81,7 @@ transplant_candidates <- function(matches, rec_ids, max_offer = NA){
 
       tx_o <- d_of_org[of_x, ] |>
         bind_cols(matches[i, c("d_id", "don_org")]) |>
-        dplyr::mutate(organs_rec = org_rec)
+        mutate(organs_rec = org_rec)
 
       rec_ids <- c(rec_ids, as.numeric(tx_o[, "c_id"]))
 
@@ -144,30 +93,30 @@ transplant_candidates <- function(matches, rec_ids, max_offer = NA){
 
       tr <- bind_rows(tr, tx_o)
 
-      # if((tx_o$surg_type == "S" & tx_o$don_org == "DLU") | (tx_o$surg_type == "E" & tx_o$don_org == "DLU" & tx_o$accept_single == 1 & tx_o$accept_double ==0)){
+      ## This is looking at the person who just got it, if either, then not a match_double is correct
       if((tx_o$surg_type == "S" & tx_o$don_org == "DLU") | (tx_o$surg_type == "E" & tx_o$don_org == "DLU" & tx_o$match_single & !tx_o$match_double)){
 
-        ##
         tr$organs_rec[nrow(tr)] <- 1
 
        ## Make sure we don't transplant the person twice
         d_of_org <- filter(d_of_org, !(c_id %in% rec_ids))
+
         if(nrow(d_of_org) == 0){next}
+
         if(all(!d_of_org$match_single)){next}
         ## Make sure they are able to receive the single offer
         d_of_org <- filter(d_of_org, match_single)
-        ##
+
         if(all(d_of_org$surg_type == "D")){next}
-        # if(all(d_of_org$accept_single ==0)){next}
-        # if(!any(d_of_org$accept_single ==1 & d_of_org$surg_type %in% c("S", "E"))){next}
-        ## If accept_double and accept_single are the variables
-        # of_x2 <- min(which(d_of_org$accept_single ==1 & d_of_org$surg_type %in% c("S", "E")))
+
         of_x2 <- min(which(d_of_org$accept==1 & d_of_org$surg_type %in% c("S", "E")))
 
         tx_o2 <- d_of_org[of_x2, ] |> bind_cols(matches[i, c("d_id", "don_org")])
 
         tr <- bind_rows(tr, tx_o2)
+
         tr$organs_rec[nrow(tr)] <- 1
+
         rec_ids <- c(rec_ids, tx_o2$c_id)
 
       }

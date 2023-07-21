@@ -2,10 +2,7 @@
 #'
 #' @param days number of days to simulate
 #' @param can_start number of candidates to start on the waitlist, they will be randomly selected to be mor listing day, all of these candidates will have a negative c_id and listing_day
-#' @param waitlist_update_freq how often to update waitlist patients
-#' @param post_tx_update_freq how often to update post_tx patients
 #' @param match_alg function of how to screen and match individuals
-#' @param extra_days how many days to simulate deaths
 #' @param ... arguments for match_alg
 #' @param seed seed to set
 #' @param desired random or mean for parameter generation
@@ -19,88 +16,30 @@
 #' @export
 #'
 #' @examples
-#'
-#' r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+#'\dontrun{
+#' r1 <- run_simulation(days = 20, can_start = 1000,
 #'  match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
 #'   wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
-#' r2 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+#' r2 <- run_simulation(days = 20, can_start = 1000,
 #'  match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
 #'  wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
 #'  bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
-run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, post_tx_update_freq = 1,
-                           match_alg = match_cas(), extra_days = 0,
+#'  }
+run_simulation <- function(days, can_start = 1250,
+                           match_alg = match_cas(),
                            ...,
                            seed = NULL, desired = "random", return_params = FALSE, include_matches = FALSE){
 
   call1 <- match.call(expand.dots = TRUE)
 
-  ## Other warning and stuff to check
-  # model <- match.arg(model, c("LAS15", "LAS21", "CAS23"))
-
   set.seed(seed = seed)
   ## For timing purposes
   tic <- Sys.time()
-  ### Starting the simulation with 1000 candidates to start
   match_f <- match_alg
-  # m1 <- paste(quote(match_las))
   m1 <- dplyr::quo_name(enquo(match_alg))
   lu_f <- if(grepl("las", m1)){calculate_las}else{calculate_sub_cas}
 
   if(is.numeric(can_start)){
-
-
-  # cust_day <- function(x){
-  #   dy <- ceiling(x/350)+10
-  #   dy <- dy*50
-  #   q1 <- gen_and_spawn_candidates(days = dy) |>
-  #     # dplyr::left_join(odd3, by = "dx_grp") %>%
-  #     # dplyr::slice_sample(n = x, weight_by = o1) %>%
-  #     # dplyr::select(-o1) %>%
-  #     # dplyr::mutate(listing_day = -ceiling(rgamma(x, shape = 0.68, scale = 500))) %>%
-  #     # dplyr::arrange(listing_day) %>%
-  #     # dplyr::mutate(c_id = -dplyr::n() + dplyr::row_number()-1)
-  #     # dplyr::mutate(listing_day = -ceiling(rgamma(nrow(.), shape = 0.68, scale = 500))) |>
-  #     dplyr::mutate(listing_day = -round(rgamma(n = max(dplyr::row_number()), shape = 0.6816127092994521685654, rate = 0.0017683888980645867499))) |>
-  #     # dplyr::mutate(listing_day = -ceiling(rgamma(n = max(dplyr::row_number()), shape = 0.45857445548312275596, rate = 0.0011901870568239542817))) |>
-  #     dplyr::filter(hy_removal_day > -listing_day) |>
-  #     dplyr::left_join(odd3, by = "dx_grp") |>
-  #     dplyr::slice_sample(n = x, weight_by = dx_weight) |>
-  #     dplyr::select(-c(dx_weight)) |>
-  #     dplyr::arrange(listing_day) |>
-  #     dplyr::mutate(c_id = -dplyr::n() + dplyr::row_number()-1)
-  #
-  #   return(q1)
-  # }
-
-    # cust_day <- function(x){
-    #   dy <- ceiling(x/350)+10
-    #   dy <- dy*50
-    #   q1 <- gen_and_spawn_candidates(days = dy)|>
-    #     dplyr::left_join(prior_dist_gammas, by = dplyr::join_by(dx_grp)) |>
-    #     dplyr::rowwise() |>
-    #     dplyr::mutate(listing_day = -floor(rsamp(rgamma, n = 1, limits = c(0, max(1, hy_removal_day-1)), shape = shape, rate = rate))) |>
-    #     # dplyr::mutate(listing_day = -round(rsamp(rgamma, n = 1, limits = c(0, hy_removal_day-1), shape = 0.6816127092994521685654, rate = 0.0017683888980645867499))) |>
-    #     dplyr::ungroup() |>
-    #     dplyr::select(-c(shape, rate))
-    #     # dplyr::mutate(listing_day = -round(rgamma(n = max(dplyr::row_number()), shape = 0.6816127092994521685654, rate = 0.0017683888980645867499))) |>
-    #     # dplyr::filter(hy_removal_day > -listing_day)
-    #   # |>
-    #   #   dplyr::left_join(odd3, by = "dx_grp") |>
-    #   # dplyr::slice_sample(n = x, weight_by = dx_weight) |>
-    #   # dplyr::select(-c(dx_weight)) |>
-    #   # dplyr::arrange(listing_day) |>
-    #   # dplyr::mutate(c_id = -dplyr::n() + dplyr::row_number()-1)
-    #
-    #   q1lu <- lu_f(q1, ...) |> select(c_id, lu_score) |> left_join(q1, by = join_by(c_id)) |>
-    #     # dplyr::slice_sample(n = x, weight_by = (lu_score^(-5))) |>
-    #     dplyr::slice_sample(n = x, weight_by = (lu_score^(-3))) |>
-    #     # dplyr::select(-c(dx_weight)) |>
-    #     dplyr::arrange(listing_day) |>
-    #     dplyr::mutate(c_id = -dplyr::n() + dplyr::row_number()-1) |>
-    #     dplyr::select(-lu_score)
-    #
-    #   return(q1lu)
-    # }
 
     cust_day <- function(x){
       dy <- ceiling(x/350)+10
@@ -129,8 +68,8 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
         dplyr::arrange(c_id) |>
         dplyr::select(-c(lu_score, dx_weight))
 
-
       return(q2)
+
     }
 
   old_candidates <- cust_day(can_start)
@@ -158,9 +97,11 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
   dl <- dplyr::filter(new_donors, don_util == 1)
 
   ## creating empty lists
-  current_candidates_d <- cl |>
-    dplyr::filter(c_id == -Inf)
+  current_candidates_d <- tibble()
+  # cl |>
+  #   dplyr::filter(c_id == -Inf)
 
+  # recipient_d <- tibble()
   recipient_d <- cl |>
     dplyr::filter(c_id == -Inf) |>
     dplyr::mutate(transplant_day = NA_real_)
@@ -178,16 +119,8 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
     dplyr::select(d_id) |>
     dplyr::mutate(discard_day = NA_real_, offers = NA_integer_)
 
-  ## add matches
-
-  # match_args <- dots[rlang::fn_fmls_names(match_f)]
-  # match_args <- match_args[lapply(match_args, length)>0]
-  # match_args <- purrr::prepend(purrr::prepend(match_args, list(head(dl, 5))), list(old_candidates))
-  all_matches <- match_f(old_candidates, head(dl, 5), ...) |>
-    # tidyr::unnest(cols = data) |>
-    dplyr::filter(d_id == -Inf) #|>
-    # tidyr::nest()
-  # all_matches <- do.call(match_f, match_args) %>% dplyr::nest_by(d_id) %>% dplyr::filter(d_id == -Inf)
+  all_matches <- match_f(cands = old_candidates, dons = head(dl, 5), ...) |>
+    dplyr::filter(d_id == -Inf)
 
   iter0 <- list(
     current_candidates = old_candidates,
@@ -201,15 +134,14 @@ run_simulation <- function(days, can_start = 1250, waitlist_update_freq = 1, pos
   ## iteration
 
   test_i <- iter0
-  if(extra_days >0L){days <- days + extra_days}
   ds <- 1:days
   ### For progress bar in timing may eventually remove
-  qs <- ceiling(quantile(ds, probs = seq(.1, 1, .1)))
+  qs <- ceiling(stats::quantile(ds, probs = seq(.1, 1, .1)))
 
   #################
   for(i in ds){
     test_i <- iteration(i,
-                        cl, dl, include_matches = include_matches, updated_list = test_i, waitlist_update_freq = waitlist_update_freq, post_tx_update_freq = post_tx_update_freq
+                        cl, dl, include_matches = include_matches, updated_list = test_i
                         , match_alg = match_alg, ...
 
     )

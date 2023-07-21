@@ -1,21 +1,21 @@
 #' Screen Candidates and Donors for Compatibility
 #'
-#' These functions screen for compatible candidates and donors.
+#' Screen for compatible candidates and donors based on biological factors
 #'
 #' \code{height_screen} screens compatible donors and candidates based on acceptable height ranges.
 #'
 #' \code{abo_screen} screens donors and compatible donors based on blood type
 #'
-#' \code{pra_screen} not yet implemented will screen on pra compatibility organs
+#' \code{pra_screen} not yet implemented will screen on pra compatibility organs.
 #'
 #' \code{count_screen} Makes sure double lung transplant are matched with double lung donors, singles can be matched and received a one of the double lung
 #'
-#' \code{las_dist_calc} Returns the distance between the matched candidates and donors with las distance categories.
+#' \code{las_dist_calc} Returns the distance between the matched candidates and donors with LAS distance categories.
 #'
 #' @param cands tibble of candidates
 #' @param dons tibble of donors
 #'
-#' @return a dataset containing compatible donors and candidates based on specific criteria
+#' @return a dataset containing compatible donors and candidates based on specific criteria or a dataset of all comprable matches and their respective rankings
 #' @name screen
 #' @export
 #'
@@ -162,7 +162,6 @@ dist_calc <- function(cands, dons){
 #' @param ... tibbles of screening conditions, height, blood, pra, distance, etc
 #' @param overall_ranking tibble containing overall ranking by candidate
 #'
-#' @return a dataset of all comparable matches and their respective rankings
 #' @export
 #'
 #' @rdname screen
@@ -194,9 +193,9 @@ las_offer_rank <- function(..., overall_ranking){
 
 
 #' @param efficiency_weight weight of efficiency for distance between candidate and donor
-#' @param cost_weight weight given for cost part of CAS (if not specified is half of efficiency weight)
-#' @param distance_weight weight given for distance part of CAS (if not specified is half of efficiency weight)
-#' @param checks whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated
+#' @param cost_weight weight given for cost part of CAS (if NA specified is half of efficiency weight)
+#' @param distance_weight weight given for distance part of CAS (if NA specified is half of efficiency weight)
+#' @param checks whether or not to check the conditions and display warnings, this is there to not check conditions every day when the simulation is iterated
 #'
 #' @export
 #'

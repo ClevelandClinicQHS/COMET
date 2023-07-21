@@ -10,8 +10,6 @@ iteration(
   donor_database,
   include_matches,
   updated_list,
-  waitlist_update_freq = NA,
-  post_tx_update_freq = NA,
   match_alg,
   ...
 )
@@ -28,16 +26,12 @@ current_candidates, waitlist_death_database, recipient_database, and post_tx_dea
 
 \item{updated_list}{named list of databases that updated at each time point, originally all empty, \cr}
 
-\item{waitlist_update_freq}{how often one wants to update the waitlist candidates}
-
-\item{post_tx_update_freq}{how often one wants to update the transplant recipients}
-
 \item{match_alg}{function for matching}
 
 \item{...}{arguemnts for match algorithm}
 }
 \value{
-a named list of databases that updated at each time point, originally all empty, current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database
+a named list of databases that updated at each time point, originally all empty, current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, discarded_donors
 }
 \description{
 Iteration

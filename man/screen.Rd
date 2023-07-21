@@ -46,30 +46,28 @@ cas_offer_rank(
 
 \item{efficiency_weight}{weight of efficiency for distance between candidate and donor}
 
-\item{cost_weight}{weight given for cost part of CAS (if not specified is half of efficiency weight)}
+\item{cost_weight}{weight given for cost part of CAS (if NA specified is half of efficiency weight)}
 
-\item{distance_weight}{weight given for distance part of CAS (if not specified is half of efficiency weight)}
+\item{distance_weight}{weight given for distance part of CAS (if NA specified is half of efficiency weight)}
 
-\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
+\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every day when the simulation is iterated}
 }
 \value{
-a dataset containing compatible donors and candidates based on specific criteria
-
-a dataset of all comparable matches and their respective rankings
+a dataset containing compatible donors and candidates based on specific criteria or a dataset of all comprable matches and their respective rankings
 }
 \description{
-These functions screen for compatible candidates and donors.
+Screen for compatible candidates and donors based on biological factors
 }
 \details{
 \code{height_screen} screens compatible donors and candidates based on acceptable height ranges.
 
 \code{abo_screen} screens donors and compatible donors based on blood type
 
-\code{pra_screen} not yet implemented will screen on pra compatibility organs
+\code{pra_screen} not yet implemented will screen on pra compatibility organs.
 
 \code{count_screen} Makes sure double lung transplant are matched with double lung donors, singles can be matched and received a one of the double lung
 
-\code{las_dist_calc} Returns the distance between the matched candidates and donors with las distance categories.
+\code{las_dist_calc} Returns the distance between the matched candidates and donors with LAS distance categories.
 
 Matching rules for LAS distances are broken into the following zones, 250 nautical miles, 500, 1000, 1500, 2500, the US
 }

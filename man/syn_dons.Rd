@@ -5,8 +5,7 @@
 \alias{syn_dons}
 \title{Synthetic Donor Set}
 \format{
-## `syn_dons`
-A tibble of 10 synthetic donors
+`syn_dons` A tibble of 10 synthetic donors
 \describe{
 \item{d_id}{unqiue donor identifier}
 \item{hospital}{integer from 1-1691 of donor hospital}

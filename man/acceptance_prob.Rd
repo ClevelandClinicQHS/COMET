@@ -19,3 +19,7 @@ matched_data with acceptance probabilities
 \description{
 Acceptance Probability from matched data
 }
+\examples{
+dplyr::mutate(syn_matches, offer_rank = rank(-lu_score), .by = d_id) |>
+ acceptance_prob(dons = syn_dons, cands = syn_cands)
+}

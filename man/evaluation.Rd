@@ -4,7 +4,7 @@
 \alias{eval_simulation}
 \alias{evaluation}
 \alias{daily_count_las}
-\alias{cutoff}
+\alias{spec_day}
 \alias{concat2}
 \title{Evaluation}
 \usage{
@@ -19,13 +19,13 @@ eval_simulation(
 
 daily_count_las(
   COMET,
-  min_date = 1,
-  max_date = NA,
+  min_enroll_date = 1,
+  max_enroll_date = NA,
   LAS_FUN = calculate_las,
   ...
 )
 
-cutoff(COMET, enroll_date, waitlist_date, post_tx_date)
+spec_day(COMET, day)
 
 concat2(
   COMET,
@@ -38,7 +38,7 @@ concat2(
 \arguments{
 \item{COMET}{a COMET object}
 
-\item{min_enroll_date}{date to enroll candidates at default is 1}
+\item{min_enroll_date}{date to enroll candidates at (default is 1)}
 
 \item{max_enroll_date}{date to stop the enrollment period, defaults is maximum date found}
 
@@ -48,36 +48,47 @@ concat2(
 
 \item{group}{summary statistics by a certain group}
 
-\item{min_date}{start date for daily las count}
-
-\item{max_date}{end date for find daily las_count (default is maximum listing day of COMEt)}
-
 \item{LAS_FUN}{function to calculate LAS/CAS score}
 
 \item{...}{arguments pased to LAS_FUN}
 
-\item{enroll_date}{last date to enroll for simulation}
-
-\item{max_data}{end date for find daily las_count (default is maximum listing day of COMEt)}
-
-\item{censor_date}{last date to censor individuals post-transplant}
+\item{day}{date of simluation}
 }
 \value{
-\code{eval_simulation()} returns a tibble of summary statistics
+\code{eval_simulation()} returns a tibble of summary statistics. See details for data dictionary
 
-a tibble of daily counts and mean and median las per COMET
+\code{daily_count_las} returns a tibble of daily counts and mean and median LAS/CAS score per day
 
-a tibble with simulation data and calucated survival data
+\code{spec_day} returns a tibble of candidates on waiting list at a specific day
 
-a tibble of candidates and time information
+\code{concat2} returns a tibble of candidates with their survival data
 }
 \description{
-Evaluation
-
-Title
+A few functions to help look at and evaluate the results from a COMET object.
 }
 \details{
-\item
+Data dictionary for \code{eval_simulation()}
+\itemize{
+\item{can_count}{ - total candidate count}
+\item{tx_count}{ - total number of transplants}
+\item{wait_death}{ - number of deaths on the waiting list}
+\item{removal}{ - number of removals for "other" reasons}
+\item{cens}{ - number of people with censored outcomes or still waiting for a transplant}
+\item{wait_death_yrs}{ - number of waitlist patient years}
+\item{post_tx_death}{ - number of of post-transplant deahts}
+\item{tx_ppy}{ - number of transplants per patient year}
+\item{wld_ppy}{ - wait list deaths per patient year}
+\item{ptd_ppy}{ - post transplant deaths per patient year}
+\item{pt_1yr}{ - pecentage of transplant recipients that survived 1 year}
+\item{pt_2yr}{ - pecentage of transplant recipients that survived 1 year}
+\item{med_wlt}{ - median time on the waiting list}
+\item{med_ptt}{ - median post transplant time}
+\item{med_offer}{ - median offer rank of those who were transplanted}
+\item{don_count}{ - total number of donors}
+\item{don_util}{ - number of donor utilized}
+\item{d_med_offer}{ - median times a donor was offered if not utilized}
+\item{d_orgs}{ - number of organs not utilized}
+}
 }
 \examples{
 \dontrun{
@@ -85,6 +96,7 @@ r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post
  match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
  wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
 eval_simulation(r1)
+spec_day(r1, 5)
+concat2(r1)
 }
-\dontrun{concat2(r1)}
 }

@@ -22,5 +22,5 @@ Transplant Candidates
 \examples{
 mz <- match_las(syn_cands, syn_dons, wl_model = "LAS15", post_tx_model = "LAS15",
  wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365)
-transplant_candidates(mz)
+transplant_candidates(mz, rec_ids = NA, max_offer = NA)
 }

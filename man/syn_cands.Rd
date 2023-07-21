@@ -5,8 +5,7 @@
 \alias{syn_cands}
 \title{Synthetic Candidate Set}
 \format{
-## `syn_cands`
-A tibble of 100 synethic candidates
+`syn_cands`  A tibble of 100 synethic candidates
 \describe{
   \item{c_id}{unique candidate identifier}
   \item{center}{integer of 1-61 unique centers}
@@ -23,7 +22,7 @@ A tibble of 100 synethic candidates
   \item{wgt_kg}{weight in kilograms}
   \item{bmi}{body mass index}
   \item{resp_supp}{respiratory support cluster}
-  \item{surg_type}{double "D", single "S", either, "E" type of transplant is preferred}
+  \item{surg_type}{double "D", single "S", either "E" type of transplant is preferred}
   \item{diab}{diabetes}
   \item{fev1}{forced expiratory volume in the first second}
   \item{fvc}{fored vital capacity}

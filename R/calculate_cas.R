@@ -1,4 +1,6 @@
-#' Calculate continuous distribution
+#' Calculate Composite Allocation Score (CAS)
+#'
+#' Calcualte the subCAS
 #'
 #' @param data dataset of patients containing covaraites for las calculations and other continuous distribution factors
 #' @param wl_model model to use in waitlist component of the CAS
@@ -16,8 +18,12 @@
 #' @param checks whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated
 #'
 #'
-#' @return a dataset of cas calcualted metrics without the efficiency/distance metric
+#' @return \code{calculate_sub_cas} a dataset of candidate, CAS score on a 0 to 1 scale (lu_score) without the efficiency weight,
+#' and ov_rank which is the overall rank of each candidate. 1 is the highest CAS score
+#' \code{calculate_cas_dist} a dataset of matches with lu_score that contains the efficiency weight. It will contain the estimaed cost (pcost) for efficiency calculation.
 #' @export
+#'
+#' @rdname calculate_cas
 #'
 #' @importFrom dplyr left_join
 #' @importFrom dplyr distinct
@@ -32,9 +38,11 @@
 #' @importFrom methods is
 #'
 #' @examples
-#' calculate_subcas(data = syn_cands, wl_model = "CAS23", post_tx_model = "CAS23",
+#' calculate_sub_cas(data = syn_cands, wl_model = "CAS23", post_tx_model = "CAS23",
 #'  wl_weight = .25, post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
-#'   pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
+#'  pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
+#'
+#' calculate_cas_dist(syn_matches, efficiency_weight = 0.1)
 calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = NA, post_tx_weight = NA, bio_weight = NA,
                                  peds_weight = NA, pld_weight = NA, wl_cap = NA, post_tx_cap = NA, abo_weight = NA, height_weight = NA, cpra_weight = NA, checks = TRUE){
 
@@ -64,12 +72,6 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
     }
   }
 
-  # if(round(weights, 0) > 1L){
-  #   warning("sum of weights > 1")
-  # }
-
-
-
   wl <- trunc_days(wl_model, cand_data = data, cap = wl_cap, wl = TRUE)
 
   post_tx <- trunc_days(post_tx_model, cand_data = data, cap = post_tx_cap, wl = FALSE)
@@ -91,7 +93,7 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
   return(data)
 }
 
-#' Calculate continuous distribution
+#' @name calculate_cas
 #'
 #' @param match_data dataset of patients containing covaraites for las calculations and other continuous distribution factors
 #' @param efficiency_weight weight given for efficiency (cost and distance)
@@ -129,7 +131,7 @@ calculate_cas_dist <- function(match_data, efficiency_weight = NA, cost_weight =
         efficiency_weight2 *
         (as.numeric(distance_nm <= 45) +
            as.numeric(between(distance_nm, 45, 90)) * (1 - 0.15/45 * (distance_nm - 45)) +
-           as.numeric(distance_nm >=90) * 0.875/(1 + exp(0.0025 * (distance_nm - 1500))))
+           as.numeric(distance_nm >= 90) * 0.875/(1 + exp(0.0025 * (distance_nm - 1500))))
     )
 
   return(data)

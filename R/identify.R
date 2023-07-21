@@ -1,41 +1,49 @@
 #' Update Patients
 #'
+#' Updating patients status and characteristics
+#'
 #' @name update
 #'
 #' @param patients dataset of lung transplant patients
 #' @param model which model to use for identifying deaths
-#' @param elapsed_time name of variable for elasped time
-#' @param step_size how far back for conditional survival (default is 1 day)
-#' @param pre_tx is deaths pre or post transplant
-#' @param cap cap for suvival estiamte
-#' @param date date
+#' @param elapsed_time name of variable for elapsed time
+#' @param pre_tx is the updating for pre or post transplatn
+#' @param cap cap for survival calculation
+#' @param date current date (numeric)
 #'
 #' @importFrom stats setNames
+#' @importFrom rlang as_label
+#' @importFrom rlang enquo
+#' @importFrom dplyr mutate
+#' @importFrom dplyr filter
 #'
-#' @return A list of candidates who were Alive, Dead, new_char for new characteristics and removed if on waiting list
+#' @return \code{update_patients} returns a list of candidates who were Alive, Dead, new_char for new characteristics and removed if on waiting list
 #' @export
 #'
 #' @examples
-#' identify_deaths(cands, "CAS23", days_on_waitlist, 1, TRUE, 365, 16)
-#' identify_removals(cands, days_on_waitlist, 1, TRUE, 2365, 16)
-#' update_patients(cands, "CAS23r", days_on_waitlist, 1, TRUE, 365, 16)
-update_patients <- function(patients, model = NULL, elapsed_time, step_size, pre_tx = TRUE, cap = NA, date){
+#' identify_deaths(syn_cands, model = "CAS23", elapsed_time = days_on_waitlist,
+#'    pre_tx = TRUE, cap = 365,  date = 16)
+#' identify_removals(syn_cands, elapsed_time =  days_on_waitlist, cap = 2365)
+#' update_patients(syn_cands, model = "CAS23r", elapsed_time =days_on_waitlist,
+#'   pre_tx = TRUE, cap = 365, date = 16)
+update_patients <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE, cap = NA, date){
 
   ## string so one can join by them later
   ela_str <- as_label(enquo(elapsed_time))
 
+  ## The idea behind this step is update patients as they age on the waitlist, will eventually be replaced with update characteristics
   patients <- mutate(patients, age = age_at_listing + (date - listing_day)/365)
   up_patients <- patients
 
   if(pre_tx){
-    removed <- identify_removals(patients, elapsed_time = {{elapsed_time}}, step_size = step_size, cap = 2365)
+    removed <- identify_removals(patients, elapsed_time = {{elapsed_time}}, cap = 2365)
     patients <- filter(patients, !(c_id %in% removed$c_id))
   }else{
     removed <- patients[0,]
   }
 
   ## change this to find_deaths()
-  deaths <- identify_deaths(patients, model = model, elapsed_time = {{elapsed_time}}, step_size = step_size, pre_tx = pre_tx, cap = cap, date = date)
+  deaths <- identify_deaths(patients, model = model, elapsed_time = {{elapsed_time}}, pre_tx = pre_tx, cap = cap, date = date)
 
   dead <- filter(deaths, death == 1)
 
@@ -45,22 +53,23 @@ update_patients <- function(patients, model = NULL, elapsed_time, step_size, pre
 
 }
 
-#'
 #' @importFrom rlang as_label
 #' @importFrom rlang enquo
 #' @importFrom dplyr mutate
 #' @importFrom dplyr left_join
 #' @importFrom dplyr mutate
 #' @importFrom dplyr across
+#' @importFrom dplyr select
 #' @importFrom tidyr contains
 #' @importFrom rlang sym
 #' @importFrom methods is
+#' @importFrom stats setNames
 #'
 #' @name update
 #'
-#' @return a dataset of candidates and whether or not they were removed from the waiting list
+#' @return \code{identify_removals} returns a dataset of candidates and whether or not they were removed from the waiting list (not for being too sick)
 #' @export
-identify_removals <- function(patients, elapsed_time, step_size = 1, cap = NA){
+identify_removals <- function(patients, elapsed_time, cap = NA){
 
   ela_str <- as_label(enquo(elapsed_time))
 
@@ -68,7 +77,7 @@ identify_removals <- function(patients, elapsed_time, step_size = 1, cap = NA){
 
   rl <- select(patients, c_id, dx_grp, {{elapsed_time}}) |>
     mutate(across(contains("days"), ~ifelse(.x > cap, cap, ifelse(.x <0, 0, .x)))) |>
-    mutate(days_ago = {{elapsed_time}} - step_size) |>
+    mutate(days_ago = {{elapsed_time}} - 1) |>
     left_join(rem_rt, by = setNames(c("Days", "dx_grp"), c(ela_str, "dx_grp"))) |>
     left_join(rem_rt, by = c("days_ago" = "Days", "dx_grp" = "dx_grp"), suffix = c("_y", "_x")) |>
     mutate(cond_x = Survival_y/Survival_x,
@@ -83,21 +92,22 @@ identify_removals <- function(patients, elapsed_time, step_size = 1, cap = NA){
 
 #' @name update
 #'
-#' @return a dataset of candidates and whether or not they experienced death on the waitlist
+#' @return \code{identify_deaths} returns a dataset of candidates and whether or not they experienced death or were too sick to transplant while on the waiting list
 #' @export
-identify_deaths <- function(patients, model = NULL, elapsed_time, step_size, pre_tx = TRUE, cap = NA, date){
+identify_deaths <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE, cap = NA, date){
 
   ela_str <- as_label(enquo(elapsed_time))
 
   if(is(model, "coxph")){
+    # stop()
 
-    if(any(str_detect(names(model$xlevels), "strata"))){
-      stop("stratified coxph not supported yet")
-    }
-    surv_rt = create_surv_rates(model, cap = cap) |>
-      rename(Days = time, Survival = surv)
-
-    lp_data <- tibble(c_id = patients$c_id, lp = predict(model, newdata = patients, type = "lp"))
+    # if(any(str_detect(names(model$xlevels), "strata"))){
+    #   stop("stratified coxph not supported yet")
+    # }
+    # surv_rt = create_surv_rates(model, cap = cap) |>
+    #   rename(Days = time, Survival = surv)
+    #
+    # lp_data <- tibble(c_id = patients$c_id, lp = predict(model, newdata = patients, type = "lp"))
 
   }else{
 
@@ -105,11 +115,11 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, step_size, pre
       switch(model,
              CAS23r = {
                surv_rt_rec <- post_tx_cas23_survrates_rec365
-               surv_rt <- post_tx_cas23_survrates
+               surv_rt <- post_tx_cas23_survratesS
                lp_f <- calc_post_tx_cas23
              },
              CAS23 = {
-               surv_rt <- post_tx_cas23_survrates
+               surv_rt <- post_tx_cas23_survratesS
                lp_f <- calc_post_tx_cas23
              },
              LAS15 = {
@@ -148,31 +158,28 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, step_size, pre
 
   lp_val <- sym(colnames(lp_data)[str_which(colnames(lp_data), "c_id", negate = TRUE)])
 
-  # dl <- left_join(lp_data, select(patients, c_id, dx_grp, {{elapsed_time}}), by = "c_id")
   lp_data2 <- lp_data
 
   dl <- left_join(lp_data2, select(patients, c_id, {{elapsed_time}}, dx_grp), by = c("c_id")) |>
     mutate(across(contains("days"), ~ifelse(.x > cap, cap, ifelse(.x <0, 0, .x)))) |>
-    mutate(days_ago = {{elapsed_time}} - step_size) |>
+    mutate(days_ago = {{elapsed_time}} - 1) |>
     left_join(surv_rt, by = setNames("Days", ela_str)) |>
     left_join(surv_rt, by = c("days_ago" = "Days"), suffix = c("_y", "_x")) |>
     mutate(cond_x = (Survival_y^exp(!!lp_val))/(Survival_x^exp(!!lp_val)),
            death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - cond_x)
     )
 
-  if(any(dl[ela_str] > 365)){
+  if(any(dl[ela_str] >= 300)){
 
     if(pre_tx){
 
       dl_max <- left_join(lp_data, select(patients, c_id, {{elapsed_time}}, dx_grp), by = c("c_id")) |>
-        filter({{elapsed_time}} > 365) |>
+        filter({{elapsed_time}} >= 365) |>
         left_join(max_death_day, by = "dx_grp") |>
         mutate(across(contains("days"), ~ifelse(.x > max_days, max_days, ifelse(.x <0, 0, .x)))) |>
         left_join(wl_survpost365, by = setNames(c("Days", "dx_grp"), c(ela_str, "dx_grp"))) |>
-        mutate(days_ago = {{elapsed_time}} - step_size) |>
+        mutate(days_ago = {{elapsed_time}} - 1) |>
         left_join(wl_survpost365, by = c("days_ago" = "Days", "dx_grp"), suffix = c("_y", "_x")) |>
-        # left_join(wl_survpost365, by = setNames("Days", ela_str)) |>
-        # left_join(wl_survpost365, by = c("days_ago" = "Days"), suffix = c("_y", "_x")) |>
         mutate(cond_x = (Survival_y/Survival_x),
                death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - cond_x)
         )
@@ -180,13 +187,12 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, step_size, pre
       dl <- bind_rows(dlr, dl_max)
     }
 
-    ## only if
     if(model == "CAS23r" & !pre_tx){
 
       dl_pre <- left_join(lp_data, select(patients, c_id, {{elapsed_time}}, dx_grp), by = c("c_id")) |>
         mutate(across(contains("days"), ~ifelse(.x > cap, cap, ifelse(.x <0, 0, .x)))) |>
-        mutate(days_ago = {{elapsed_time}} - step_size) |>
-        filter(days_ago <= 363) |>
+        mutate(days_ago = {{elapsed_time}} - 1) |>
+        filter(days_ago <= 298) |>
         left_join(surv_rt_rec, by = setNames("Days", ela_str)) |>
         left_join(surv_rt_rec, by = c("days_ago" = "Days"), suffix = c("_y", "_x")) |>
         mutate(cond_x = (Survival_y^exp(!!lp_val))/(Survival_x^exp(!!lp_val)),
@@ -198,5 +204,7 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, step_size, pre
     }
 
   }
+
   return(dl)
+
 }

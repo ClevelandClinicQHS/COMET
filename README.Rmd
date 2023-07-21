@@ -35,15 +35,15 @@ devtools::install_github("ClevelandClinicQHS/COMET")
 library(COMET)
 ## basic example code
 ## Simulates under LAS rules
-r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+r1 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
-                     wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 367473)
+                     wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
 
 ## Simulates the CAS rules
-r2 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+r2 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
-                     bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1, seed = 367473)
+                     bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1, seed = 26638)
 
 ## You can mix and match systems, change weights
 ## for example simulate the LAS using the CAS models
@@ -66,33 +66,42 @@ eval_simulation(r1, group = dx_grp)
 
 
 ## A further demonstration to show what is going on behind the scenes
-```{r}
+```{r, eval = FALSE}
 ## One major advantage of the simulation is the use of synthetic candidates and donors
 ## All of these rely on bayesian hyperparametric distributions for the candidate and donor characteristics
 syn_cands <- gen_and_spawn_candidates(days = 100)
 
-syn_dons <- gen_and_spawn_donors(days = 2)
+syn_dons <- gen_and_spawn_donors(days = 10)
 ```
 
 ## 
 ```{r}
 ## screening
 ## Screening is done for height, blood type, organ count,
-height_screen(syn_cands, syn_dons)
+hm1 <- height_screen(syn_cands, syn_dons)
+hm1
 ## returns if compabitible for single, double transplant, if a double transplant they will match for double lung
-abo_screen(syn_cands, syn_dons)
+am1 <- abo_screen(syn_cands, syn_dons)
+am1
 ## returns abo_exact abo compatible organs since that is a tie breaker in the LAS
 
 ## Ensure double with double, singles may take a double if only is assigned or either can
-count_screen(syn_cands, syn_dons)
+cm1 <- count_screen(syn_cands, syn_dons)
+cm1
 
 ## Distance calculation 
-las_dist_calc(syn_cands, syn_dons)
-
-## matching
-
+lm1 <- las_dist_calc(syn_cands, syn_dons)
+lm1
 
 ## ranking
+
+lr1 <- calculate_las(syn_cands, wl_model = "LAS15", post_tx_model = "LAS15", wl_cap = 365, post_tx_cap = 365, wl_weight = 2, post_tx_weight = 1) |> dplyr::mutate(ov_rank = rank(-lu_score)) |> dplyr::arrange(ov_rank)
+
+lr1
+
+## matching and offering rank
+las_offer_rank(hm1, am1, cm1, lm1, overall_ranking = lr1)
+cas_offer_rank(hm1, am1, cm1, lm1, overall_ranking = lr1)
 
 ## calculating LAS/CAS scores
 calculate_las(syn_cands, wl_model = "LAS15", post_tx_model = "LAS15", wl_cap = 365, post_tx_cap = 365, wl_weight = 2, post_tx_weight = 1)
@@ -106,11 +115,21 @@ calculate_sub_cas(syn_cands, wl_model = "LAS15", post_tx_model = "LAS15", wl_cap
                   abo_weight = 0.10, height_weight = 0.05, cpra_weight = 0)
 
 ## updating patients
+set.seed(266388)
+update_patients(syn_cands, model = "CAS23", elapsed_time = days_on_waitlist, pre_tx = TRUE, cap = 365, date = 11)
+
+
 
 
 
 ## transplanting
+# set.seed(367473)
 
+mz <- match_las(syn_cands, syn_dons, wl_model = "LAS15", post_tx_model = "LAS15", 
+                wl_cap = 365, post_tx_cap = 365, wl_weight = 2, post_tx_weight = 1)
+mz
+
+transplant_candidates(mz, rec_ids = NA, max_offer = NA)
 ## post-transplant
 ```
 

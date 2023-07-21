@@ -1,6 +1,6 @@
 #' @rdname calc_las
 #'
-#' @param ci cardiac index
+#' @param ci cardiac index (L/min/m<sup>2</sup>)
 #' @param cvp central venous pressure (mmHg)
 #' @param bili_50 bilirubin increase of 50\% (0 or 1)
 #' @param fvc forced vital capapcity (\%)
@@ -113,7 +113,7 @@ calc_wl_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
         )
       +
         case_when(
-          dx %in% c(214, 1608)                        ~  0.6680518055684700, # bronchiectasis
+          dx %in% c(1608)                             ~  0.6680518055684700, # bronchiectasis
           dx %in% c(1500, 1501, 1502, 1548, 1549)     ~ -0.6278657824830000, # eisenmenger's
           dx == 1611                                  ~ -0.3162937838984600, # Lymphangioleiomyomatosis
           dx == 1612                                  ~  0.4453284411081100, # Obliterative bronchiolitis
@@ -221,7 +221,7 @@ calc_post_tx_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         # ## specific diagnoses
         case_when(
-          dx %in% c(214, 1608)                        ~  0.1889100379099400, # bronchiectasis
+          dx %in% c(1608)                             ~  0.1889100379099400, # bronchiectasis
           dx %in% c(1500, 1501, 1502, 1548, 1549)     ~  0.9146727886744700, # eisenmenger's
           dx == 1611                                  ~ -1.5194416206749400, # Lymphangioleiomyomatosis
           dx == 1612                                  ~ -1.2050508750702600, # Obliterative bronchiolitis

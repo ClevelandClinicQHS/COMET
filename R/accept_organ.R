@@ -10,8 +10,14 @@
 #' @importFrom dplyr mutate
 #' @importFrom stats rbinom
 #' @importFrom stats model.matrix
+#' @importFrom stats plogis
 #'
 #' @return matched_data with acceptance probabilities
+#' @export
+#'
+#' @examples
+#' dplyr::mutate(syn_matches, offer_rank = rank(-lu_score), .by = d_id) |>
+#'  acceptance_prob(dons = syn_dons, cands = syn_cands)
 acceptance_prob <- function(matched_data, dons, cands){
 
   can_need <- select(cands, c_id, center) |>
@@ -26,7 +32,7 @@ acceptance_prob <- function(matched_data, dons, cands){
 
   mm <- model.matrix(~splines::bs(offer_rank, knots = seq(10, 100, 10)) + center2 + don_dcd + smoke_hist + age_55, data = mz1) %*% accpt_coef
 
-  odds <- inv_log(mm)
+  odds <- plogis(mm)
 
   probs <- mutate(matched_data,
                   pred = odds[, 1],

@@ -7,10 +7,7 @@
 run_simulation(
   days,
   can_start = 1250,
-  waitlist_update_freq = 1,
-  post_tx_update_freq = 1,
   match_alg = match_cas(),
-  extra_days = 0,
   ...,
   seed = NULL,
   desired = "random",
@@ -23,13 +20,7 @@ run_simulation(
 
 \item{can_start}{number of candidates to start on the waitlist, they will be randomly selected to be mor listing day, all of these candidates will have a negative c_id and listing_day}
 
-\item{waitlist_update_freq}{how often to update waitlist patients}
-
-\item{post_tx_update_freq}{how often to update post_tx patients}
-
 \item{match_alg}{function of how to screen and match individuals}
-
-\item{extra_days}{how many days to simulate deaths}
 
 \item{...}{arguments for match_alg}
 
@@ -48,12 +39,13 @@ list of full donors and candidates simluated at beginning and final datasets, wh
 Run Simulation
 }
 \examples{
-
-r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+\dontrun{
+r1 <- run_simulation(days = 20, can_start = 1000,
  match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
   wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
-r2 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+r2 <- run_simulation(days = 20, can_start = 1000,
  match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
  wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
  bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
+ }
 }

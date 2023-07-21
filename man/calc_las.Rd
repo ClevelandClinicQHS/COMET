@@ -121,7 +121,7 @@ calc_post_tx_las21(
 \arguments{
 \item{data}{dataset of patient data}
 
-\item{c_id}{candidate id}
+\item{c_id}{unique candidate id}
 
 \item{dx_grp}{diagnosis group (A, B, C, or D)}
 
@@ -143,7 +143,7 @@ calc_post_tx_las21(
 
 \item{pco2}{\out{pco<sub>2</sub> (mmHG)}}
 
-\item{pco2_15}{\out{pco<sub>2</sub> increase by at least 15\% threshold (0 or 1)}}
+\item{pco2_15}{\out{pco<sub>2</sub> increase by at least 15\% threshold (0 or 1(TRUE))}}
 
 \item{cont_mech}{continuous mechangical ventilation (0 or 1)}
 
@@ -153,7 +153,7 @@ calc_post_tx_las21(
 
 \item{ecmo}{ECMO (0 or 1)}
 
-\item{ci}{cardiac index}
+\item{ci}{cardiac index (L/min/m<sup>2</sup>)}
 
 \item{cvp}{central venous pressure (mmHg)}
 
@@ -174,12 +174,13 @@ Calculate LAS/CAS Linear Predictors
 \details{
 Numeric Diagnosis Options
 \itemize{
-\item 214,1608: bronchiestais
+\item 1608: bronchiestais
 \item 1605:  sarcoidosis
 \item 1519,1613: pulmonary fibrosis (non-idiopathetic),
 \item 1611: lymphangioleiomyomatosis
 \item 1612: Obliterative bronchiolitis
 \item 1500,1501,1502,1548,1549: eisenmenger's
+\item 1617: COVID caused fibrosis
 }
 }
 \examples{

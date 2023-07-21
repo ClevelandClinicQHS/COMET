@@ -2,7 +2,7 @@
 % Please edit documentation in R/LAS.R
 \name{calculate_las}
 \alias{calculate_las}
-\title{Calcualate LAS scores}
+\title{Calculate LAS scores}
 \usage{
 calculate_las(
   wl_data,
@@ -18,9 +18,9 @@ calculate_las(
 \arguments{
 \item{wl_data}{data to calculate las}
 
-\item{wl_model}{"LAS15","LAS21", "CAS23" or own coxph model for waitlist  (in days)}
+\item{wl_model}{which waitlist model to use. Options are "LAS15","LAS21", "CAS23"}
 
-\item{post_tx_model}{"LAS15","LAS21", "CAS23" or own coxph model for post-transplant mortality (in days)}
+\item{post_tx_model}{which post transplant model to use. Options are"LAS15","LAS21", "CAS23"}
 
 \item{wl_cap}{cap of waitlist survival}
 
@@ -30,15 +30,16 @@ calculate_las(
 
 \item{post_tx_weight}{relative weight of post-transplant mortality}
 
-\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
+\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every day the simulation is iterated}
 }
 \value{
-a dataset of candidates and their LAS score on a 0 to 1 scale. To get LAS/CAS score simply multiply by 100.
+a dataset of candidates and their LAS score on a 0 to 1 scale and linear predictors for waitlist and post-transplant components.
+To get LAS/CAS score simply multiply by 100.
 }
 \description{
-Calcualate LAS scores
+Calculate LAS scores
 }
 \examples{
-calculate_las(cands, wl_model = "LAS21", post_tx_model = "LAS21", wl_cap = 365, post_tx_cap = 365,
-wl_weigth = 2, post_tx_weight = 1)
+calculate_las(syn_cands, wl_model = "LAS21", post_tx_model = "LAS21",
+ wl_cap = 365, post_tx_cap = 365, wl_weight = 2, post_tx_weight = 1)
 }

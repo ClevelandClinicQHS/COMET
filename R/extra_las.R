@@ -1,8 +1,33 @@
-#' Get Survival Data
-#' @rdname get_surv_data
-#' @param object a survfit object
+#' Get Survival Data from coxph and survfit object
+#'
+#' @param object either a survfit or coxph object
+#' @param ... other arguments depending on class
+#'
+#' @return a data.frame of survival times from a survfit of coxph
 #' @export
-get_surv_data.survfit <- function(object){
+#'
+#' @rdname get_surv_data
+#'
+#' @examples
+#' # Create the simplest test data set
+#' ## same example from survival package
+#' test1 <- list(time=c(4,3,1,1,2,2,3),
+#'             status=c(1,1,1,0,1,1,0),
+#'            x=c(0,2,1,1,1,0,0),
+#'            sex=c(0,0,0,0,1,1,1))
+#' # Fit a stratified model
+#' c1 <- survival::coxph(survival::Surv(time, status) ~ x + survival::
+#' strata(sex), test1)
+#' km1 <- survival::survfit(survival::Surv(time, status) ~ 1, test1)
+#' get_surv_data(c1)
+#' get_surv_data(km1)
+get_surv_data <- function(object, ...){
+  UseMethod("get_surv_data")
+}
+
+#' @name get_surv_data
+#' @export
+get_surv_data.survfit <- function(object, ...){
   s1 <- summary(object)
   df <- data.frame(time = s1$time, surv = s1$surv, std.err = s1$std.err,
                    lower = s1$lower, upper = s1$upper, n.risk = s1$n.risk,
@@ -13,9 +38,8 @@ get_surv_data.survfit <- function(object){
   }
   return(df)
 }
-#' @rdname get_surv_data
-#' @param object an survival object
-#' @param ... other arguments for survfit.coxph
+
+#' @name get_surv_data
 #' @export
 get_surv_data.coxph <- function(object, ...){
   object1 <- survival::survfit(object, ...)
@@ -31,30 +55,6 @@ get_surv_data.coxph <- function(object, ...){
   return(df)
 }
 
-#' Get Survival Data from coxph and survfit object
-#'
-#' @param object either a survfit or coxph object
-#' @param ... other arguments depending on class
-#'
-#' @return a data.frame of survival times from a survfit of coxph
-#' @export
-#'
-#' @examples
-#' # Create the simplest test data set
-#' ## same example from survival package
-#' test1 <- list(time=c(4,3,1,1,2,2,3),
-#'             status=c(1,1,1,0,1,1,0),
-#'            x=c(0,2,1,1,1,0,0),
-#'            sex=c(0,0,0,0,1,1,1))
-#' # Fit a stratified model
-#' c1 <- coxph(Surv(time, status) ~ x + strata(sex), test1)
-#' km1 <- survfit(Surv(time, status) ~ 1, test1)
-#' get_surv_data(c1)
-#' get_surv_data(km1)
-get_surv_data <- function(object, ...){
-  UseMethod("get_surv_data")
-}
-
 #' Creating complete survival estimates
 #'
 #' expand and fill in the data.frame from start to finish. No more missing days
@@ -62,7 +62,6 @@ get_surv_data <- function(object, ...){
 #' @param object either survift or coxph object
 #' @param cap if you want survival capped at any timepoint, default is max of data
 #' @param ignore ignore warnings or not
-#'
 #'
 #' @importFrom dplyr sym
 #' @importFrom dplyr ungroup
@@ -76,9 +75,9 @@ get_surv_data <- function(object, ...){
 #' @importFrom tidyr fill
 #' @importFrom tidyr complete
 #' @importFrom dplyr any_of
+#' @importFrom dplyr .data
 #'
 #' @return a complete dataset of survival estimates and time
-#' @export
 create_surv_rates <- function(object, cap = NA, ignore = FALSE){
   dW <- getOption("warn")
 
@@ -133,7 +132,7 @@ create_surv_rates <- function(object, cap = NA, ignore = FALSE){
 #' @name trunc_days
 #'
 #' @examples
-#' trunc_days("LAS21", cands, 365, TRUE)
+#' trunc_days("LAS21", syn_cands, 365, TRUE)
 trunc_days <- function(object, ...){
   UseMethod("trunc_days")
 }
@@ -144,6 +143,15 @@ trunc_days <- function(object, ...){
 #' @param cand_data candidate data
 #' @param cap cap for truncation survival
 #' @param wl boolean for waitlist or not
+#'
+#' @importFrom dplyr select
+#' @importFrom stats predict
+#' @importFrom dplyr mutate
+#' @importFrom dplyr nest_by
+#' @importFrom dplyr left_join
+#' @importFrom tidyr unnest
+#' @importFrom dplyr ungroup
+#' @importFrom dplyr arrange
 #'
 #' @rdname trunc_days
 trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE, ...){
@@ -176,6 +184,8 @@ trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE, ...){
 
 #' @param wl TRUE (waitlist) or FALSE (post_transplant)
 #' @rdname trunc_days
+#' @importFrom dplyr filter
+#' @importFrom dplyr mutate
 #' @export
 trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE, ...){
 
@@ -214,9 +224,9 @@ trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE, ...){
 
   if(is.na(cap)){cap <- max(surv$Days)}
 
-  surv <- filter(surv, Days <= cap)
+  surv <- filter(surv, .data$Days <= cap)
   surv1 <- f1(cand_data) |>
-    mutate(expected = mean_survival(lp, surv$Survival))
+    mutate(expected = mean_survival(.data$lp, surv$Survival))
   return(surv1)
 }
 

@@ -30,5 +30,5 @@ a dateset of candidates, linear predictor and mean survival
 Truncated Survival days
 }
 \examples{
-trunc_days("LAS21", cands, 365, TRUE)
+trunc_days("LAS21", syn_cands, 365, TRUE)
 }

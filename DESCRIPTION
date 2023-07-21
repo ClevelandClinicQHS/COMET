@@ -1,12 +1,12 @@
 Package: COMET
 Type: Package
 Title: Computational Open-source Model for Transplantation 'COMET'
-Version: 0.0.0.9103
+Version: 0.0.0.9104
 Authors@R: c(person("Gunsalus", "Paul", email = "gunsalp@ccf.org", role = c("aut","cre"), comment = c(ORCID = "0000-0001-6976-9094")),
              person("Swiler", "Mark", email = "swilerm@ccf.org", role = "ctb", comment = c(ORCID = "0000-0001-7070-671X")),
              person("Rose", "Johnie", email = "rosej15@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-7458-9303")),
              person("Dalton", "Jarrod", email = "daltonj@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-8336-1212")))
-Description: Provides an open source simulation to model the united states lung allocation process within synthetic candidate and donor populations
+Description: COMET provides an open source simulation to model the united states lung allocation process within synthetic candidate and donor populations.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -20,9 +20,7 @@ Imports:
     dplyr (>= 1.1.0),
     stringr,
     Rcpp,
-    RcppEigen,
     splines,
-    magrittr,
     sn, 
     survival,
     plyr,

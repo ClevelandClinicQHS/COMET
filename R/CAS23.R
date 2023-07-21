@@ -3,7 +3,7 @@
 #' @name calc_las
 #'
 #' @param data dataset of patient data
-#' @param c_id candidate id
+#' @param c_id unique candidate id
 #' @param dx_grp diagnosis group (A, B, C, or D)
 #' @param dx diagnosis (numeric, see details for ones in LAS/CAS)
 #' @param age age in years
@@ -14,7 +14,7 @@
 #' @param pap_syst systolic pulmonary artery pressure (mmHg)
 #' @param pap_mean mean pulmonary artery pressure (mmHg)
 #' @param pco2 \out{pco<sub>2</sub> (mmHG)}
-#' @param pco2_15 \out{pco<sub>2</sub> increase by at least 15\% threshold (0 or 1)}
+#' @param pco2_15 \out{pco<sub>2</sub> increase by at least 15\% threshold (0 or 1(TRUE))}
 #' @param cont_mech continuous mechangical ventilation (0 or 1)
 #' @param creat creatinine (mg/dL)
 #' @param bili bilirubin (mg/dL)
@@ -23,12 +23,13 @@
 #' @return a dataset with c_id and linear predictor for waitlist or post-transplant linear predictor according to LAS/CAS equations
 #'
 #' @details Numeric Diagnosis Options
-#' * 214,1608: bronchiestais
+#' * 1608: bronchiestais
 #' * 1605:  sarcoidosis
 #' * 1519,1613: pulmonary fibrosis (non-idiopathetic),
 #' * 1611: lymphangioleiomyomatosis
 #' * 1612: Obliterative bronchiolitis
 #' * 1500,1501,1502,1548,1549: eisenmenger's
+#' * 1617: COVID caused fibrosis
 #' @md
 #'
 #' @export
@@ -117,10 +118,6 @@ calc_wl_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
       +
         ## specific diagnoses
         case_when(
-          # dx %in% c(214, 1608)                        ~  0.40107198445555, # bronchiectasis
-          # dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.64590852776042, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          # dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  1.39885489102977, # sarcoidosis w/ PAP <= 30mmHg (group A)
-          # dx %in% c(1519, 1613)                       ~ 0.2088684500011, # pulmonary Fibrosis, not idiopathic:
           dx == 1608                                  ~  0.40107198445555, # bronchiectasis
           dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.64590852776042, # sarcoidosis w/ PAP  > 30mmHg (group D)
           dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  1.39885489102977, # sarcoidosis w/ PAP <= 30mmHg (group A)

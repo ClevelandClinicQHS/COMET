@@ -11,19 +11,17 @@ update_patients(
   patients,
   model = NULL,
   elapsed_time,
-  step_size,
   pre_tx = TRUE,
   cap = NA,
   date
 )
 
-identify_removals(patients, elapsed_time, step_size = 1, cap = NA)
+identify_removals(patients, elapsed_time, cap = NA)
 
 identify_deaths(
   patients,
   model = NULL,
   elapsed_time,
-  step_size,
   pre_tx = TRUE,
   cap = NA,
   date
@@ -34,28 +32,28 @@ identify_deaths(
 
 \item{model}{which model to use for identifying deaths}
 
-\item{elapsed_time}{name of variable for elasped time}
+\item{elapsed_time}{name of variable for elapsed time}
 
-\item{step_size}{how far back for conditional survival (default is 1 day)}
+\item{pre_tx}{is the updating for pre or post transplatn}
 
-\item{pre_tx}{is deaths pre or post transplant}
+\item{cap}{cap for survival calculation}
 
-\item{cap}{cap for suvival estiamte}
-
-\item{date}{date}
+\item{date}{current date (numeric)}
 }
 \value{
-A list of candidates who were Alive, Dead, new_char for new characteristics and removed if on waiting list
+\code{update_patients} returns a list of candidates who were Alive, Dead, new_char for new characteristics and removed if on waiting list
 
-a dataset of candidates and whether or not they were removed from the waiting list
+\code{identify_removals} returns a dataset of candidates and whether or not they were removed from the waiting list (not for being too sick)
 
-a dataset of candidates and whether or not they experienced death on the waitlist
+\code{identify_deaths} returns a dataset of candidates and whether or not they experienced death or were too sick to transplant while on the waiting list
 }
 \description{
-Update Patients
+Updating patients status and characteristics
 }
 \examples{
-identify_deaths(cands, "CAS23", days_on_waitlist, 1, TRUE, 365, 16)
-identify_removals(cands, days_on_waitlist, 1, TRUE, 2365, 16)
-update_patients(cands, "CAS23r", days_on_waitlist, 1, TRUE, 365, 16)
+identify_deaths(syn_cands, model = "CAS23", elapsed_time = days_on_waitlist,
+   pre_tx = TRUE, cap = 365,  date = 16)
+identify_removals(syn_cands, elapsed_time =  days_on_waitlist, cap = 2365)
+update_patients(syn_cands, model = "CAS23r", elapsed_time =days_on_waitlist,
+  pre_tx = TRUE, cap = 365, date = 16)
 }
