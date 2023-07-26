@@ -33,7 +33,7 @@ run_simulation(
 \item{include_matches}{TRUE or FALSE, whether or not the include the donor and candidates matches}
 }
 \value{
-list of full donors and candidates simluated at beginning and final datasets, who's left on waitlist, transplanted, death on both and discarded donors
+list of full donors and candidates simluated at beginning and final datasets, who's left on waitlist, transplanted, death on both and non utililized donors
 }
 \description{
 Run Simulation

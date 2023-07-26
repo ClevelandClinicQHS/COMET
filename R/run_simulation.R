@@ -12,7 +12,7 @@
 #' @importFrom stats rgamma
 #' @importFrom utils head
 #'
-#' @return list of full donors and candidates simluated at beginning and final datasets, who's left on waitlist, transplanted, death on both and discarded donors
+#' @return list of full donors and candidates simluated at beginning and final datasets, who's left on waitlist, transplanted, death on both and non utililized donors
 #' @export
 #'
 #' @examples
@@ -114,10 +114,10 @@ run_simulation <- function(days, can_start = 1250,
     dplyr::filter(c_id == -Inf) |>
     dplyr::mutate(transplant_day = NA_real_, d_id = NA_real_, death_day = NA_real_)
 
-  discarded_donors <- dl |>
+  non_used_donors <- dl |>
     dplyr::filter(d_id == -Inf) |>
     dplyr::select(d_id) |>
-    dplyr::mutate(discard_day = NA_real_, offers = NA_integer_)
+    dplyr::mutate(non_used_day = NA_real_, offers = NA_integer_)
 
   all_matches <- match_f(cands = old_candidates, dons = head(dl, 5), ...) |>
     dplyr::filter(d_id == -Inf)
@@ -127,7 +127,7 @@ run_simulation <- function(days, can_start = 1250,
     recipient_database = recipient_d,
     waitlist_death_database = waitlist_death_d,
     post_tx_death_database = post_tx_death_d,
-    discarded_donors = discarded_donors,
+    non_used_donors = non_used_donors,
     all_matches = all_matches
   )
 

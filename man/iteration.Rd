@@ -17,12 +17,12 @@ iteration(
 \arguments{
 \item{date}{current date to simulate}
 
-\item{candidate_database}{full candidate database, from initiialization}
+\item{candidate_database}{full candidate database, from initialization}
 
-\item{donor_database}{full candidate database, from initiialization}
+\item{donor_database}{full candidate database, from initialization}
 
 \item{include_matches}{TRUE or FALSE, whether or not the include the donor and candidates matches
-current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, discarded_donors}
+current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, non_used_donors}
 
 \item{updated_list}{named list of databases that updated at each time point, originally all empty, \cr}
 
@@ -31,7 +31,7 @@ current_candidates, waitlist_death_database, recipient_database, and post_tx_dea
 \item{...}{arguemnts for match algorithm}
 }
 \value{
-a named list of databases that updated at each time point, originally all empty, current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, discarded_donors
+a named list of databases that updated at each time point, originally all empty, current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, non_used_donors
 }
 \description{
 Iteration

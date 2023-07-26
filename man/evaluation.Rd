@@ -86,8 +86,8 @@ Data dictionary for \code{eval_simulation()}
 \item{med_offer}{ - median offer rank of those who were transplanted}
 \item{don_count}{ - total number of donors}
 \item{don_util}{ - number of donor utilized}
-\item{d_med_offer}{ - median times a donor was offered if not utilized}
-\item{d_orgs}{ - number of organs not utilized}
+\item{nu_med_offer}{ - median times a donor was offered if not utilized}
+\item{nu_orgs}{ - number of organs not utilized}
 }
 }
 \examples{

@@ -1,20 +1,19 @@
 #' Iteration
 #'
 #' @param date current date to simulate
-#' @param candidate_database full candidate database, from initiialization
-#' @param donor_database full candidate database, from initiialization
+#' @param candidate_database full candidate database, from initialization
+#' @param donor_database full candidate database, from initialization
 #' @param updated_list named list of databases that updated at each time point, originally all empty, \cr
 #' @param include_matches TRUE or FALSE, whether or not the include the donor and candidates matches
-#'  current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, discarded_donors
+#'  current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, non_used_donors
 #' @param match_alg function for matching
 #' @param ... arguemnts for match algorithm
 #'
-#' @return a named list of databases that updated at each time point, originally all empty, current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, discarded_donors
+#' @return a named list of databases that updated at each time point, originally all empty, current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, non_used_donors
 #' @export
 #'
 #' @importFrom dplyr filter
 #' @importFrom dplyr bind_rows
-#' @importFrom dplyr bind_cols
 #' @importFrom dplyr anti_join
 #' @importFrom dplyr select
 #' @importFrom stats na.omit
@@ -39,7 +38,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
   recipient_database <- updated_list$recipient_database
   waitlist_death_database <- updated_list$waitlist_death_database
   post_tx_death_database <- updated_list$post_tx_death_database
-  discarded_donors <- updated_list$discarded_donors
+  non_used_donors <- updated_list$non_used_donors
   all_matches <- updated_list$all_matches
 
   current_candidates <- mutate(current_candidates, days_on_waitlist = date - listing_day)
@@ -50,10 +49,10 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
 
   if(nrow(can_up) > 0){
     ## updated patients right now just calculates LAS Conditional Survival and die and ages patients
-    updated_wl_candidates <- update_patients(patients = can_up, model = "CAS23r", elapsed_time = days_on_waitlist, pre_tx = TRUE,
-                                               cap = 730, date = date)
-    # updated_wl_candidates <- update_patients(patients = can_up, model = "CAS23", elapsed_time = days_on_waitlist, pre_tx = TRUE,
-    #                                           cap = 365, date = date)
+    updated_wl_candidates <- update_patients(patients = can_up, model = "CAS23r", elapsed_time = days_on_waitlist,
+                                             pre_tx = TRUE, cap = 730, date = date)
+    # updated_wl_candidates <- update_patients(patients = can_up, model = "CAS23", elapsed_time = days_on_waitlist,
+    #                                           pre_tx = TRUE, cap = 365, date = date)
 
     can_up <- updated_wl_candidates$new_char
 
@@ -137,7 +136,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
               recipient_database = recipient_database,
               waitlist_death_database = waitlist_death_database,
               post_tx_death_database = post_tx_death_database,
-              discarded_donors = discarded_donors,
+              non_used_donors = non_used_donors,
               all_matches = all_matches
     )
     return(l)
@@ -157,7 +156,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
               recipient_database = recipient_database,
               waitlist_death_database = waitlist_death_database,
               post_tx_death_database = post_tx_death_database,
-              discarded_donors = discarded_donors,
+              non_used_donors = non_used_donors,
               all_matches = all_matches
     )
     return(l)
@@ -175,7 +174,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
               recipient_database = recipient_database,
               waitlist_death_database = waitlist_death_database,
               post_tx_death_database = post_tx_death_database,
-              discarded_donors = discarded_donors,
+              non_used_donors = non_used_donors,
               all_matches = all_matches
     )
     return(l)
@@ -195,10 +194,10 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
     tidyr::complete(d_id = min(donors_avl$d_id):max(donors_avl$d_id), fill = list(organs_rec = 0))
 
   dead_donors <- left_join(donors_avl, tr_x, by = c("d_id")) |>
-    mutate(organs_discard = organs_avl - organs_rec) |>
-    filter(organs_discard > 0 |is.na(organs_discard)) |>
-    select(d_id, don_org, organs_discard) |>
-    mutate(discard_day = date) |>
+    mutate(organs_non_used = organs_avl - organs_rec) |>
+    filter(organs_non_used > 0 |is.na(organs_non_used)) |>
+    select(d_id, don_org, organs_non_used) |>
+    mutate(non_used_day = date) |>
     left_join(matches, by = c("d_id", "don_org")) |>
     mutate(offers = sapply(data, nrow)) |>
     select(-data)
@@ -214,7 +213,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
   }
 
   ## adds them to the database
-  discarded_donors <- bind_rows(discarded_donors, dead_donors)
+  non_used_donors <- bind_rows(non_used_donors, dead_donors)
 
   ## moves the patients from waitlist to transplanted and matches them to their actual donor
   new_recipients <- alive |>
@@ -241,7 +240,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
             waitlist_death_database = waitlist_death_database,
             recipient_database = recipient_database,
             post_tx_death_database = post_tx_death_database,
-            discarded_donors = discarded_donors,
+            non_used_donors = non_used_donors,
             all_matches = all_matches
 
   )

@@ -31,15 +31,6 @@ calculate_las <- function(wl_data, wl_model = NULL, post_tx_model = NULL,  wl_ca
                           wl_weight = NA, post_tx_weight = NA, checks = TRUE){
 
   if(checks){
-    checkmate::assert(
-      checkmate::checkClass(post_tx_model, "coxph"),
-      checkmate::checkChoice(post_tx_model, c("LAS15","LAS21", "CAS23"))
-    )
-
-    checkmate::assert(
-      checkmate::checkClass(wl_model, "coxph"),
-      checkmate::checkChoice(wl_model, c("LAS15","LAS21", "CAS23"))
-    )
 
     if((!is.character(wl_model) & !is(wl_model, "coxph"))){
       stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")

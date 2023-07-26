@@ -31,6 +31,7 @@
 #' @importFrom dplyr filter
 #' @importFrom dplyr join_by
 #' @importFrom dplyr arrange
+#' @importFrom rlang .data
 #'
 #' @examples
 #' ## The functions will use the internal cands and dons stored in the package
@@ -52,16 +53,17 @@ height_screen <- function(cands, dons){
 
   cand_x <- left_join(cands, single_rg, by = "dx_grp") |>
     left_join(double_rg, by = "dx_grp") |>
-    mutate(s_lower = hgt_in + s_lower,
-           s_upper = hgt_in + s_upper,
-           d_lower = hgt_in + d_lower,
-           d_upper = hgt_in + d_upper) |>
-    rename(hgt_in_c = hgt_in)
+    ## The .data$ are here so satisfy CRAN and prevent other bugs
+    mutate(s_lower = .data$hgt_in + .data$s_lower,
+           s_upper = .data$hgt_in + .data$s_upper,
+           d_lower = .data$hgt_in + .data$d_lower,
+           d_upper = .data$hgt_in + .data$d_upper) |>
+    rename(hgt_in_c = .data$hgt_in)
 
-  don_x <- select(dons, d_id, hgt_in_d = hgt_in, don_org)
+  don_x <- select(dons, .data$d_id, hgt_in_d = .data$hgt_in, .data$don_org)
 
-  s_match <- inner_join(don_x, cand_x, by = join_by(between(hgt_in_d, s_lower, s_upper)))
-  d_match <- inner_join(don_x, cand_x, by = join_by(between(hgt_in_d, d_lower, d_upper)))
+  s_match <- inner_join(don_x, cand_x, by = join_by(between(x$hgt_in_d, y$s_lower, y$s_upper)))
+  d_match <- inner_join(don_x, cand_x, by = join_by(between(x$hgt_in_d, y$d_lower, y$d_upper)))
 
   # s_match <- inner_join(cand_x, don_x, by = join_by(between(hgt_in_d, s_lower, s_upper)))
   # d_match <- inner_join(cand_x, don_x, by = join_by(between(hgt_in_d, d_lower, d_upper)))
@@ -69,13 +71,13 @@ height_screen <- function(cands, dons){
   ## Just as a checker
   height_match <- bind_rows(s_match, d_match) |>
     distinct(c_id, d_id, .keep_all = TRUE) |>
-    mutate(match_single = between(hgt_in_d, s_lower, s_upper),
-           match_double = between(hgt_in_d, d_lower, d_upper)) |>
+    mutate(match_single = between(hgt_in_d, .data$s_lower, .data$s_upper),
+           match_double = between(hgt_in_d, .data$d_lower, .data$d_upper)) |>
     ## if one only one lung must match a single
-    filter(don_org == "DLU" |(match_single & don_org %in% c("LUL", "LUR"))) |>
+    filter(.data$don_org == "DLU" |(.data$match_single & .data$don_org %in% c("LUL", "LUR"))) |>
     ## if the candidate is only a double transplant, make sure they match with double lungs
-    filter(!(!match_double & surg_type == "D")) |>
-    select(c_id, d_id, match_single, match_double) |>
+    filter(!(!.data$match_double & .data$surg_type == "D")) |>
+    select(.data$c_id, .data$d_id, .data$match_single, .data$match_double) |>
     arrange(c_id, d_id)
 
     return(height_match)
@@ -90,9 +92,9 @@ abo_screen <- function(cands, dons){
 
   don_x <- inner_join(dons, abo_match_df, by = "abo", multiple = "all")
 
-  abo_match <- inner_join(cands, don_x, by = join_by(abo == match), multiple = "all") |>
-    mutate(abo_exact = (abo == abo.y)) |>
-    select(c_id, d_id, abo_exact)
+  abo_match <- inner_join(cands, don_x, by = c("abo" = "match"), multiple = "all") |>
+    mutate(abo_exact = (.data$abo == .data$abo.y)) |>
+    select(.data$c_id, .data$d_id, .data$abo_exact)
 
   return(abo_match)
 }
@@ -118,7 +120,7 @@ count_screen <- function(cands, dons){
   don_x <- inner_join(dons, count_match_df, by = "don_org", relationship = "many-to-many")
 
   count_match <- inner_join(cands, don_x, by = join_by(surg_type == match), relationship = "many-to-many") |>
-    select(c_id, d_id)
+    select(.data$c_id, .data$d_id)
 
   return(count_match)
 

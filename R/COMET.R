@@ -1,22 +1,10 @@
-#' COMET
+#' COMET-package
 #'
-#' @section Initialization components:
-#' \itemize{
-#' \item \code{\link{gen_and_spawn_candidates}}
-#' \item \code{\link{gen_and_spawn_donors}}
-#'}
+#' The COMET package provides a open source framework to simulate the lung allocation system of the United States.
 #'
-#' @section Iterative components:
-#' \itemize{
-#' \item \code{\link{transplant_candidates}}
-#' \item \code{\link{update_patients}}
-#' \item \code{\link{match_cas}}
-#'}
-#' @section Families:
-#' In addition to the partition of the simulation into initialization and iterative aspects,
-#' functions generally track either only candidates, only donors, or both candidates and donors, so
-#' allow for package description in this manner.  This allows for families of functions to be classified by the
-#' primary agents they manipulate.
+#'
+#' @section Funding:
+#' This project was funded by the National Heart, Lung, and Blood Institute of the National Institutes of Health (R01HL153175). The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
 #'
 #' @docType package
 #' @name COMET

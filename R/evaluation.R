@@ -32,8 +32,8 @@
 #' \item{med_offer}{ - median offer rank of those who were transplanted}
 #' \item{don_count}{ - total number of donors}
 #' \item{don_util}{ - number of donor utilized}
-#' \item{d_med_offer}{ - median times a donor was offered if not utilized}
-#' \item{d_orgs}{ - number of organs not utilized}
+#' \item{nu_med_offer}{ - median times a donor was offered if not utilized}
+#' \item{nu_orgs}{ - number of organs not utilized}
 #' }
 #'
 #' @export
@@ -54,15 +54,15 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
   ct <- concat2(COMET, min_enroll_date = min_enroll_date, max_enroll_date = max_enroll_date,
                 wl_censor_date = wl_censor_date, post_tx_censor_date = post_tx_censor_date)
 
-  dd <- COMET$discarded_donors
+  dd <- COMET$non_used_donors
 
-  dd1 <- dplyr::filter(dd, don_org == "DLU" & organs_discard == 1) |>
+  dd1 <- dplyr::filter(dd, don_org == "DLU" & organs_non_used == 1) |>
     dplyr::left_join(select(ct, d_id, offer_rank), by = c("d_id")) |>
     dplyr::mutate(offers = offers - offer_rank) |>
     dplyr::select(-offer_rank) |>
     dplyr::bind_rows(dd)
 
-  dd1 <- dplyr::summarise(dd1, d_med_offer = median(offers, na.rm = TRUE), d_orgs = sum(organs_discard))
+  dd1 <- dplyr::summarise(dd1, nu_med_offer = median(offers, na.rm = TRUE), nu_orgs = sum(organs_non_used))
 
   don_stats <- dplyr::summarise(COMET$all_donors, don_count = dplyr::n(), don_util = sum(don_util))
 

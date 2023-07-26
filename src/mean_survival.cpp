@@ -3,7 +3,7 @@ using namespace Rcpp;
 
 //' Mean Survival
 //'
-//' This function calculates mean survival
+//' Calculates mean survival
 //'
 //' @param lp vector of linear predictors
 //' @param surv_rates vector of survival times

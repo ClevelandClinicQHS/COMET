@@ -12,7 +12,7 @@ mean_survival(lp, surv_rates)
 \item{surv_rates}{vector of survival times}
 }
 \description{
-This function calculates mean survival
+Calculates mean survival
 }
 \examples{
 lps <- c(0, 1, -.5)
