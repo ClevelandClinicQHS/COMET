@@ -64,11 +64,11 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
     if(is.na(bio_weight3)){
       stop("cpra_weight is missing")
     }
-    if((!is.character(wl_model) & !is(wl_model, "coxph"))){
-      stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
+    if(!is.character(wl_model)){
+      stop("\"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
     }
-    if((!is.character(post_tx_model) & !is(post_tx_model, "coxph"))){
-      stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
+    if((!is.character(post_tx_model))){
+      stop("\"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
     }
   }
 

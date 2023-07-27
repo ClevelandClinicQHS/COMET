@@ -98,61 +98,48 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE,
 
   ela_str <- as_label(enquo(elapsed_time))
 
-  if(is(model, "coxph")){
-    # stop()
-
-    # if(any(str_detect(names(model$xlevels), "strata"))){
-    #   stop("stratified coxph not supported yet")
-    # }
-    # surv_rt = create_surv_rates(model, cap = cap) |>
-    #   rename(Days = time, Survival = surv)
-    #
-    # lp_data <- tibble(c_id = patients$c_id, lp = predict(model, newdata = patients, type = "lp"))
-
+  if(!pre_tx){
+    switch(model,
+           CAS23r = {
+             surv_rt_rec <- post_tx_cas23_survrates_rec365
+             surv_rt <- post_tx_cas23_survratesS
+             lp_f <- calc_post_tx_cas23
+           },
+           CAS23 = {
+             surv_rt <- post_tx_cas23_survratesS
+             lp_f <- calc_post_tx_cas23
+           },
+           LAS15 = {
+             surv_rt <- post_tx_las15_survrates[-2,]
+             lp_f <- calc_post_tx_las15
+           },
+           LAS21 = {
+             surv_rt <- post_tx_las21_survrates
+             lp_f <- calc_post_tx_las21
+           }
+    )
   }else{
-
-    if(!pre_tx){
-      switch(model,
-             CAS23r = {
-               surv_rt_rec <- post_tx_cas23_survrates_rec365
-               surv_rt <- post_tx_cas23_survratesS
-               lp_f <- calc_post_tx_cas23
-             },
-             CAS23 = {
-               surv_rt <- post_tx_cas23_survratesS
-               lp_f <- calc_post_tx_cas23
-             },
-             LAS15 = {
-               surv_rt <- post_tx_las15_survrates[-2,]
-               lp_f <- calc_post_tx_las15
-             },
-             LAS21 = {
-               surv_rt <- post_tx_las21_survrates
-               lp_f <- calc_post_tx_las21
-             }
-      )
-    }else{
-      switch(model,
-             CAS23r = {
-               surv_rt <- wl_cas23_survrates_rec365
-               lp_f <- calc_wl_cas23
-             },
-             CAS23 = {
-               surv_rt <- wl_cas23_survratesS
-               lp_f <- calc_wl_cas23
-             },
-             LAS15 = {
-               surv_rt <- wl_las15_survrates
-               lp_f <- calc_wl_las15
-             },
-             LAS21 = {
-               surv_rt <- wl_las21_survrates
-               lp_f <- calc_wl_las21
-             }
-      )
-    }
-    lp_data <- lp_f(patients)
+    switch(model,
+           CAS23r = {
+             surv_rt <- wl_cas23_survrates_rec365
+             lp_f <- calc_wl_cas23
+           },
+           CAS23 = {
+             surv_rt <- wl_cas23_survratesS
+             lp_f <- calc_wl_cas23
+           },
+           LAS15 = {
+             surv_rt <- wl_las15_survrates
+             lp_f <- calc_wl_las15
+           },
+           LAS21 = {
+             surv_rt <- wl_las21_survrates
+             lp_f <- calc_wl_las21
+           }
+    )
   }
+  lp_data <- lp_f(patients)
+
 
   if(cap > max(surv_rt$Days)){cap <- max(surv_rt$Days)}
 

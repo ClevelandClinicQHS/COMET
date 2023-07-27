@@ -32,11 +32,11 @@ calculate_las <- function(wl_data, wl_model = NULL, post_tx_model = NULL,  wl_ca
 
   if(checks){
 
-    if((!is.character(wl_model) & !is(wl_model, "coxph"))){
-      stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
+    if((!is.character(wl_model))){
+      stop("\"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
     }
-    if((!is.character(post_tx_model) & !is(post_tx_model, "coxph"))){
-      stop("Only coxph objects, \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
+    if((!is.character(post_tx_model))){
+      stop("\"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
     }
   }
 

@@ -1,6 +1,6 @@
 #' Truncated Survival days
 #'
-#' @param object survival object (only coxph models currently are accepted)
+#' @param object only character objects of 'LAS15', 'LAS21' and 'CAS23' are acceptable
 #' @param ... arguement given from other methods
 #'
 #' @return a dateset of candidates, linear predictor and mean survival
@@ -12,51 +12,6 @@
 trunc_days <- function(object, ...){
   UseMethod("trunc_days")
 }
-
-
-#' @export
-#'
-#' @param cand_data candidate data
-#' @param cap cap for truncation survival
-#' @param wl boolean for waitlist or not
-#'
-#' @importFrom dplyr select
-#' @importFrom stats predict
-#' @importFrom dplyr mutate
-#' @importFrom dplyr nest_by
-#' @importFrom dplyr left_join
-#' @importFrom tidyr unnest
-#' @importFrom dplyr ungroup
-#' @importFrom dplyr arrange
-#'
-#' @rdname trunc_days
-trunc_days.coxph <- function(object, cand_data, cap = NA, wl = TRUE, ...){
-
-  surv <- create_surv_rates(object, cap = cap)
-  lp <- predict(object, newdata = cand_data, type = "lp")
-  cond <- colnames(surv) %in% c("time", "surv")
-
-  if(!all(cond)){
-    str1 <- colnames(surv)[which(!cond)]
-    data_n <- select(cand_data, c_id, !!str1) |>
-      mutate(lp = lp) |>
-      nest_by(!!sym(str1))
-
-    surv1 <- nest_by(surv, !!sym(str1)) |>
-      left_join(data_n, by = str1) |>
-      mutate(expected = list(mean_survival(data.y$lp, data.x$surv))) |>
-      unnest(cols = c(data.y, expected)) |>
-      ungroup() |>
-      select(c_id, expected) |>
-      arrange(c_id)
-
-  }else{
-    surv1 <- mutate(cand_data, expected = mean_survival(lp, surv$surv)) |>
-      select(c_id, expected)
-  }
-  return(surv1)
-}
-
 
 #' @param wl TRUE (waitlist) or FALSE (post_transplant)
 #' @rdname trunc_days
