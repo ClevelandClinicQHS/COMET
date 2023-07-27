@@ -1,6 +1,6 @@
 Package: COMET
 Type: Package
-Title: Computational Open-source Model for Transplantation 'COMET'
+Title: COMET: Computational Open-source Model for Transplantation
 Version: 0.0.0.9105
 Authors@R: c(person("Gunsalus", "Paul", email = "gunsalp@ccf.org", role = c("aut","cre"), comment = c(ORCID = "0000-0001-6976-9094")),
              person("Swiler", "Mark", email = "swilerm@ccf.org", role = "ctb", comment = c(ORCID = "0000-0001-7070-671X")),
@@ -26,7 +26,6 @@ Imports:
     MASS (>= 7.3-58.2),
     tidyr (>= 1.3.0)
 Suggests:
-  survival,
-  survhelp
+  survival
 Depends: 
     R (>= 4.2.0)
