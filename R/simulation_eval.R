@@ -6,7 +6,7 @@
 # library(furrr)
 # # # # # # # #
 # plan(cluster, workers = 75)
-# # sds <- 1001:2000
+# sds <- 1001:2000
 # sds <- 1:300
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,

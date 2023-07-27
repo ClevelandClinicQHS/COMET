@@ -82,6 +82,7 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
                      wld_ppy = wait_death/wait_death_yrs,
                      ptd_ppy = post_tx_death/post_tx_years,
                      ## added
+                     med_dist = median(distance_nm, na.rm = TRUE),
                      pt_1yr = mean(post_tx_time > 365, na.rm = TRUE),
                      pt_2yr = mean(post_tx_time > 730, na.rm = TRUE),
                      med_wlt = median(wait_death_time, na.rm  = TRUE),
