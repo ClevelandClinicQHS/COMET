@@ -14,6 +14,10 @@ trunc_days(object, ...)
 
 \item{...}{arguement given from other methods}
 
+\item{cand_data}{candidate data}
+
+\item{cap}{cap for truncation survival}
+
 \item{wl}{TRUE (waitlist) or FALSE (post_transplant)}
 }
 \value{

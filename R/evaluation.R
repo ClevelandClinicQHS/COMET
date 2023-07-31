@@ -171,12 +171,12 @@ concat2 <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl_censor_
   if(is.na(wl_censor_date)) wl_censor_date <- mld
   if(is.na(post_tx_censor_date)) post_tx_censor_date <- mld
 
-  if(post_tx_censor_date > mld){warning(paste("post_tx_censor_date:", post_tx_censor_date, "is greater than the date of maximum listing of", mld))
-    post_tx_censor_date <- min(mld, post_tx_censor_date)}
-  if(wl_censor_date > mld){warning(paste("wl_censor_date:", wl_censor_date, "is greater than the date of maximum listing of", mld))
-    wl_censor_date <- min(mld, post_tx_censor_date)}
-  if(max_enroll_date > mld){warning(paste("max_enroll_date:", max_enroll_date, "is greater than the date of maximum listing of", mld))
-    max_enroll_date <- min(mld, post_tx_censor_date)}
+  if(post_tx_censor_date > mld){warning(paste("post_tx_censor_date:", post_tx_censor_date, "is greater than the date of maximum listing of", mld))}
+
+  if(wl_censor_date > mld){warning(paste("wl_censor_date:", wl_censor_date, "is greater than the date of maximum listing of", mld))}
+
+  if(max_enroll_date > mld){warning(paste("max_enroll_date:", max_enroll_date, "is greater than the date of maximum listing of", mld))}
+
 
 
   alls <- dplyr::bind_rows(COMET$current_candidates, COMET$waitlist_death_database, COMET$recipient_database, COMET$post_tx_death_database) |>
