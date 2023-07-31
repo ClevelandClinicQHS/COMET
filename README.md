@@ -27,14 +27,14 @@ library(COMET)
 r1 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.815812 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.70737 mins
 
 ## Simulates the CAS rules
 r2 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
                      bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.248416 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 4.280185 mins
 
 ## You can mix and match systems, change weights
 ## for example simulate the LAS using the CAS models
@@ -51,28 +51,33 @@ r2 <- run_simulation(days = 400, can_start = 1000,
 # see how many were transplanted, donor count, waitlist deaths
 eval_simulation(r1)
 #>   can_count tx_count wait_death removal cens wait_death_yrs post_tx_death
-#> 1      4258     2758        321     136 1043       2440.802           219
-#>   post_tx_years   tx_ppy   wld_ppy   ptd_ppy     pt_1yr pt_2yr med_wlt med_ptt
-#> 1       1400.81 1.129956 0.1315141 0.1563381 0.06925308      0      82     179
-#>   med_offer don_count don_util nu_med_offer nu_orgs
-#> 1         5      2904     2687          138     552
+#> 1      4325     2700        328     138 1159       2403.231           193
+#>   post_tx_years   tx_ppy   wld_ppy   ptd_ppy med_dist     pt_1yr pt_2yr med_wlt
+#> 1      1402.053 1.123488 0.1364829 0.1376552 202.4022 0.08148148      0      75
+#>   med_ptt med_offer don_count don_util nu_med_offer nu_orgs
+#> 1     185         5      2827     2626          144     558
 
 eval_simulation(r1, group = dx_grp)
 #>   dx_grp can_count tx_count wait_death removal cens wait_death_yrs
-#> 1      A      1222      876         33      27  286      1152.6516
-#> 2      B       276      168         20      17   71       155.2197
-#> 3      C       366      244         20      12   90       181.0157
-#> 4      D      2394     1470        248      80  596       951.9151
-#>   post_tx_death post_tx_years    tx_ppy    wld_ppy   ptd_ppy     pt_1yr pt_2yr
-#> 1            63     458.54073 0.7599868 0.02862964 0.1373924 0.07191781      0
-#> 2            17      85.62628 1.0823368 0.12884961 0.1985372 0.05952381      0
-#> 3            14     121.45106 1.3479491 0.11048763 0.1152728 0.06557377      0
-#> 4           125     735.19233 1.5442553 0.26052743 0.1700235 0.06938776      0
-#>   med_wlt med_ptt med_offer don_count don_util nu_med_offer nu_orgs
-#> 1   134.0   191.0        10      2904     2687          138     552
-#> 2    81.0   179.0         3      2904     2687          138     552
-#> 3    83.0   170.0         5      2904     2687          138     552
-#> 4    62.5   175.5         4      2904     2687          138     552
+#> 1      A      1226      844         28      33  321      1090.7926
+#> 2      B       279      154         25      21   79       164.4079
+#> 3      C       340      200         19       9  112       152.5394
+#> 4      D      2480     1502        256      75  647       995.4908
+#>   post_tx_death post_tx_years    tx_ppy    wld_ppy   ptd_ppy med_dist
+#> 1            56      449.3032 0.7737493 0.02566941 0.1246374 219.3709
+#> 2            11       75.3347 0.9366944 0.15206078 0.1460150 179.9796
+#> 3            16      104.4764 1.3111370 0.12455802 0.1531447 188.2805
+#> 4           110      772.9391 1.5088036 0.25715959 0.1423139 197.9192
+#>       pt_1yr pt_2yr med_wlt med_ptt med_offer don_count don_util nu_med_offer
+#> 1 0.09478673      0     126   190.0        11      2827     2626          144
+#> 2 0.08441558      0      94   159.0         5      2827     2626          144
+#> 3 0.06500000      0      75   183.0         5      2827     2626          144
+#> 4 0.07589880      0      57   185.5         4      2827     2626          144
+#>   nu_orgs
+#> 1     558
+#> 2     558
+#> 3     558
+#> 4     558
 ```
 
 ## A further demonstration to show what is going on behind the scenes
@@ -149,16 +154,16 @@ lm1
 #> # A tibble: 1,000 × 4
 #>     c_id  d_id distance_nm proximity_class
 #>    <int> <int>       <dbl> <fct>          
-#>  1     2     8     245.    <250           
-#>  2     2    10      65.5   <250           
-#>  3     3     2     118.    <250           
-#>  4     3     3       0.207 <250           
-#>  5     4     2     232.    <250           
-#>  6     4     3     186.    <250           
-#>  7     6     6       6.02  <250           
-#>  8     8     5     218.    <250           
-#>  9     8     7     201.    <250           
-#> 10     8     8     232.    <250           
+#>  1     2     3       178.  <250           
+#>  2     4     3       241.  <250           
+#>  3     9     8        50.3 <250           
+#>  4    10     1       233.  <250           
+#>  5    10     9        84.7 <250           
+#>  6    11     2       221.  <250           
+#>  7    11     3       131.  <250           
+#>  8    13     3       241.  <250           
+#>  9    15     7       201.  <250           
+#> 10    16     6        70.2 <250           
 #> # ℹ 990 more rows
 
 ## ranking
@@ -186,16 +191,16 @@ las_offer_rank(hm1, am1, cm1, lm1, overall_ranking = lr1)
 #> # A tibble: 275 × 12
 #>     c_id  d_id match_single match_double abo_exact distance_nm proximity_class
 #>    <int> <int> <lgl>        <lgl>        <lgl>           <dbl> <fct>          
-#>  1     2     1 TRUE         FALSE        TRUE            1483. 1000-1500      
-#>  2    71     1 TRUE         FALSE        TRUE            1342. 1000-1500      
-#>  3    79     1 TRUE         TRUE         TRUE            1065. 1000-1500      
-#>  4    89     1 TRUE         TRUE         TRUE            1399. 1000-1500      
-#>  5    50     1 TRUE         TRUE         TRUE            1399. 1000-1500      
-#>  6    41     1 TRUE         TRUE         TRUE            1354. 1000-1500      
-#>  7    30     1 TRUE         TRUE         TRUE            1343. 1000-1500      
-#>  8    28     1 TRUE         TRUE         FALSE           1364. 1000-1500      
-#>  9    13     1 TRUE         TRUE         TRUE            1525. 1500-2500      
-#> 10    26     1 TRUE         FALSE        TRUE            1520. 1500-2500      
+#>  1    28     1 TRUE         TRUE         FALSE            193. <250           
+#>  2    49     1 TRUE         TRUE         TRUE             483. 250-500        
+#>  3    63     1 TRUE         TRUE         TRUE             483. 250-500        
+#>  4    21     1 TRUE         TRUE         TRUE             483. 250-500        
+#>  5    41     1 TRUE         TRUE         TRUE             336. 250-500        
+#>  6    30     1 TRUE         TRUE         TRUE             486. 250-500        
+#>  7    47     1 FALSE        TRUE         TRUE             444. 250-500        
+#>  8    46     1 TRUE         TRUE         FALSE            416. 250-500        
+#>  9    23     1 TRUE         FALSE        FALSE            380. 250-500        
+#> 10    13     1 TRUE         TRUE         TRUE             583. 500-1000       
 #> # ℹ 265 more rows
 #> # ℹ 5 more variables: lp.wl <dbl>, lp.ptx <dbl>, lu_score <dbl>, ov_rank <dbl>,
 #> #   offer_rank <int>
@@ -203,16 +208,16 @@ cas_offer_rank(hm1, am1, cm1, lm1, overall_ranking = lr1)
 #> # A tibble: 275 × 13
 #>     c_id  d_id match_single match_double abo_exact distance_nm proximity_class
 #>    <int> <int> <lgl>        <lgl>        <lgl>           <dbl> <fct>          
-#>  1     1     2 FALSE        TRUE         TRUE             262. 250-500        
-#>  2     1     6 TRUE         TRUE         TRUE            1592. 1500-2500      
-#>  3     1     8 TRUE         TRUE         TRUE             700. 500-1000       
-#>  4     1    10 FALSE        TRUE         TRUE             528. 500-1000       
-#>  5     2     1 TRUE         FALSE        TRUE            1483. 1000-1500      
-#>  6     2     2 TRUE         TRUE         FALSE            494. 250-500        
-#>  7     2     3 TRUE         FALSE        TRUE             376. 250-500        
-#>  8     2     5 TRUE         TRUE         TRUE             440. 250-500        
-#>  9     2     6 TRUE         FALSE        FALSE           1450. 1000-1500      
-#> 10     2     8 TRUE         TRUE         FALSE            245. <250           
+#>  1     1     2 FALSE        TRUE         TRUE            1257. 1000-1500      
+#>  2     1     6 TRUE         TRUE         TRUE             385. 250-500        
+#>  3     1     8 TRUE         TRUE         TRUE             541. 500-1000       
+#>  4     1    10 FALSE        TRUE         TRUE            1143. 1000-1500      
+#>  5     2     1 TRUE         FALSE        TRUE             753. 500-1000       
+#>  6     2     2 TRUE         TRUE         FALSE            395. 250-500        
+#>  7     2     3 TRUE         FALSE        TRUE             178. <250           
+#>  8     2     5 TRUE         TRUE         TRUE             690. 500-1000       
+#>  9     2     6 TRUE         FALSE        FALSE           1397. 1000-1500      
+#> 10     2     8 TRUE         TRUE         FALSE            615. 500-1000       
 #> # ℹ 265 more rows
 #> # ℹ 6 more variables: lp.wl <dbl>, lp.ptx <dbl>, lu_score <dbl>, ov_rank <dbl>,
 #> #   pcost <dbl>, offer_rank <dbl>
@@ -351,16 +356,17 @@ mz
 #> 10    10 DLU     <tibble [61 × 14]>
 
 transplant_candidates(mz, rec_ids = NA, max_offer = NA)
-#> # A tibble: 7 × 17
+#> # A tibble: 8 × 17
 #>    d_id don_org  c_id match_single match_double abo_exact distance_nm
 #>   <int> <fct>   <int> <lgl>        <lgl>        <lgl>           <dbl>
-#> 1     1 DLU        13 TRUE         TRUE         TRUE            1525.
-#> 2     2 DLU        96 TRUE         TRUE         FALSE            118.
-#> 3     4 DLU        23 TRUE         TRUE         TRUE             472.
-#> 4     5 DLU         2 TRUE         TRUE         TRUE             440.
-#> 5     6 LUL        18 TRUE         FALSE        FALSE            836.
-#> 6     8 DLU        49 TRUE         TRUE         FALSE            232.
-#> 7    10 DLU        38 FALSE        TRUE         TRUE             229.
+#> 1     1 DLU        23 TRUE         FALSE        FALSE            380.
+#> 2     1 DLU         2 TRUE         FALSE        TRUE             753.
+#> 3     2 DLU        48 TRUE         TRUE         TRUE             287.
+#> 4     4 DLU        43 TRUE         TRUE         TRUE             272.
+#> 5     5 DLU        26 TRUE         TRUE         TRUE             831.
+#> 6     6 LUL         1 TRUE         TRUE         TRUE             385.
+#> 7     8 DLU        64 TRUE         TRUE         TRUE             613.
+#> 8    10 DLU        93 FALSE        TRUE         TRUE             402.
 #> # ℹ 10 more variables: proximity_class <fct>, lp.wl <dbl>, lp.ptx <dbl>,
 #> #   lu_score <dbl>, ov_rank <dbl>, offer_rank <int>, pred <dbl>, accept <int>,
 #> #   surg_type <fct>, organs_rec <dbl>

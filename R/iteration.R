@@ -98,10 +98,10 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
 
     if(nrow(rec_up) > 0){
 
-      updated_post_tx_recipients <- update_patients(patients = rec_up, model = "CAS23r", elapsed_time = days_after_tx, pre_tx = FALSE,
-                                                      cap = 1825, date = date)
-      # updated_post_tx_recipients <- update_patients(patients = rec_up, model = "CAS23", elapsed_time = days_after_tx, pre_tx = FALSE,
-      #                                                cap = 1825, date = date)
+      updated_post_tx_recipients <- update_patients(patients = rec_up, model = "CAS23r", elapsed_time = days_after_tx,
+                                                    pre_tx = FALSE, cap = 1825, date = date)
+      # updated_post_tx_recipients <- update_patients(patients = rec_up, model = "CAS23", elapsed_time = days_after_tx,
+      #                                               pre_tx = FALSE, cap = 1825, date = date)
 
       rec_up <- updated_post_tx_recipients$new_char
 

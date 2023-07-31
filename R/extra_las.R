@@ -13,7 +13,10 @@ trunc_days <- function(object, ...){
   UseMethod("trunc_days")
 }
 
+#' @param cand_data candidate data
+#' @param cap cap for truncation survival
 #' @param wl TRUE (waitlist) or FALSE (post_transplant)
+#'
 #' @rdname trunc_days
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate

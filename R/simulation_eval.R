@@ -1,7 +1,7 @@
 # # # # ########### Run simulation in parallel
 # # #
 # library(COMET)
-# library(dplyr)
+# # library(dplyr)
 # library(survival)
 # library(furrr)
 # # # # # # # #
@@ -13,9 +13,9 @@
 #                                         match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
 #                                         wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365, seed = .x),
 #                   .progress = TRUE)
-# # # # # #
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec1.RDS")
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs1.RDS")
+# # # # #
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec2.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs2.RDS")
 # # # # # # #
 # # # # ##
 # sds <- 1001:2000
@@ -23,56 +23,56 @@
 #                                        match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
 #                                        wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365, seed = .x), .progress = TRUE)
 # # # # # #
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec1.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec2.RDS")
 #
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,
 #                                         match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
 #                                         wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1,
 #                                         seed = .x), .progress = TRUE)
 # # # # #
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec1_cas.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec2_cas.RDS")
 #
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,
 #                                         match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
 #                                         wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0,
 #                                         seed = .x), .progress = TRUE)
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec1_cas0eff.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec2_cas0eff.RDS")
 # ####
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,
 #                                         match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
 #                                         wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.2,
 #                                         seed = .x), .progress = TRUE)
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec1_cas2eff.RDS")
-##
-# #
-# # ##
-# #
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/1000TSAM_LAS_Runs_rec2_cas2eff.RDS")
+#
+#
+# ##
+#
 # # ## So I can study some matches
 # sds <- 1:300
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,
 #                                        match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
 #                                        wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365, seed = .x, include_matches = TRUE), .progress = TRUE)
 # # # # # #
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec1M.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec2M.RDS")
 #
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,
 #                                        match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
 #                                        wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1,
 #                                        seed = .x, include_matches = TRUE), .progress = TRUE)
 # # # #
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec1_casM.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec2_casM.RDS")
 # #
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,
 #                                        match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
 #                                        wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0,
 #                                        seed = .x, include_matches = TRUE), .progress = TRUE)
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec1_cas0effM.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec2_cas0effM.RDS")
 # ####
 # rs0 <- future_map(sds, ~run_simulation(days = 802, can_start = 1275,
 #                                        match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
 #                                        wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.2,
 #                                        seed = .x, include_matches = TRUE), .progress = TRUE)
-# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec1_cas2effM.RDS")
+# saveRDS(rs0, "/proj/DaltonLab/projects/lungTx/p0054/data/300TSAM_LAS_Runs_rec2_cas2effM.RDS")
 # # # # #
 # # # #
 # # # # # ##### Evaluating
