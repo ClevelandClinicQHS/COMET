@@ -11,14 +11,15 @@ gen_and_spawn_donors(desired = "random", days, return_params = FALSE)
 gen_and_spawn_candidates(desired = "random", days, return_params = FALSE)
 }
 \arguments{
-\item{desired}{whether the bayesian parameters should be "random" or the "mean"}
+\item{desired}{whether the Bayesian parameters should be "random" or the "mean"}
 
 \item{days}{number of days (must be greater than > 1)}
 
-\item{return_params}{TRUE or FALSE, to return the paramters}
+\item{return_params}{if TRUE returns the parameters used for generating donors and candidates}
 }
 \value{
-either a list containing synthetic donors and parameters used to generate their attritubutes or a dataset of synthetic donors
+if return_params = TRUE a list containing synthetic donors or candidates and parameters used to generate their attributes
+ Otherwise a data set of synthetic donors or candidates
 }
 \description{
 Generate bayesian parameters and spawn donors/candidates

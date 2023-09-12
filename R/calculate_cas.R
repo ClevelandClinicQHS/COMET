@@ -1,15 +1,15 @@
 #' Calculate Composite Allocation Score (CAS)
 #'
-#' Calcualte the subCAS
+#' Calculate the subCAS (non-distance related metrics)
 #'
-#' @param data dataset of patients containing covaraites for las calculations and other continuous distribution factors
-#' @param wl_model model to use in waitlist component of the CAS
+#' @param data dataset of patients containing covariates for las calculations and other continuous distribution factors
+#' @param wl_model model to use in the waitlist component of the CAS
 #' @param post_tx_model model to use in the post-transplant component of the CAS
-#' @param wl_cap number of days to cap the waitlist component CAS score at CAS
-#' @param post_tx_cap number of days to cap the post transplant component of the CAS
-#' @param wl_weight weight applied to waitlist model
-#' @param post_tx_weight weight applied to post transplant model
-#' @param bio_weight weight applied to biologoical measures (height, abo (blood), and hla)
+#' @param wl_cap number of days to cap the waitlist component CAS score at CAS (days)
+#' @param post_tx_cap number of days to cap the post transplant component of the CAS (days)
+#' @param wl_weight weight applied to the waitlist model
+#' @param post_tx_weight weight applied to the post transplant model
+#' @param bio_weight weight applied to biological measures (height, abo (blood), and hla)
 #' @param peds_weight weight applied to give a bonus to pediatric patients
 #' @param pld_weight weight given as bonus if a prior living donor
 #' @param abo_weight weight for blood type compatability (if not specified will default to 1/3 of bio weight)
@@ -36,10 +36,12 @@
 #' @importFrom tidyr unnest
 #' @importFrom dplyr between
 #' @importFrom methods is
+#' @importFrom rlang .data
 #'
 #' @examples
-#' calculate_sub_cas(data = syn_cands, wl_model = "CAS23", post_tx_model = "CAS23",
-#'  wl_weight = .25, post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
+#' calculate_sub_cas(data = syn_cands, wl_model = "CAS23",
+#'  post_tx_model = "CAS23", wl_weight = .25,
+#'  post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
 #'  pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
 #'
 #' calculate_cas_dist(syn_matches, efficiency_weight = 0.1)
@@ -81,14 +83,14 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
 
   data <- data |>
     mutate(
-      lu_score = wl_weight * (25^(1 - expected.wl/wl_cap) - 1)/24 +
-        post_tx_weight * expected.ptx/post_tx_cap +
-        bio_weight1 * (100^pabo - 1)/99 + bio_weight2 * (100^pcpra - 1)/99 + bio_weight3 * (100^phgt - 1)/99 +
-        peds_weight * as.numeric(age < 18) +
-        pld_weight * pld,
-      ov_rank = rank(-lu_score)
+      lu_score = wl_weight * (25^(1 - .data$expected.wl/wl_cap) - 1)/24 +
+        post_tx_weight * .data$expected.ptx/post_tx_cap +
+        bio_weight1 * (100^.data$pabo - 1)/99 + bio_weight2 * (100^.data$pcpra - 1)/99 + bio_weight3 * (100^.data$phgt - 1)/99 +
+        peds_weight * as.numeric(.data$age < 18) +
+        pld_weight * .data$pld,
+      ov_rank = rank(-.data$lu_score)
     ) |>
-    select(c_id, lu_score, ov_rank)
+    select(.data$c_id, .data$lu_score, .data$ov_rank)
 
   return(data)
 }
@@ -97,9 +99,9 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
 #'
 #' @param match_data dataset of patients containing covaraites for las calculations and other continuous distribution factors
 #' @param efficiency_weight weight given for efficiency (cost and distance)
-#' @param cost_weight weight given for cost part of CAS (if not specified is half of efficiency weight)
-#' @param distance_weight weight given for distance part of CAS (if not specified is half of efficiency weight)
-#' @param checks whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated
+#' @param cost_weight weight given for cost part of CAS (if not specified will default to 1/2 of efficiency_weight)
+#' @param distance_weight weight given for distance part of CAS (if not specified will default to 1/2 of efficiency_weight)
+#' @param checks if TRUE checks the conditions and display warnings, this is there to not check conditions every time the simulation is iterated
 #'
 #' @return a dataset complete with the efficient/distance metric
 #' @export
@@ -122,16 +124,16 @@ calculate_cas_dist <- function(match_data, efficiency_weight = NA, cost_weight =
 
   data <- match_data |>
     mutate(
-      pcost = 6.3 * distance_nm +
-        as.numeric(distance_nm > 43.44) * 247.63 * (distance_nm - 43.44) -
-        as.numeric(distance_nm > 67.17) * 104.44 * (distance_nm - 67.17) -
-        as.numeric(distance_nm > 86.90) * 128.34 * (distance_nm - 86.90),
-      lu_score = lu_score +
-        efficiency_weight1 * (1- pcost/118981.1) +
+      pcost = 6.3 * .data$distance_nm +
+        as.numeric(.data$distance_nm > 43.44) * 247.63 * (.data$distance_nm - 43.44) -
+        as.numeric(.data$distance_nm > 67.17) * 104.44 * (.data$distance_nm - 67.17) -
+        as.numeric(.data$distance_nm > 86.90) * 128.34 * (.data$distance_nm - 86.90),
+      lu_score = .data$lu_score +
+        efficiency_weight1 * (1- .data$pcost/118981.1) +
         efficiency_weight2 *
-        (as.numeric(distance_nm <= 45) +
-           as.numeric(between(distance_nm, 45, 90)) * (1 - 0.15/45 * (distance_nm - 45)) +
-           as.numeric(distance_nm >= 90) * 0.875/(1 + exp(0.0025 * (distance_nm - 1500))))
+        (as.numeric(.data$distance_nm <= 45) +
+           as.numeric(between(.data$distance_nm, 45, 90)) * (1 - 0.15/45 * (.data$distance_nm - 45)) +
+           as.numeric(.data$distance_nm >= 90) * 0.875/(1 + exp(0.0025 * (.data$distance_nm - 1500))))
     )
 
   return(data)

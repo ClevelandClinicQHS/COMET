@@ -4,10 +4,10 @@
 \alias{transplant_candidates}
 \title{Transplant Candidates}
 \usage{
-transplant_candidates(matches, rec_ids, max_offer = NA)
+transplant_candidates(matches, rec_ids = NA, max_offer = NA)
 }
 \arguments{
-\item{matches}{nested tibble of matches}
+\item{matches}{nested tibble of matches by d_id}
 
 \item{rec_ids}{vector of c_id of transplanted candidates}
 

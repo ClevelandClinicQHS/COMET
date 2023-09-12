@@ -1,8 +1,10 @@
 #' Calculate LAS scores
 #'
 #' @param wl_data data to calculate las
-#' @param wl_model which waitlist model to use. Options are "LAS15","LAS21", "CAS23"
-#' @param post_tx_model which post transplant model to use. Options are"LAS15","LAS21", "CAS23"
+#' @param wl_model which waitlist model to use.
+#' Options are "LAS15","LAS21", "CAS23"
+#' @param post_tx_model which post transplant model to use.
+#' Options are "LAS15","LAS21", "CAS23"
 #' @param wl_cap cap of waitlist survival
 #' @param post_tx_cap cap of post-transplant survival
 #' @param wl_weight relative weight of waitlist mortality
@@ -19,6 +21,7 @@
 #' @importFrom dplyr select
 #' @importFrom tidyr unnest
 #' @importFrom methods is
+#' @importFrom rlang .data
 #'
 #' @return a dataset of candidates and their LAS score on a 0 to 1 scale and linear predictors for waitlist and post-transplant components.
 #' To get LAS/CAS score simply multiply by 100.
@@ -48,7 +51,8 @@ calculate_las <- function(wl_data, wl_model = NULL, post_tx_model = NULL,  wl_ca
   both <- left_join(wl, post_tx, by = "c_id", suffix = c(".wl",".ptx"))
 
   ## sclaes the data
-  scaled <- scale_pre_post(both, pre = expected.wl, post = expected.ptx, pre_cap = wl_cap, post_cap = post_tx_cap,
+  scaled <- scale_pre_post(both, pre = .data$expected.wl, post = .data$expected.ptx,
+                           pre_cap = wl_cap, post_cap = post_tx_cap,
                            pre_weight = wl_weight, post_weight = post_tx_weight)
 
   return(scaled)

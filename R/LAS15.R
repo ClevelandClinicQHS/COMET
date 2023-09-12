@@ -1,6 +1,6 @@
 #' @rdname calc_las
 #'
-#' @param ci cardiac index (L/min/m<sup>2</sup>)
+#' @param ci cardiac index \ifelse{html}{\out{(L/min/m<sup>2</sup>)}}{\eqn{\textrm{L/min/m}^{2}}}
 #' @param cvp central venous pressure (mmHg)
 #' @param bili_50 bilirubin increase of 50\% (0 or 1)
 #' @param fvc forced vital capapcity (\%)
@@ -113,13 +113,13 @@ calc_wl_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
         )
       +
         case_when(
-          dx %in% c(1608)                             ~  0.6680518055684700, # bronchiectasis
-          dx %in% c(1500, 1501, 1502, 1548, 1549)     ~ -0.6278657824830000, # eisenmenger's
-          dx == 1611                                  ~ -0.3162937838984600, # Lymphangioleiomyomatosis
-          dx == 1612                                  ~  0.4453284411081100, # Obliterative bronchiolitis
-          dx %in% c(1519, 1613)                       ~ -0.2091170018125500, # pulmonary Fibrosis, not idiopathic:
-          dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.4577749354638600, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  0.9330846239906700, # sarcoidosis w/ PAP <= 30mmHg (group A)
+          dx %in% c(1608)                                               ~  0.6680518055684700, # bronchiectasis
+          dx %in% c(1500, 1501, 1502, 1548, 1549)                       ~ -0.6278657824830000, # eisenmenger's
+          dx == 1611                                                    ~ -0.3162937838984600, # Lymphangioleiomyomatosis
+          dx == 1612                                                    ~  0.4453284411081100, # Obliterative bronchiolitis
+          dx %in% c(1519, 1613)                                         ~ -0.2091170018125500, # pulmonary Fibrosis, not idiopathic:
+          dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~ -0.4577749354638600, # sarcoidosis w/ PAP  > 30mmHg (group D)
+          dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~  0.9330846239906700, # sarcoidosis w/ PAP <= 30mmHg (group A)
           # TRUE ~ 0
           .default = 0
         ) +
@@ -147,7 +147,7 @@ calc_wl_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
 
 #' @rdname calc_las
 #'
-#' @param creat_150 creatine increase >150\% (0 or 1)
+#' @param creat_150 creatinine increase >150\% (0 or 1)
 #'
 #' @export
 calc_post_tx_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, age = age, o2rest = o2rest,
@@ -221,13 +221,13 @@ calc_post_tx_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         # ## specific diagnoses
         case_when(
-          dx %in% c(1608)                             ~  0.1889100379099400, # bronchiectasis
-          dx %in% c(1500, 1501, 1502, 1548, 1549)     ~  0.9146727886744700, # eisenmenger's
-          dx == 1611                                  ~ -1.5194416206749400, # Lymphangioleiomyomatosis
-          dx == 1612                                  ~ -1.2050508750702600, # Obliterative bronchiolitis
-          dx %in% c(1519, 1613)                       ~ -0.0723596761367600, # pulmonary Fibrosis, not idiopathic:
-          dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.0437880049066331, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~ -0.1389363636019300, # sarcoidosis w/ PAP <= 30mmHg (group A)
+          dx %in% c(1608)                                               ~  0.1889100379099400, # bronchiectasis
+          dx %in% c(1500, 1501, 1502, 1548, 1549)                       ~  0.9146727886744700, # eisenmenger's
+          dx == 1611                                                    ~ -1.5194416206749400, # Lymphangioleiomyomatosis
+          dx == 1612                                                    ~ -1.2050508750702600, # Obliterative bronchiolitis
+          dx %in% c(1519, 1613)                                         ~ -0.0723596761367600, # pulmonary Fibrosis, not idiopathic:
+          dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~ -0.0437880049066331, # sarcoidosis w/ PAP  > 30mmHg (group D)
+          dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~ -0.1389363636019300, # sarcoidosis w/ PAP <= 30mmHg (group A)
           # TRUE ~ 0
           .default = 0
         ) +

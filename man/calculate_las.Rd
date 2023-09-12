@@ -18,9 +18,11 @@ calculate_las(
 \arguments{
 \item{wl_data}{data to calculate las}
 
-\item{wl_model}{which waitlist model to use. Options are "LAS15","LAS21", "CAS23"}
+\item{wl_model}{which waitlist model to use.
+Options are "LAS15","LAS21", "CAS23"}
 
-\item{post_tx_model}{which post transplant model to use. Options are"LAS15","LAS21", "CAS23"}
+\item{post_tx_model}{which post transplant model to use.
+Options are "LAS15","LAS21", "CAS23"}
 
 \item{wl_cap}{cap of waitlist survival}
 

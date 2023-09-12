@@ -8,7 +8,7 @@
 #'
 #' \code{pra_screen} not yet implemented will screen on pra compatibility organs.
 #'
-#' \code{count_screen} Makes sure double lung transplant are matched with double lung donors, singles can be matched and received a one of the double lung
+#' \code{count_screen} Makes sure double lung transplant are matched with double lung donors, singles can be matched and received one of the double lung
 #'
 #' \code{las_dist_calc} Returns the distance between the matched candidates and donors with LAS distance categories.
 #'
@@ -34,21 +34,25 @@
 #' @importFrom rlang .data
 #'
 #' @examples
-#' ## The functions will use the internal cands and dons stored in the package
+#' ## The functions will use the internal syn_cands
+#' ## and syn_dons stored in the package
 #' height_match <- height_screen(syn_cands, syn_dons)
 #' abo_match <- abo_screen(syn_cands, syn_dons)
 #' pra_match <- pra_screen(syn_cands, syn_dons)
 #' count_match <- count_screen(syn_cands, syn_dons)
 #' las_dists <- las_dist_calc(syn_cands, syn_dons)
 #' cas_dists <- dist_calc(syn_cands, syn_dons)
-#' las_rank <- calculate_las(syn_cands, wl_model = "LAS15", post_tx_model = "LAS15",
-#'  wl_cap = 365, post_tx_cap = 365, wl_weight = 2, post_tx_weight = 1)
-#' las_offers <- las_offer_rank(height_match, abo_match, count_match, pra_match, las_dists,
-#'  overall_ranking = las_rank)
-#' cas_rank <- calculate_sub_cas(syn_cands, wl_model = "CAS23", post_tx_model = "CAS23",
-#'  wl_weight = 0.25, post_tx_weight = 0.25, bio_weight = 0.15, pld_weight = 0.05, peds_weight = 0.2)
-#' cas_offers <- cas_offer_rank(height_match, abo_match, count_match, pra_match, cas_dists,
-#'  overall_ranking = cas_rank)
+#' las_rank <- calculate_las(syn_cands, wl_model = "LAS15",
+#'  post_tx_model = "LAS15",
+#'  wl_cap = 365, post_tx_cap = 365, wl_weight = 2,
+#'   post_tx_weight = 1)
+#' las_offers <- las_offer_rank(height_match, abo_match,
+#'  count_match, pra_match, las_dists, overall_ranking = las_rank)
+#' cas_rank <- calculate_sub_cas(syn_cands, wl_model = "CAS23",
+#'  post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
+#'   bio_weight = 0.15, pld_weight = 0.05, peds_weight = 0.2)
+#' cas_offers <- cas_offer_rank(height_match, abo_match, count_match,
+#'  pra_match, cas_dists, overall_ranking = cas_rank)
 height_screen <- function(cands, dons){
 
   cand_x <- left_join(cands, single_rg, by = "dx_grp") |>
@@ -70,15 +74,15 @@ height_screen <- function(cands, dons){
 
   ## Just as a checker
   height_match <- bind_rows(s_match, d_match) |>
-    distinct(c_id, d_id, .keep_all = TRUE) |>
-    mutate(match_single = between(hgt_in_d, .data$s_lower, .data$s_upper),
-           match_double = between(hgt_in_d, .data$d_lower, .data$d_upper)) |>
+    distinct(.data$c_id, .data$d_id, .keep_all = TRUE) |>
+    mutate(match_single = between(.data$hgt_in_d, .data$s_lower, .data$s_upper),
+           match_double = between(.data$hgt_in_d, .data$d_lower, .data$d_upper)) |>
     ## if one only one lung must match a single
     filter(.data$don_org == "DLU" |(.data$match_single & .data$don_org %in% c("LUL", "LUR"))) |>
     ## if the candidate is only a double transplant, make sure they match with double lungs
     filter(!(!.data$match_double & .data$surg_type == "D")) |>
     select(.data$c_id, .data$d_id, .data$match_single, .data$match_double) |>
-    arrange(c_id, d_id)
+    arrange(.data$c_id, .data$d_id)
 
     return(height_match)
 
@@ -119,7 +123,7 @@ count_screen <- function(cands, dons){
 
   don_x <- inner_join(dons, count_match_df, by = "don_org", relationship = "many-to-many")
 
-  count_match <- inner_join(cands, don_x, by = join_by(surg_type == match), relationship = "many-to-many") |>
+  count_match <- inner_join(cands, don_x, by = c("surg_type" = "match"), relationship = "many-to-many") |>
     select(.data$c_id, .data$d_id)
 
   return(count_match)
@@ -134,13 +138,13 @@ count_screen <- function(cands, dons){
 #' @importFrom dplyr arrange
 las_dist_calc <- function(cands, dons){
 
-  dist_match <- crossing(select(cands, c_id, center), select(dons, d_id, hospital)) |>
+  dist_match <- crossing(select(cands, .data$c_id, .data$center), select(dons, .data$d_id, .data$hospital)) |>
     left_join(dist_data, by = c("center" = "can_center", "hospital" = "don_hosp")) |>
-    mutate(proximity_class = cut(distance_nm, c(-1, 250, 500, 1000, 1500, 2500, 100000),
+    mutate(proximity_class = cut(.data$distance_nm, c(-1, 250, 500, 1000, 1500, 2500, 100000),
                                  labels = c("<250", "250-500", "500-1000", "1000-1500", "1500-2500", ">2500"), right = FALSE)
     ) |>
     arrange(proximity_class) |>
-    select(c_id, d_id, distance_nm, proximity_class)
+    select(.data$c_id, .data$d_id, .data$distance_nm, .data$proximity_class)
 
   return(dist_match)
 
@@ -151,9 +155,9 @@ las_dist_calc <- function(cands, dons){
 #' @rdname screen
 dist_calc <- function(cands, dons){
 
-  dist_match <- crossing(select(cands, c_id, center), select(dons, d_id, hospital)) |>
+  dist_match <- crossing(select(cands, .data$c_id, .data$center), select(dons, .data$d_id, .data$hospital)) |>
     left_join(dist_data, by = c("center" = "can_center", "hospital" = "don_hosp")) |>
-    select(c_id, d_id, distance_nm)
+    select(.data$c_id, .data$d_id, .data$distance_nm)
 
   return(dist_match)
 
@@ -183,10 +187,10 @@ las_offer_rank <- function(..., overall_ranking){
   l <- list(...)
 
   # all_x <- reduce(l, inner_join, by = c("d_id", "c_id")) |>
-  all_x <- Reduce(function(x,y) inner_join(x, y, by = join_by(c_id, d_id)), l) |>
-    left_join(overall_ranking, by = join_by(c_id)) |>
-    group_by(d_id) |>
-    arrange(d_id, proximity_class, desc(abo_exact), desc(lu_score)) |>
+  all_x <- Reduce(function(x,y) inner_join(x, y, by = c("c_id", "d_id")), l) |>
+    left_join(overall_ranking, by = "c_id") |>
+    group_by(.data$d_id) |>
+    arrange(.data$d_id, .data$proximity_class, desc(abo_exact), desc(lu_score)) |>
     mutate(offer_rank = row_number()) |>
     ungroup()
 
@@ -210,18 +214,20 @@ las_offer_rank <- function(..., overall_ranking){
 #' @importFrom dplyr ungroup
 #' @importFrom dplyr join_by
 #' @importFrom purrr reduce
+#' @importFrom rlang .data
 cas_offer_rank <- function(..., overall_ranking, efficiency_weight = 0.10, cost_weight = NA, distance_weight = NA, checks = TRUE){
 
   l <- list(...)
 
+
   # all_x <- reduce(l, inner_join, by = c("d_id", "c_id")) |>
-  all_x <- Reduce(function(x,y) inner_join(x, y, by = join_by(c_id, d_id)), l) |>
-    left_join(overall_ranking, by = join_by(c_id)) |>
+  all_x <- Reduce(function(x,y) inner_join(x, y, by = c("c_id", "d_id")), l) |>
+    left_join(overall_ranking, by = "c_id") |>
     calculate_cas_dist(match_data = _, efficiency_weight = efficiency_weight,
                        cost_weight = cost_weight, distance_weight = distance_weight, checks = checks) |>
-    group_by(d_id) |>
-    mutate(offer_rank = rank(-lu_score)) |>
-    ungroup()
+    # group_by(.data$d_id) |>
+    mutate(offer_rank = rank(-.data$lu_score), .by = .data$d_id) #|>
+    # ungroup()
 
   return(all_x)
 

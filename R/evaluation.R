@@ -21,12 +21,12 @@
 #' \item{removal}{ - number of removals for "other" reasons}
 #' \item{cens}{ - number of people with censored outcomes or still waiting for a transplant}
 #' \item{wait_death_yrs}{ - number of waitlist patient years}
-#' \item{post_tx_death}{ - number of of post-transplant deahts}
+#' \item{post_tx_death}{ - number of of post-transplant deatjs}
 #' \item{tx_ppy}{ - number of transplants per patient year}
 #' \item{wld_ppy}{ - wait list deaths per patient year}
 #' \item{ptd_ppy}{ - post transplant deaths per patient year}
 #' \item{pt_1yr}{ - pecentage of transplant recipients that survived 1 year}
-#' \item{pt_2yr}{ - pecentage of transplant recipients that survived 1 year}
+#' \item{pt_2yr}{ - pecentage of transplant recipients that survived 2 years}
 #' \item{med_wlt}{ - median time on the waiting list}
 #' \item{med_ptt}{ - median post transplant time}
 #' \item{med_offer}{ - median offer rank of those who were transplanted}
@@ -36,11 +36,13 @@
 #' \item{nu_orgs}{ - number of organs not utilized}
 #' }
 #'
+#' @importFrom rlang .data
+#'
 #' @export
 #'
 #' @examples
 #' \dontrun{
-#' r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+#' r1 <- run_simulation(days = 20, can_start = 1000,
 #'  match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
 #'  wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
 #' eval_simulation(r1)
@@ -56,38 +58,38 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
 
   dd <- COMET$non_used_donors
 
-  dd1 <- dplyr::filter(dd, don_org == "DLU" & organs_non_used == 1) |>
-    dplyr::left_join(select(ct, d_id, offer_rank), by = c("d_id")) |>
-    dplyr::mutate(offers = offers - offer_rank) |>
-    dplyr::select(-offer_rank) |>
+  dd1 <- dplyr::filter(dd, .data$don_org == "DLU" & .data$organs_non_used == 1) |>
+    dplyr::left_join(select(ct, .data$d_id, .data$offer_rank), by = c("d_id")) |>
+    dplyr::mutate(offers = .data$offers - .data$offer_rank) |>
+    dplyr::select(-.data$offer_rank) |>
     dplyr::bind_rows(dd)
 
-  dd1 <- dplyr::summarise(dd1, nu_med_offer = median(offers, na.rm = TRUE), nu_orgs = sum(organs_non_used))
+  dd1 <- dplyr::summarise(dd1, nu_med_offer = median(.data$offers, na.rm = TRUE), nu_orgs = sum(.data$organs_non_used))
 
-  don_stats <- dplyr::summarise(COMET$all_donors, don_count = dplyr::n(), don_util = sum(don_util))
+  don_stats <- dplyr::summarise(COMET$all_donors, don_count = dplyr::n(), don_util = sum(.data$don_util))
 
   don_stats  <- cbind(don_stats, dd1)
 
   can_stats <- ct |>
     dplyr::group_by({{group}}) |>
     dplyr::summarise(can_count = dplyr::n(),
-                     tx_count = sum(tx),
-                     wait_death = sum(wait_death, na.rm = TRUE),
-                     removal = sum(removal, na.rm = TRUE),
-                     cens = dplyr::n() - tx_count - wait_death - removal,
-                     wait_death_yrs = sum(wait_death_time, na.rm = TRUE)/365.25,
-                     post_tx_death = sum(post_tx_death, na.rm = TRUE),
-                     post_tx_years = sum(post_tx_time, na.rm = TRUE)/365.25,
-                     tx_ppy = tx_count/wait_death_yrs,
-                     wld_ppy = wait_death/wait_death_yrs,
-                     ptd_ppy = post_tx_death/post_tx_years,
+                     tx_count = sum(.data$tx),
+                     wait_death = sum(.data$wait_death, na.rm = TRUE),
+                     removal = sum(.data$removal, na.rm = TRUE),
+                     cens = dplyr::n() - .data$tx_count - .data$wait_death - .data$removal,
+                     wait_death_yrs = sum(.data$wait_death_time, na.rm = TRUE)/365.25,
+                     post_tx_death = sum(.data$post_tx_death, na.rm = TRUE),
+                     post_tx_years = sum(.data$post_tx_time, na.rm = TRUE)/365.25,
+                     tx_ppy = .data$tx_count/.data$wait_death_yrs,
+                     wld_ppy = .data$wait_death/.data$wait_death_yrs,
+                     ptd_ppy = .data$post_tx_death/.data$post_tx_years,
                      ## added
-                     med_dist = median(distance_nm, na.rm = TRUE),
-                     pt_1yr = mean(post_tx_time > 365, na.rm = TRUE),
-                     pt_2yr = mean(post_tx_time > 730, na.rm = TRUE),
-                     med_wlt = median(wait_death_time, na.rm  = TRUE),
-                     med_ptt = median(post_tx_time, na.rm = TRUE),
-                     med_offer = median(offer_rank, na.rm = TRUE)
+                     med_dist = median(.data$distance_nm, na.rm = TRUE),
+                     pt_1yr = mean(.data$post_tx_time > 365, na.rm = TRUE),
+                     pt_2yr = mean(.data$post_tx_time > 730, na.rm = TRUE),
+                     med_wlt = median(.data$wait_death_time, na.rm  = TRUE),
+                     med_ptt = median(.data$post_tx_time, na.rm = TRUE),
+                     med_offer = median(.data$offer_rank, na.rm = TRUE)
     )
 
   sim_stats <- cbind(can_stats, don_stats)
@@ -117,7 +119,7 @@ daily_count_las <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, LA
 
   if(is.na(max_date)) max_date <- max(COMET$all_candidates$listing_day)
 
-  dy <- min_date:max_date
+  dy <- min_enroll_date:max_date
 
   sp_dy <- lapply(dy, function(x) spec_day(COMET, x))
   spdy_las <- lapply(sp_dy, function(x) left_join(x, las, by = "c_id", suffix = c("_t", "_s")))
@@ -145,8 +147,8 @@ spec_day <- function(COMET, day){
     stop(paste0(day, " must be between ", min(ct$listing_day), " and ", max(ct$listing_day)))
   }
 
-  all_x <- ct |>  dplyr::filter(listing_day <= day) |>
-    dplyr::filter(wait_death_day > day | is.na(wait_death_day))
+  all_x <- ct |>  dplyr::filter(.data$listing_day <= day) |>
+    dplyr::filter(.data$wait_death_day > day | is.na(.data$wait_death_day))
 
   return(all_x)
 }
@@ -161,6 +163,8 @@ spec_day <- function(COMET, day){
 #'
 #' @return \code{concat2} returns a tibble of candidates with their survival data
 #' @export
+#'
+#' @importFrom rlang .data
 concat2 <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl_censor_date = NA, post_tx_censor_date = NA){
 
   if(!is(COMET, "COMET")){stop("Must supply a COMET object")}
@@ -180,45 +184,45 @@ concat2 <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl_censor_
 
 
   alls <- dplyr::bind_rows(COMET$current_candidates, COMET$waitlist_death_database, COMET$recipient_database, COMET$post_tx_death_database) |>
-    dplyr::mutate(wl_event_day = pmin(transplant_day, death_day, removal_day, na.rm = TRUE)) |>
+    dplyr::mutate(wl_event_day = pmin(.data$transplant_day, .data$death_day, .data$removal_day, na.rm = TRUE)) |>
     ## remove those listed after certain day
-    dplyr::filter(listing_day <= max_enroll_date) |>
+    dplyr::filter(.data$listing_day <= max_enroll_date) |>
     ## remove those who were experienced an event from the
-    dplyr::filter(wl_event_day >= min_enroll_date | is.na(wl_event_day)) |>
+    dplyr::filter(.data$wl_event_day >= min_enroll_date | is.na(.data$wl_event_day)) |>
     ## will do nothing if set to the max
-    dplyr::mutate(days_after_tx = if_else(!is.na(transplant_day) & transplant_day >= post_tx_censor_date & is.na(death_day), NA_real_, post_tx_censor_date - transplant_day),
-                  transplant_day = if_else(!is.na(transplant_day) & transplant_day > wl_censor_date, NA_real_, transplant_day),
+    dplyr::mutate(days_after_tx = if_else(!is.na(.data$transplant_day) & .data$transplant_day >= post_tx_censor_date & is.na(.data$death_day), NA_real_, post_tx_censor_date - .data$transplant_day),
+                  transplant_day = if_else(!is.na(.data$transplant_day) & .data$transplant_day > wl_censor_date, NA_real_, .data$transplant_day),
                   # death_day = if_else(!is.na(death_day) & death_day >= post_tx_censor_date, NA_real_, death_day),
-                  removal_day = if_else(!is.na(removal_day) & removal_day > wl_censor_date, NA_real_, removal_day),
+                  removal_day = if_else(!is.na(.data$removal_day) & .data$removal_day > wl_censor_date, NA_real_, .data$removal_day),
                   # death_day = if_else((is.na(transplant_day) & death_day >= wl_censor_date), NA_real_, death_day),
-                  death_day = case_when((is.na(transplant_day) & death_day > wl_censor_date) ~ NA_real_,
-                                        !is.na(death_day) & death_day > post_tx_censor_date ~ NA_real_,
-                                        .default = death_day
+                  death_day = case_when((is.na(.data$transplant_day) & .data$death_day > wl_censor_date) ~ NA_real_,
+                                        !is.na(.data$death_day) & .data$death_day > post_tx_censor_date ~ NA_real_,
+                                        .default = .data$death_day
                                         ),
                   days_after_tx = case_when(
-                    is.na(transplant_day) ~ NA_real_,
-                    death_day < post_tx_censor_date ~ death_day - transplant_day,
-                    .default = post_tx_censor_date - transplant_day
+                    is.na(.data$transplant_day) ~ NA_real_,
+                    .data$death_day < post_tx_censor_date ~ .data$death_day - .data$transplant_day,
+                    .default = post_tx_censor_date - .data$transplant_day
                   )
                   ) |>
     ## set aside other variables
-    dplyr::mutate(tx = as.numeric(!is.na(transplant_day)),
-                  wait_death = as.numeric(is.na(transplant_day) & !is.na(death_day)),
-                  removal = as.numeric(!is.na(removal_day)),
-                  post_tx_death = ifelse(is.na(transplant_day), NA_real_, as.numeric(!is.na(death_day) & !is.na(transplant_day))),
+    dplyr::mutate(tx = as.numeric(!is.na(.data$transplant_day)),
+                  wait_death = as.numeric(is.na(.data$transplant_day) & !is.na(.data$death_day)),
+                  removal = as.numeric(!is.na(.data$removal_day)),
+                  post_tx_death = ifelse(is.na(.data$transplant_day), NA_real_, as.numeric(!is.na(.data$death_day) & !is.na(.data$transplant_day))),
                   wait_death_day = dplyr::case_when(tx == 1 ~ transplant_day,
                                                     wait_death == 1 ~ death_day,
                                                     removal == 1 ~ removal_day,
                                                     tx == 0 & wait_death == 0 & removal == 0 ~ NA_real_),
                   # wait_death_time = dplyr::case_when(!is.na(wait_death_day) ~ wait_death_day - listing_day,
                                                      # .default = waitlist_date - listing_day),
-                  wait_death_time = dplyr::case_when(!is.na(wait_death_day) ~ wait_death_day - listing_day,
-                                                     .default = wl_censor_date - listing_day),
-                  time_to_transplant = transplant_day - listing_day,
-                  post_tx_time = dplyr::case_when(post_tx_death == 1 ~ death_day - transplant_day,
+                  wait_death_time = dplyr::case_when(!is.na(wait_death_day) ~ wait_death_day - .data$listing_day,
+                                                     .default = wl_censor_date - .data$listing_day),
+                  time_to_transplant = .data$transplant_day - .data$listing_day,
+                  post_tx_time = dplyr::case_when(post_tx_death == 1 ~ death_day - .data$transplant_day,
                                                   post_tx_death == 0 ~ days_after_tx),
-                  post_tx_day = post_tx_time + transplant_day) |>
-    dplyr::arrange(c_id)
+                  post_tx_day = .data$post_tx_time + .data$transplant_day) |>
+    dplyr::arrange(.data$c_id)
 
   # vctrs::vec_assigr1
   return(alls)

@@ -75,12 +75,12 @@ Data dictionary for \code{eval_simulation()}
 \item{removal}{ - number of removals for "other" reasons}
 \item{cens}{ - number of people with censored outcomes or still waiting for a transplant}
 \item{wait_death_yrs}{ - number of waitlist patient years}
-\item{post_tx_death}{ - number of of post-transplant deahts}
+\item{post_tx_death}{ - number of of post-transplant deatjs}
 \item{tx_ppy}{ - number of transplants per patient year}
 \item{wld_ppy}{ - wait list deaths per patient year}
 \item{ptd_ppy}{ - post transplant deaths per patient year}
 \item{pt_1yr}{ - pecentage of transplant recipients that survived 1 year}
-\item{pt_2yr}{ - pecentage of transplant recipients that survived 1 year}
+\item{pt_2yr}{ - pecentage of transplant recipients that survived 2 years}
 \item{med_wlt}{ - median time on the waiting list}
 \item{med_ptt}{ - median post transplant time}
 \item{med_offer}{ - median offer rank of those who were transplanted}
@@ -92,7 +92,7 @@ Data dictionary for \code{eval_simulation()}
 }
 \examples{
 \dontrun{
-r1 <- run_simulation(days = 20, can_start = 1000, waitlist_update_freq = 1, post_tx_update_freq = 1,
+r1 <- run_simulation(days = 20, can_start = 1000,
  match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
  wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
 eval_simulation(r1)

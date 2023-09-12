@@ -18,7 +18,7 @@ run_simulation(
 \arguments{
 \item{days}{number of days to simulate}
 
-\item{can_start}{number of candidates to start on the waitlist, they will be randomly selected to be mor listing day, all of these candidates will have a negative c_id and listing_day}
+\item{can_start}{number of candidates to start on the waitlist, they will be randomly selected to be more reflective of a waiting period listing day, all of these candidates will have a negative c_id and listing_day}
 
 \item{match_alg}{function of how to screen and match individuals}
 
@@ -28,12 +28,12 @@ run_simulation(
 
 \item{desired}{random or mean for parameter generation}
 
-\item{return_params}{TRUE or FALSE see the paramters used for generating donors and candidates}
+\item{return_params}{if TRUE returns the parameters used for generating donors and candidates}
 
-\item{include_matches}{TRUE or FALSE, whether or not the include the donor and candidates matches}
+\item{include_matches}{if TRUE returns the donor and candidates matches}
 }
 \value{
-list of full donors and candidates simluated at beginning and final datasets, who's left on waitlist, transplanted, death on both and non utililized donors
+list of full donors and candidates simulated at beginning and final datasets, who's left on waiting list, transplanted, died on waiting list, died post transplant and non utililized donors
 }
 \description{
 Run Simulation
@@ -45,7 +45,8 @@ r1 <- run_simulation(days = 20, can_start = 1000,
   wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
 r2 <- run_simulation(days = 20, can_start = 1000,
  match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
- wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
- bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
+ wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365,
+  post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+   peds_weight = 0.2, efficiency_weight = 0.1)
  }
 }

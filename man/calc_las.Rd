@@ -121,7 +121,7 @@ calc_post_tx_las21(
 \arguments{
 \item{data}{dataset of patient data}
 
-\item{c_id}{unique candidate id}
+\item{c_id}{unique candidate identifier}
 
 \item{dx_grp}{diagnosis group (A, B, C, or D)}
 
@@ -129,7 +129,7 @@ calc_post_tx_las21(
 
 \item{age}{age in years}
 
-\item{bmi}{bmi {\out{(kg/m<sup>2</sup>)}}}
+\item{bmi}{\ifelse{html}{\out{(body mass index (kg/m<sup>2</sup>)}}{\eqn{\textrm{body mass index (kg/m}^{2})}}}
 
 \item{funstat}{functional status (1 = No assistance needed, 2 = some assistance needed, 3 = total assistance needed)}
 
@@ -141,9 +141,9 @@ calc_post_tx_las21(
 
 \item{pap_mean}{mean pulmonary artery pressure (mmHg)}
 
-\item{pco2}{\out{pco<sub>2</sub> (mmHG)}}
+\item{pco2}{\ifelse{html}{\out{pCO<sub>2</sub> (mmHg)}}{\eqn{\textrm{pCO}_{2}\textrm{ (mmHg)}}}}
 
-\item{pco2_15}{\out{pco<sub>2</sub> increase by at least 15\% threshold (0 or 1(TRUE))}}
+\item{pco2_15}{\ifelse{html}{\out{increase in pCO<sub>2</sub> by 15 percent (1,0)}}{\eqn{\textrm{increase in pCO}_{2}\textrm{ by 15 percent (1,0)}}}}
 
 \item{cont_mech}{continuous mechangical ventilation (0 or 1)}
 
@@ -153,7 +153,7 @@ calc_post_tx_las21(
 
 \item{ecmo}{ECMO (0 or 1)}
 
-\item{ci}{cardiac index (L/min/m<sup>2</sup>)}
+\item{ci}{cardiac index \ifelse{html}{\out{(L/min/m<sup>2</sup>)}}{\eqn{\textrm{L/min/m}^{2}}}}
 
 \item{cvp}{central venous pressure (mmHg)}
 
@@ -163,7 +163,7 @@ calc_post_tx_las21(
 
 \item{diab}{diabetes (0 or 1)}
 
-\item{creat_150}{creatine increase >150\% (0 or 1)}
+\item{creat_150}{creatinine increase >150\% (0 or 1)}
 }
 \value{
 a dataset with c_id and linear predictor for waitlist or post-transplant linear predictor according to LAS/CAS equations

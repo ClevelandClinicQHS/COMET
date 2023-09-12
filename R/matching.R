@@ -2,14 +2,14 @@
 #'
 #' @name match_
 #'
-#' @param cands candidates on waiting list
-#' @param dons donors avaible
-#' @param wl_model model used for waitlist component of LAS
-#' @param post_tx_model model used for post-transplant componet of LAS
-#' @param wl_weight weight of waitlist componet
-#' @param wl_cap cap for waitlist survival
-#' @param post_tx_weight weight of post-transplant compoent
-#' @param post_tx_cap cap for post-transplant survival
+#' @param cands tibble of candidates on waiting list
+#' @param dons tibble of donors available for transplant
+#' @param wl_model model used for the waitlist component of LAS
+#' @param post_tx_model model used for the  post-transplant component of LAS
+#' @param wl_weight weight of the waitlist component
+#' @param wl_cap cap for waitlist survival (days)
+#' @param post_tx_weight weight of the post-transplant component
+#' @param post_tx_cap cap for post-transplant survival (days)
 #' @param checks whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated
 #'
 #' @return a nested tibble of donors and candidates
@@ -22,11 +22,14 @@
 #' @importFrom tidyr nest
 #'
 #' @examples
-#' match_las(syn_cands, syn_dons, wl_model = "LAS15", post_tx_model = "LAS15",
-#'  wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
-#' match_cas(syn_cands, syn_dons, wl_model = "CAS23", post_tx_model = "CAS23",
-#'  wl_weight =.25, post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,
-#'  bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
+#' match_las(syn_cands, syn_dons, wl_model = "LAS15",
+#'  post_tx_model = "LAS15", wl_weight = 2,
+#'   post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
+#' match_cas(syn_cands, syn_dons, wl_model = "CAS23",
+#'  post_tx_model = "CAS23", wl_weight =.25,
+#'   post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,
+#'  bio_weight = .15, pld_weight = 0.05,
+#'  peds_weight = 0.2, efficiency_weight = 0.1)
 match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight = NA, wl_cap = NA, post_tx_weight = NA, post_tx_cap = NA, checks = TRUE){
 
   hm <- height_screen(cands, dons)
@@ -40,10 +43,11 @@ match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
     mutate(ov_rank = rank(-lu_score))
 
   matches <- las_offer_rank(hm, bm, pm, dm, cm, overall_ranking = las_scores)
-  if(nrow(matches) == 0){
-    return(matches)
+  if(nrow(matches) > 0L){
+    # return(matches) ## changed this 8/4/23
+    matches <- acceptance_prob(matched_data = matches, dons = dons, cands = cands)
   }
-  matches <- acceptance_prob(matched_data = matches, dons = dons, cands = cands)
+
   ## acceptance
   don_ov <- select(dons, d_id, don_org)
   can_ov <- select(cands, c_id, surg_type)
@@ -110,10 +114,14 @@ match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
                               pld_weight = pld_weight, abo_weight = abo_weight, height_weight = height_weight, cpra_weight = cpra_weight, checks = checks)
 
   matches <- cas_offer_rank(hm, bm, pm, dm, cm, overall_ranking = cas_ov, efficiency_weight = efficiency_weight, cost_weight = cost_weight, distance_weight = distance_weight, checks = checks)
-  if(nrow(matches) == 0){
-    return(matches)
+  # if(nrow(matches) == 0){
+  #   return(matches)
+  # }
+  # matches <- acceptance_prob(matches, dons = dons, cands = cands)
+  if(nrow(matches) > 0L){
+    # return(matches)
+    matches <- acceptance_prob(matched_data = matches, dons = dons, cands = cands)
   }
-  matches <- acceptance_prob(matches, dons = dons, cands = cands)
 
   don_ov <- select(dons, d_id, don_org)
   can_ov <- select(cands, c_id, surg_type)

@@ -32,25 +32,25 @@ calculate_cas_dist(
 )
 }
 \arguments{
-\item{data}{dataset of patients containing covaraites for las calculations and other continuous distribution factors}
+\item{data}{dataset of patients containing covariates for las calculations and other continuous distribution factors}
 
-\item{wl_model}{model to use in waitlist component of the CAS}
+\item{wl_model}{model to use in the waitlist component of the CAS}
 
 \item{post_tx_model}{model to use in the post-transplant component of the CAS}
 
-\item{wl_weight}{weight applied to waitlist model}
+\item{wl_weight}{weight applied to the waitlist model}
 
-\item{post_tx_weight}{weight applied to post transplant model}
+\item{post_tx_weight}{weight applied to the post transplant model}
 
-\item{bio_weight}{weight applied to biologoical measures (height, abo (blood), and hla)}
+\item{bio_weight}{weight applied to biological measures (height, abo (blood), and hla)}
 
 \item{peds_weight}{weight applied to give a bonus to pediatric patients}
 
 \item{pld_weight}{weight given as bonus if a prior living donor}
 
-\item{wl_cap}{number of days to cap the waitlist component CAS score at CAS}
+\item{wl_cap}{number of days to cap the waitlist component CAS score at CAS (days)}
 
-\item{post_tx_cap}{number of days to cap the post transplant component of the CAS}
+\item{post_tx_cap}{number of days to cap the post transplant component of the CAS (days)}
 
 \item{abo_weight}{weight for blood type compatability (if not specified will default to 1/3 of bio weight)}
 
@@ -58,15 +58,15 @@ calculate_cas_dist(
 
 \item{cpra_weight}{weight for cpra compatability (if not specified will default to 1/3 of bio weight)}
 
-\item{checks}{whether or not to check the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
+\item{checks}{if TRUE checks the conditions and display warnings, this is there to not check conditions every time the simulation is iterated}
 
 \item{match_data}{dataset of patients containing covaraites for las calculations and other continuous distribution factors}
 
 \item{efficiency_weight}{weight given for efficiency (cost and distance)}
 
-\item{cost_weight}{weight given for cost part of CAS (if not specified is half of efficiency weight)}
+\item{cost_weight}{weight given for cost part of CAS (if not specified will default to 1/2 of efficiency_weight)}
 
-\item{distance_weight}{weight given for distance part of CAS (if not specified is half of efficiency weight)}
+\item{distance_weight}{weight given for distance part of CAS (if not specified will default to 1/2 of efficiency_weight)}
 }
 \value{
 \code{calculate_sub_cas} a dataset of candidate, CAS score on a 0 to 1 scale (lu_score) without the efficiency weight,
@@ -76,11 +76,12 @@ and ov_rank which is the overall rank of each candidate. 1 is the highest CAS sc
 a dataset complete with the efficient/distance metric
 }
 \description{
-Calcualte the subCAS
+Calculate the subCAS (non-distance related metrics)
 }
 \examples{
-calculate_sub_cas(data = syn_cands, wl_model = "CAS23", post_tx_model = "CAS23",
- wl_weight = .25, post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
+calculate_sub_cas(data = syn_cands, wl_model = "CAS23",
+ post_tx_model = "CAS23", wl_weight = .25,
+ post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
  pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
 
 calculate_cas_dist(syn_matches, efficiency_weight = 0.1)

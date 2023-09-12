@@ -1,6 +1,6 @@
 #' Transplant Candidates
 #'
-#' @param matches nested tibble of matches
+#' @param matches nested tibble of matches by d_id
 #' @param rec_ids vector of c_id of transplanted candidates
 #' @param max_offer maximum number of offers to consider
 #'
@@ -19,7 +19,7 @@
 #' mz <- match_las(syn_cands, syn_dons, wl_model = "LAS15", post_tx_model = "LAS15",
 #'  wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365)
 #' transplant_candidates(mz, rec_ids = NA, max_offer = NA)
-transplant_candidates <- function(matches, rec_ids, max_offer = NA){
+transplant_candidates <- function(matches, rec_ids = NA, max_offer = NA){
 
   rec_ids <- rec_ids
   new_ids <- NA

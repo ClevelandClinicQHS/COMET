@@ -11,6 +11,7 @@
 #' @importFrom stats rbinom
 #' @importFrom stats model.matrix
 #' @importFrom stats plogis
+#' @importFrom rlang .data
 #'
 #' @return matched_data with acceptance probabilities
 #' @export
@@ -20,11 +21,11 @@
 #'  acceptance_prob(dons = syn_dons, cands = syn_cands)
 acceptance_prob <- function(matched_data, dons, cands){
 
-  can_need <- select(cands, c_id, center) |>
-    mutate(center2 = factor(ifelse(center %in% accpt_centers, center, -99), levels = c(-99, accpt_centers)))
+  can_need <- select(cands, .data$c_id, .data$center) |>
+    mutate(center2 = factor(ifelse(.data$center %in% accpt_centers, .data$center, -99), levels = c(-99, accpt_centers)))
 
-  don_need <- select(dons, d_id, smoke_hist, age, don_dcd) |>
-    mutate(age_55 = (age > 55))
+  don_need <- select(dons, .data$d_id, .data$smoke_hist, .data$age, .data$don_dcd) |>
+    mutate(age_55 = (.data$age > 55))
 
   mz1 <- matched_data |>
     left_join(don_need, by = "d_id") |>

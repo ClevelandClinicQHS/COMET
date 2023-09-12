@@ -2,11 +2,12 @@
 #'
 #' @name gen_and_spawn
 #'
-#' @param desired whether the bayesian parameters should be "random" or the "mean"
+#' @param desired whether the Bayesian parameters should be "random" or the "mean"
 #' @param days number of days (must be greater than > 1)
-#' @param return_params TRUE or FALSE, to return the paramters
+#' @param return_params if TRUE returns the parameters used for generating donors and candidates
 #'
-#' @return either a list containing synthetic donors and parameters used to generate their attritubutes or a dataset of synthetic donors
+#' @return if return_params = TRUE a list containing synthetic donors or candidates and parameters used to generate their attributes
+#'  Otherwise a data set of synthetic donors or candidates
 #' @export
 #'
 #' @examples
@@ -14,7 +15,8 @@
 #' d1 <- gen_and_spawn_donors("random", days = 10)
 #' c1 <- gen_and_spawn_candidates("random", days = 10)
 #' }
-gen_and_spawn_donors <- function(desired = "random", days, return_params = FALSE){
+gen_and_spawn_donors <- function(desired = "random", days,
+                                 return_params = FALSE){
 
   if(days <= 1L)stop('days must be greater than 1')
   if(!(desired %in% c("mean", "random")))stop('desired must be "random" or "mean"')
@@ -61,7 +63,8 @@ gen_and_spawn_donors <- function(desired = "random", days, return_params = FALSE
 #' @rdname gen_and_spawn
 #'
 #' @export
-gen_and_spawn_candidates <- function(desired = "random", days, return_params = FALSE){
+gen_and_spawn_candidates <- function(desired = "random", days,
+                                     return_params = FALSE){
 
   if(days <= 1L)stop('days must be greater than 1')
   if(!(desired %in% c("mean", "random")))stop('desired must be "random" or "mean"')
@@ -177,6 +180,7 @@ gen_and_spawn_candidates <- function(desired = "random", days, return_params = F
 #' @importFrom stringr str_extract
 #' @importFrom stringr str_detect
 #' @importFrom purrr pmap_chr
+#' @importFrom rlang .data
 generate_params <- function(characteristic, desired = "random"){
 
   char_sel <- characteristic
@@ -272,7 +276,7 @@ generate_params <- function(characteristic, desired = "random"){
     small_param <- params[str_which(names(params), paste0("betas\\[", mx_id,",\\d+\\]"))]
     zeros <- rep(small_param, length(small_ids))
     names(zeros) <- pmap_chr(expand.grid("betas[", small_ids, ",", 1:length(small_param),"]") |>
-                               arrange(Var2, Var4), paste0)
+                               arrange(.data$Var2, .data$Var4), paste0)
 
     ot_params <- params[str_which(names(params), paste0("betas\\[", mx_id,",\\d+\\]"), negate = TRUE)]
     names(ot_params) <- pmap_chr(expand.grid("betas[", ot_ids, ",", 1:length(small_param),"]"), paste0)
@@ -406,9 +410,9 @@ spawn_donors <- function(days, daily_lambdas_center, sex_thetas,
       gt_20pkyr = ifelse(smoke_hist == 1, "Y", "N"),
       don_org = factor(sample(don_org_lvs, size = ov_n, replace = TRUE, prob = don_org_odds)),
       don_dcd = rbinom(n = ov_n, size = 1, prob = dcd_mm),
-      # don_util = rbinom(n = ov_n, size = 1, prob = don_util_odds[2])
+      don_util = rbinom(n = ov_n, size = 1, prob = don_util_odds[2])
       ## 2018 to 2019 utilization rate
-      don_util = rbinom(n = ov_n, size = 1, prob = 0.9239855)
+      # don_util = rbinom(n = ov_n, size = 1, prob = 0.9239855)
     )
 
   df_g00 <- df_g4 |>
@@ -441,6 +445,8 @@ spawn_donors <- function(days, daily_lambdas_center, sex_thetas,
 #' @importFrom stats rgamma
 #' @importFrom stats rbinom
 #' @importFrom stats rpois
+#' @importFrom tibble as_tibble_row
+#' @importFrom rlang .data
 spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_beta, #dx_mat_beta,
                              abo_mat_beta,
                              age_params,  hgt_params, wgt_params, wgt_params_c, diab_params,
@@ -806,7 +812,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     ga_sas <- sapply(ar_levels[-length(ar_levels)],  function(x) ifelse(df_g6ar2$ga_sd == x, 1, 0))
 
     if(class(ga_sas)[1] == "numeric"){
-      ga_sas <- as_tibble_row(ga_sas)
+      ga_sas <- tibble::as_tibble_row(ga_sas)
       colnames(ga_sas) <- gsub("\\..*", "", colnames(ga_sas))
     }
 
@@ -815,7 +821,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     ## All the A's put back together
     df_g6a2 <- bind_rows(sarcA, lamA, df_g6ar2)
   }else{
-    df_g6are <- tibble(name = names(ar_levels[-length(ar_levels)]), value = 0) |>  pivot_wider()
+    df_g6are <- tibble(name = names(ar_levels[-length(ar_levels)]), value = 0) |> tidyr::pivot_wider()
     df_g6a2 <- bind_cols(sarcA, lamA, df_g6are)
   }
 
@@ -863,7 +869,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     gd_sds <- sapply(dr_levels[-length(dr_levels)],  function(x) ifelse(df_g6dr$gd_sd == x, 1, 0))
 
     if(class(gd_sds)[1] == "numeric"){
-      gd_sds <- as_tibble_row(gd_sds)
+      gd_sds <- tibble::as_tibble_row(gd_sds)
       colnames(gd_sds) <- gsub("\\..*", "", colnames(gd_sds))
     }
 
@@ -872,7 +878,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     ## Put the D's back together
     df_g6d2 <- bind_rows(sarcD, df_g6dr)
   }else{
-    df_g6dre <- tibble(name = names(dr_levels[-length(dr_levels)]), value = 0) |>  pivot_wider()
+    df_g6dre <- tibble(name = names(dr_levels[-length(dr_levels)]), value = 0) |> tidyr::pivot_wider()
     df_g6d2 <- bind_cols(sarcD, df_g6dre)
   }
 

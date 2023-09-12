@@ -1,13 +1,12 @@
 #' Iteration
 #'
 #' @param date current date to simulate
-#' @param candidate_database full candidate database, from initialization
-#' @param donor_database full candidate database, from initialization
+#' @param candidate_database full candidate database
+#' @param donor_database full donor database
 #' @param updated_list named list of databases that updated at each time point, originally all empty, \cr
-#' @param include_matches TRUE or FALSE, whether or not the include the donor and candidates matches
-#'  current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, non_used_donors
+#' @param include_matches if TRUE returns the donor and candidates matches
 #' @param match_alg function for matching
-#' @param ... arguemnts for match algorithm
+#' @param ... arguments for match algorithm
 #'
 #' @return a named list of databases that updated at each time point, originally all empty, current_candidates, waitlist_death_database, recipient_database, and post_tx_death_database, non_used_donors
 #' @export
@@ -130,7 +129,14 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
   if(nrow(alive) == 0){
 
     recipient_database <- post_tx_alive
+    new_candidates <- filter(candidate_database, listing_day == date)
+
+    ## if no new candidates procee
+
     current_candidates <- alive
+    if(nrow(new_candidates) > 0L){
+      current_candidates <- bind_rows(current_candidates, new_candidates)
+    }
 
     l <- list(current_candidates = current_candidates,
               recipient_database = recipient_database,
@@ -152,6 +158,15 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
     recipient_database <- post_tx_alive
     current_candidates <- alive
 
+    ##
+    new_candidates <- filter(candidate_database, listing_day == date)
+
+    ## if no new candidates proceed
+    if(nrow(new_candidates) > 0L){
+      current_candidates <- bind_rows(current_candidates, new_candidates)
+    }
+    ## added 8/4/23add current candidates
+
     l <- list(current_candidates = current_candidates,
               recipient_database = recipient_database,
               waitlist_death_database = waitlist_death_database,
@@ -165,59 +180,83 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
   ## Matching
   matches <- match_alg(alive, donors_avl, ...)
 
-  if(nrow(matches) == 0) {
-    ## makes sure this is updated
-    recipient_database <- post_tx_alive
-    current_candidates <- alive
-
-    l <- list(current_candidates = current_candidates,
-              recipient_database = recipient_database,
-              waitlist_death_database = waitlist_death_database,
-              post_tx_death_database = post_tx_death_database,
-              non_used_donors = non_used_donors,
-              all_matches = all_matches
-    )
-    return(l)
-  }
+  # if(nrow(matches) == 0) {
+  #
+  #   ## Adds new candidates to for the next day
+  #   ## added this 8/4/23 because if no matches skips to next day, but didn't add new patients
+  #   new_candidates <- filter(candidate_database, listing_day == date)
+  #
+  #   ## if no new candidates proceed
+  #   if(nrow(new_candidates) > 0L){
+  #     current_candidates <- bind_rows(current_candidates, new_candidates)
+  #   }
+  #
+  #   ## makes sure this is updated
+  #   recipient_database <- post_tx_alive
+  #   current_candidates <- alive
+  #
+  #   l <- list(current_candidates = current_candidates,
+  #             recipient_database = recipient_database,
+  #             waitlist_death_database = waitlist_death_database,
+  #             post_tx_death_database = post_tx_death_database,
+  #             non_used_donors = non_used_donors,
+  #             all_matches = all_matches
+  #   )
+  #   return(l)
+  # }
 
   if(include_matches){
     matches1 <- dplyr::mutate(ungroup(matches), data = lapply(data, function(x) dplyr::select(x, c_id)))
     all_matches <- bind_rows(all_matches, matches1)
+  }else{ ## added the else 8/4/23 for
+    all_matches <- matches[0,]
   }
 
   ## transplant candidate to accepted donor
-  tr <- transplant_candidates(matches, recipient_database$c_id)
+  ## changed 8/4/23 to have if(nrow(matches) >0L)
+  if(nrow(matches) > 0L){
+    tr <- transplant_candidates(matches, recipient_database$c_id)
 
-  tr_x <- tr |>
-    group_by(d_id) |>
-    dplyr::summarise(organs_rec = sum(organs_rec)) |>
-    tidyr::complete(d_id = min(donors_avl$d_id):max(donors_avl$d_id), fill = list(organs_rec = 0))
+    tr_x <- tr |>
+      group_by(d_id) |>
+      dplyr::summarise(organs_rec = sum(organs_rec)) |>
+      tidyr::complete(d_id = min(donors_avl$d_id):max(donors_avl$d_id), fill = list(organs_rec = 0))
 
-  dead_donors <- left_join(donors_avl, tr_x, by = c("d_id")) |>
-    mutate(organs_non_used = organs_avl - organs_rec) |>
-    filter(organs_non_used > 0 |is.na(organs_non_used)) |>
-    select(d_id, don_org, organs_non_used) |>
-    mutate(non_used_day = date) |>
-    left_join(matches, by = c("d_id", "don_org")) |>
-    mutate(offers = sapply(data, nrow)) |>
-    select(-data)
+    nu_donors <- left_join(donors_avl, tr_x, by = c("d_id")) |>
+      mutate(organs_non_used = organs_avl - organs_rec) |>
+      filter(organs_non_used > 0 |is.na(organs_non_used)) |>
+      select(d_id, don_org, organs_non_used) |>
+      mutate(non_used_day = date) |>
+      left_join(matches, by = c("d_id", "don_org")) |>
+      mutate(offers = sapply(data, nrow),
+             nm = FALSE) |>
+      select(-data)
+
+    tr_cids <- tr$c_id
+  }else{
+    nu_donors <- select(donors_avl, d_id, don_org, organs_non_used = organs_avl) |>
+      mutate(non_used_day = date, offers = 0, .before = don_org, nm = TRUE)
+
+    tr_cids <- NA
+    tr <- tibble(c_id = as.integer(c()), surg_type = factor(c(''), levels = c('D', 'E', 'S')))
+  }
 
   ## keep track of how many donor organs were used
-  if(nrow(dead_donors) >=1){
-    of2 <- sapply(dead_donors$offers, function(x) ifelse(is.null(x), 0, as.numeric(x)))
-    if(any(of2 == 0)){
-     dead_donors$offers <- of2
+  if(nrow(nu_donors) > 0L){
+    of2 <- sapply(nu_donors$offers, function(x) ifelse(is.null(x), 0, as.numeric(x)))
+    if(any(of2 == 0L)){
+     nu_donors$offers <- of2
     }
   }else{
-    dead_donors$offers <- as.numeric(c())
+    nu_donors$offers <- as.numeric(c())
   }
 
   ## adds them to the database
-  non_used_donors <- bind_rows(non_used_donors, dead_donors)
+  non_used_donors <- bind_rows(non_used_donors, nu_donors)
 
   ## moves the patients from waitlist to transplanted and matches them to their actual donor
   new_recipients <- alive |>
-    filter(c_id %in% tr$c_id) |>
+    filter(c_id %in% tr_cids) |>
     mutate(transplant_day = date) |>
     select(-days_on_waitlist) |>
     left_join(tr, by = c("c_id", "surg_type"))
@@ -226,7 +265,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
 
   ## updates waitlist
   current_candidates <- alive |>
-    filter(!(c_id %in% tr$c_id))
+    filter(!(c_id %in% tr_cids))
 
   ## Adds new candidates to for the next day
   new_candidates <- filter(candidate_database, listing_day == date)

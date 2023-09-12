@@ -7,7 +7,7 @@
 #' @param patients dataset of lung transplant patients
 #' @param model which model to use for identifying deaths
 #' @param elapsed_time name of variable for elapsed time
-#' @param pre_tx is the updating for pre or post transplatn
+#' @param pre_tx is the updating for pre or post transplant
 #' @param cap cap for survival calculation
 #' @param date current date (numeric)
 #'

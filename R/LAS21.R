@@ -83,10 +83,10 @@ calc_wl_las21 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
       +
         ## specific diagnoses
         case_when(
-          dx %in% c(214, 1608)                        ~  0.40107198445555, # bronchiectasis
-          dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.64590852776042, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  1.39885489102977, # sarcoidosis w/ PAP <= 30mmHg (group A)
-          dx %in% c(1519, 1613)                       ~ 0.2088684500011, # pulmonary Fibrosis, not idiopathic:
+          dx %in% c(214, 1608)                                          ~  0.40107198445555, # bronchiectasis
+          dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~ -0.64590852776042, # sarcoidosis w/ PAP  > 30mmHg (group D)
+          dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~  1.39885489102977, # sarcoidosis w/ PAP <= 30mmHg (group A)
+          dx %in% c(1519, 1613)                                         ~ 0.2088684500011, # pulmonary Fibrosis, not idiopathic:
           # TRUE ~ 0
           .default = 0
         ) +
@@ -191,11 +191,11 @@ calc_post_tx_las21 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         # ## specific diagnoses
         case_when(
-          dx %in% c(214, 1608)                        ~  0.12048575705296, # bronchiectasis
-          dx == 1612                                  ~ -0.33402539276216, # Obliterative bronchiolitis
-          dx == 106                                   ~ -0.33402539276216, # Constrictive bronchiolitis
-          dx == 1605 & dx_grp == "D" & pap_mean > 30  ~  0.43537371336129, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  0.98051166673574, # sarcoidosis w/ PAP <= 30mmHg (group A)
+          dx %in% c(214, 1608)                                          ~  0.12048575705296, # bronchiectasis
+          dx == 1612                                                    ~ -0.33402539276216, # Obliterative bronchiolitis
+          dx == 106                                                     ~ -0.33402539276216, # Constrictive bronchiolitis
+          dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~  0.43537371336129, # sarcoidosis w/ PAP  > 30mmHg (group D)
+          dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~  0.98051166673574, # sarcoidosis w/ PAP <= 30mmHg (group A)
           # TRUE ~ 0
           .default = 0
         ) +

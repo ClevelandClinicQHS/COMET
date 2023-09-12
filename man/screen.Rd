@@ -65,26 +65,30 @@ Screen for compatible candidates and donors based on biological factors
 
 \code{pra_screen} not yet implemented will screen on pra compatibility organs.
 
-\code{count_screen} Makes sure double lung transplant are matched with double lung donors, singles can be matched and received a one of the double lung
+\code{count_screen} Makes sure double lung transplant are matched with double lung donors, singles can be matched and received one of the double lung
 
 \code{las_dist_calc} Returns the distance between the matched candidates and donors with LAS distance categories.
 
 Matching rules for LAS distances are broken into the following zones, 250 nautical miles, 500, 1000, 1500, 2500, the US
 }
 \examples{
-## The functions will use the internal cands and dons stored in the package
+## The functions will use the internal syn_cands
+## and syn_dons stored in the package
 height_match <- height_screen(syn_cands, syn_dons)
 abo_match <- abo_screen(syn_cands, syn_dons)
 pra_match <- pra_screen(syn_cands, syn_dons)
 count_match <- count_screen(syn_cands, syn_dons)
 las_dists <- las_dist_calc(syn_cands, syn_dons)
 cas_dists <- dist_calc(syn_cands, syn_dons)
-las_rank <- calculate_las(syn_cands, wl_model = "LAS15", post_tx_model = "LAS15",
- wl_cap = 365, post_tx_cap = 365, wl_weight = 2, post_tx_weight = 1)
-las_offers <- las_offer_rank(height_match, abo_match, count_match, pra_match, las_dists,
- overall_ranking = las_rank)
-cas_rank <- calculate_sub_cas(syn_cands, wl_model = "CAS23", post_tx_model = "CAS23",
- wl_weight = 0.25, post_tx_weight = 0.25, bio_weight = 0.15, pld_weight = 0.05, peds_weight = 0.2)
-cas_offers <- cas_offer_rank(height_match, abo_match, count_match, pra_match, cas_dists,
- overall_ranking = cas_rank)
+las_rank <- calculate_las(syn_cands, wl_model = "LAS15",
+ post_tx_model = "LAS15",
+ wl_cap = 365, post_tx_cap = 365, wl_weight = 2,
+  post_tx_weight = 1)
+las_offers <- las_offer_rank(height_match, abo_match,
+ count_match, pra_match, las_dists, overall_ranking = las_rank)
+cas_rank <- calculate_sub_cas(syn_cands, wl_model = "CAS23",
+ post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
+  bio_weight = 0.15, pld_weight = 0.05, peds_weight = 0.2)
+cas_offers <- cas_offer_rank(height_match, abo_match, count_match,
+ pra_match, cas_dists, overall_ranking = cas_rank)
 }

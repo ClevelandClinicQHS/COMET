@@ -7,22 +7,26 @@
 \format{
 `syn_dons` A tibble of 10 synthetic donors
 \describe{
-\item{d_id}{unqiue donor identifier}
+\item{d_id}{unique donor identifier}
 \item{hospital}{integer from 1-1691 of donor hospital}
 \item{recovery_day}{day of organ recovery}
-\item{male}{sex male =1, female = 0}
-\item{race_eth}{race and ethnicity of donor}
+\item{male}{sex: male =1, female = 0}
+\item{race_eth}{race and ethnicity of donor
+ (NH White, NH Black, Hispanic, Asian, Amer. Ind, Hawaiian, Multi/Other)}
 \item{hgt_in}{height in inches (nearest 0.5)}
 \item{hgt_cm}{height in centimeters}
-\item{cod}{cause of death}
-\item{abo}{blood type}
+\item{cod}{cause of death
+(1=anoxia, 2=cerebrovascular, 3=head trauma, 4=CNS tumor, 999=Other)}
+\item{abo}{blood type (A, AB, B, O)}
 \item{age}{age of donor}
-\item{don_org}{donor organ}
-\item{smoke_hist}{smoking history}
-\item{gt_20pkyr}{greater than 20 pack years history}
-\item{don_dcd}{deceased cardiac death}
-\item{don_util}{donor able to be used for transplant(not transplanted outside US)}
-\item{organs_avl}{1 or 2, number of lungs avilable}
+\item{don_org}{donor organ
+(DLU=Double Lung, LUL= Left Lung, LUR = Right Lung)}
+\item{smoke_hist}{smoking history (1, 0)}
+\item{gt_20pkyr}{greater than 20 pack years history
+(Y or N, identical to smoke_hist)}
+\item{don_dcd}{deceased cardiac death (1, 0)}
+\item{don_util}{donor able to be used for transplant (not transplanted outside US)}
+\item{organs_avl}{1 or 2, number of lungs available}
 
 }
 }

@@ -34,7 +34,7 @@ identify_deaths(
 
 \item{elapsed_time}{name of variable for elapsed time}
 
-\item{pre_tx}{is the updating for pre or post transplatn}
+\item{pre_tx}{is the updating for pre or post transplant}
 
 \item{cap}{cap for survival calculation}
 

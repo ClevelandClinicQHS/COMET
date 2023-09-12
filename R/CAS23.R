@@ -3,18 +3,18 @@
 #' @name calc_las
 #'
 #' @param data dataset of patient data
-#' @param c_id unique candidate id
+#' @param c_id unique candidate identifier
 #' @param dx_grp diagnosis group (A, B, C, or D)
 #' @param dx diagnosis (numeric, see details for ones in LAS/CAS)
 #' @param age age in years
-#' @param bmi bmi {\out{(kg/m<sup>2</sup>)}}
+#' @param bmi \ifelse{html}{\out{(body mass index (kg/m<sup>2</sup>)}}{\eqn{\textrm{body mass index (kg/m}^{2})}}
 #' @param funstat functional status (1 = No assistance needed, 2 = some assistance needed, 3 = total assistance needed)
 #' @param walk6m six minute walk distance (ft)
 #' @param o2rest amount of oxygen received if needed while resting (L/min)
 #' @param pap_syst systolic pulmonary artery pressure (mmHg)
 #' @param pap_mean mean pulmonary artery pressure (mmHg)
-#' @param pco2 \out{pco<sub>2</sub> (mmHG)}
-#' @param pco2_15 \out{pco<sub>2</sub> increase by at least 15\% threshold (0 or 1(TRUE))}
+#' @param pco2 \ifelse{html}{\out{pCO<sub>2</sub> (mmHg)}}{\eqn{\textrm{pCO}_{2}\textrm{ (mmHg)}}}
+#' @param pco2_15 \ifelse{html}{\out{increase in pCO<sub>2</sub> by 15 percent (1,0)}}{\eqn{\textrm{increase in pCO}_{2}\textrm{ by 15 percent (1,0)}}}
 #' @param cont_mech continuous mechangical ventilation (0 or 1)
 #' @param creat creatinine (mg/dL)
 #' @param bili bilirubin (mg/dL)
@@ -118,11 +118,11 @@ calc_wl_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
       +
         ## specific diagnoses
         case_when(
-          dx == 1608                                  ~  0.40107198445555, # bronchiectasis
-          dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.64590852776042, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  1.39885489102977, # sarcoidosis w/ PAP <= 30mmHg (group A)
-          dx %in% c(1519, 1613)                       ~  0.2088684500011, # pulmonary Fibrosis, not idiopathic:
-          dx == 1617                                  ~  0.2088684500011, # pulmonary Fibrosis, COVID:
+          dx == 1608                                                    ~  0.40107198445555, # bronchiectasis
+          dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~ -0.64590852776042, # sarcoidosis w/ PAP  > 30mmHg (group D)
+          dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~  1.39885489102977, # sarcoidosis w/ PAP <= 30mmHg (group A)
+          dx %in% c(1519, 1613)                                         ~  0.2088684500011, # pulmonary Fibrosis, not idiopathic:
+          dx == 1617                                                    ~  0.2088684500011, # pulmonary Fibrosis, COVID:
           .default = 0
         ) +
         ## age
@@ -224,13 +224,6 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
       lp =
         ## age
         case_when(
-          # age < 20             ~  0.06763086 * (20 - age) + 0.78241832,
-          # between(age, 20, 30) ~ -0.07824183 * (age - 20) + 0.78241832,
-          # between(age, 30, 40) ~  0.00000000 * (age - 30) + 0.00000000,
-          # between(age, 40, 50) ~  0.00259081 * (age - 40) + 0.00000000,
-          # between(age, 50, 60) ~  0.01674634 * (age - 50) + 0.02590812,
-          # between(age, 60, 70) ~  0.02271446 * (age - 60) + 0.19337148,
-          # age > 70             ~  0.06122886 * (age - 70) + 0.42051611,
           age < 20             ~  0.0676308559079852 * (20 - age) + 0.78241832,
           between(age, 20, 30) ~ -0.0782418319259552 * (age - 20) + 0.78241832,
           between(age, 30, 40) ~  0.0000000000000000 * (age - 30) + 0.00000000,
@@ -241,12 +234,6 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         ## cardiac index
         case_when(
-          # ci < 2                ~ -0.48374911 * (2 - ci) + 0.04030226,
-          # between(ci, 2, 2.5)   ~ -0.08060453 * (ci - 2) + 0.04030226,
-          # between(ci, 2.5, 3.5) ~  0.01361694 * (ci - 2.5) + 0.00000000,
-          # between(ci, 3.5, 4.5) ~  0.08084326 * (ci - 3.5) + 0.01361694,
-          # between(ci, 4.5, 5)   ~  0.06969388 * (ci - 4.5) + 0.094460208,
-          # ci > 5                ~ -0.00232646 * (ci - 5) + 0.12930714 ,
           ci < 2                ~ -0.4837491139906200 * (2 - ci)   + 0.04030226,
           between(ci, 2, 2.5)   ~ -0.0806045255202868 * (ci - 2)   + 0.04030226,
           between(ci, 2.5, 3.5) ~  0.0136169358319050 * (ci - 2.5) + 0.00000000,
@@ -256,11 +243,6 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         ## creatinine
         case_when(
-          # creat < 0.4 & age >= 18              ~  -7.40167261 * (0.4 - creat) + 0.41872820,
-          # between(creat, 0.4, 0.6) & age >= 18 ~  -1.25841033 * (creat - 0.4) + 0.41872820,
-          # between(creat, 0.6, 0.8) & age >= 18 ~   0.37123489 * (creat - 0.6) + 0.16704614,
-          # between(creat, 0.8, 1.4) & age >= 18 ~   0.68443018 * (creat - 0.8) + 0.24129311,
-          # creat > 1.4 & age >= 18              ~   0.68818942 * (creat - 1.4) + 0.65195122,
           creat < 0.4 & age >= 18              ~  -7.4016726145812200 * (0.4 - creat) + 0.41872820,
           between(creat, 0.4, 0.6) & age >= 18 ~  -1.2584103289549000 * (creat - 0.4) + 0.41872820,
           between(creat, 0.6, 0.8) & age >= 18 ~   0.3712348866558860 * (creat - 0.6) + 0.16704614,
@@ -269,12 +251,6 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         ## six minute walk distance
         case_when(
-          # walk6m < 200                ~  -0.00025351 * (200 - walk6m) + 0.11168755,
-          # between(walk6m, 200, 600)   ~  -0.00028418 * (walk6m - 200) + 0.11168755,
-          # between(walk6m, 600, 800)   ~  -4.96e-06   * (walk6m - 600) + -0.00198468,
-          # between(walk6m, 800, 1200)  ~  -0.00019505 * (walk6m - 800) + -0.00297703,
-          # between(walk6m, 1200, 1600) ~  -0.00074286 * (walk6m - 1200) + -0.08099560,
-          # walk6m > 1600               ~   0.00353741 * (walk6m - 1600) + -0.37813894
           walk6m < 200                ~  -0.0002535116049789 * (200 - walk6m)  +  0.11168755,
           between(walk6m, 200, 600)   ~  -0.0002841805913329 * (walk6m - 200)  +  0.11168755,
           between(walk6m, 600, 800)   ~  -0.0000049617083362 * (walk6m - 600)  + -0.00198468,
@@ -284,31 +260,18 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         ## specific disease group diagnoses
         case_when(
-          # dx %in% c(214, 1608)                        ~  -0.0267066632752342, # bronchiectasis
-          # dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.0561853179859775, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          # dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  0.501743373724746, # sarcoidosis w/ PAP <= 30mmHg (group A)
-          # dx %in% c(1519, 1613)                       ~ 0.0465046441086442, # pulmonary Fibrosis, not idiopathic:
-          # dx == 1617                                  ~ 0.0465046441086442, # COVID-19 Fibrosis:
-          # dx == 1611                                  ~ -0.271420385917441, # Lymphangioleiomyomatosis
-          # dx == 1612                                  ~ -0.13263497847748, # Obliterative bronchiolitis
-          # dx == 106                                   ~ -0.13263497847748, # Constrictive bronchiolitis
-          dx == 1608                                  ~ -0.026706663, # bronchiectasis
-          dx == 1605 & dx_grp == "D" & pap_mean > 30  ~ -0.0561853179859775, # sarcoidosis w/ PAP  > 30mmHg (group D)
-          dx == 1605 & dx_grp == "A" & pap_mean <= 30 ~  0.501743373724746, # sarcoidosis w/ PAP <= 30mmHg (group A)
-          dx %in% c(1519, 1613)                       ~  0.046504644, # pulmonary Fibrosis, not idiopathic:
-          dx == 1617                                  ~  0.046504644, # COVID-19 Fibrosis:
-          dx == 1611                                  ~ -0.271420385917441, # Lymphangioleiomyomatosis
-          dx == 1612                                  ~ -0.13263497847748, # Obliterative bronchiolitis
-          dx == 106                                   ~ -0.13263497847748, # Constrictive bronchiolitis
-          # TRUE ~ 0
+          dx == 1608                                                    ~ -0.026706663, # bronchiectasis
+          dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~  0.0561853179859775, # sarcoidosis w/ PAP  > 30mmHg (group D)
+          dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~  0.501743373724746, # sarcoidosis w/ PAP <= 30mmHg (group A)
+          dx %in% c(1519, 1613)                                         ~  0.046504644, # pulmonary Fibrosis, not idiopathic:
+          dx == 1617                                                    ~  0.046504644, # COVID-19 Fibrosis:
+          dx == 1611                                                    ~ -0.271420385917441, # Lymphangioleiomyomatosis
+          dx == 1612                                                    ~ -0.13263497847748, # Obliterative bronchiolitis
+          dx == 106                                                     ~ -0.13263497847748, # Constrictive bronchiolitis
           .default = 0
         ) +
         ## functional status
         case_when(
-          # ## none
-          # funstat == 1 ~ -0.00530412835918542,
-          # ## total
-          # funstat == 3 ~  0.0743784072905196,
           ## none
           funstat == 1 ~ -0.005304128,
           ## total
@@ -318,8 +281,7 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
         ) +
         ## diagnosis group
         case_when(
-          # dx_grp == "A" ~ -0.0989017959051597,
-          # dx_grp == "C" ~ -0.167126400661002,
+
           dx_grp == "A" ~ -0.098901796,
           dx_grp == "C" ~ -0.167126401,
           # TRUE ~ 0
