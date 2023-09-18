@@ -70,6 +70,8 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
 
   don_stats  <- cbind(don_stats, dd1)
 
+  2+2
+
   can_stats <- ct |>
     dplyr::group_by({{group}}) |>
     dplyr::summarise(can_count = dplyr::n(),
