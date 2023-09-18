@@ -74,9 +74,9 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
     }
   }
 
-  wl <- trunc_days(wl_model, cand_data = data, cap = wl_cap, wl = TRUE)
+  wl <- rmst(wl_model, cand_data = data, cap = wl_cap, wl = TRUE)
 
-  post_tx <- trunc_days(post_tx_model, cand_data = data, cap = post_tx_cap, wl = FALSE)
+  post_tx <- rmst(post_tx_model, cand_data = data, cap = post_tx_cap, wl = FALSE)
 
   data <- left_join(data, wl, by = "c_id") |>
     left_join(post_tx, by = "c_id", suffix = c(".wl",".ptx"))

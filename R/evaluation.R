@@ -70,8 +70,6 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
 
   don_stats  <- cbind(don_stats, dd1)
 
-  2+2
-
   can_stats <- ct |>
     dplyr::group_by({{group}}) |>
     dplyr::summarise(can_count = dplyr::n(),
@@ -98,41 +96,6 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
 
   return(sim_stats)
 
-}
-
-#' @name evaluation
-#'
-#' @param min_enroll_date start date for daily las count
-#' @param max_enroll_date end date for find daily las_count (default is maximum listing day of COMET)
-#' @param LAS_FUN function to calculate LAS/CAS score
-#' @param ... arguments pased to LAS_FUN
-#'
-#' @importFrom stats median
-#' @importFrom dplyr left_join
-#' @importFrom dplyr tibble
-#'
-#' @return \code{daily_count_las} returns a tibble of daily counts and mean and median LAS/CAS score per day
-#' @export
-daily_count_las <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, LAS_FUN = calculate_las, ...){
-
-  if(!is(COMET, "COMET")){stop("Must supply a COMET object")}
-
-  las <- LAS_FUN(COMET$all_candidates, ...)
-
-  if(is.na(max_date)) max_date <- max(COMET$all_candidates$listing_day)
-
-  dy <- min_enroll_date:max_date
-
-  sp_dy <- lapply(dy, function(x) spec_day(COMET, x))
-  spdy_las <- lapply(sp_dy, function(x) left_join(x, las, by = "c_id", suffix = c("_t", "_s")))
-
-  dy_count <- sapply(sp_dy, nrow)
-  dy_las <- sapply(spdy_las, function(x) mean(x$lu_score_s))
-  dy_las2 <- sapply(spdy_las, function(x) median(x$lu_score_s))
-
-  tb <- dplyr::tibble(day = dy, count = dy_count, las_mean = dy_las, las_median = dy_las2)
-
-  return(tb)
 }
 
 #' @name evaluation

@@ -10,21 +10,21 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// mean_survival
-NumericVector mean_survival(NumericVector lp, NumericVector surv_rates);
-RcppExport SEXP _COMET_mean_survival(SEXP lpSEXP, SEXP surv_ratesSEXP) {
+// expected_survival
+NumericVector expected_survival(NumericVector lp, NumericVector surv_rate);
+RcppExport SEXP _COMET_expected_survival(SEXP lpSEXP, SEXP surv_rateSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
     Rcpp::traits::input_parameter< NumericVector >::type lp(lpSEXP);
-    Rcpp::traits::input_parameter< NumericVector >::type surv_rates(surv_ratesSEXP);
-    rcpp_result_gen = Rcpp::wrap(mean_survival(lp, surv_rates));
+    Rcpp::traits::input_parameter< NumericVector >::type surv_rate(surv_rateSEXP);
+    rcpp_result_gen = Rcpp::wrap(expected_survival(lp, surv_rate));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_COMET_mean_survival", (DL_FUNC) &_COMET_mean_survival, 2},
+    {"_COMET_expected_survival", (DL_FUNC) &_COMET_expected_survival, 2},
     {NULL, NULL, 0}
 };
 

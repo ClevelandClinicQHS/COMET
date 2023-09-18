@@ -43,9 +43,9 @@ calculate_las <- function(wl_data, wl_model = NULL, post_tx_model = NULL,  wl_ca
     }
   }
 
-  wl <- trunc_days(wl_model, cand_data = wl_data, cap = wl_cap, wl = TRUE)
+  wl <- rmst(wl_model, cand_data = wl_data, cap = wl_cap, wl = TRUE)
 
-  post_tx <- trunc_days(post_tx_model, cand_data = wl_data, cap = post_tx_cap, wl = FALSE)
+  post_tx <- rmst(post_tx_model, cand_data = wl_data, cap = post_tx_cap, wl = FALSE)
 
   ## joins pre and post las
   both <- left_join(wl, post_tx, by = "c_id", suffix = c(".wl",".ptx"))

@@ -1,27 +1,27 @@
-#' Truncated Survival days
+#' Restricted Meant Survival Time
 #'
 #' @param object only character objects of 'LAS15', 'LAS21' and 'CAS23' are acceptable
 #' @param ... arguement given from other methods
 #'
-#' @return a dateset of candidates, linear predictor and mean survival
+#' @return a dateset of candidates, linear predictor and restricted mean survival time in days
 #' @export
-#' @name trunc_days
+#' @name rmst
 #'
 #' @examples
-#' trunc_days("LAS21", syn_cands, 365, TRUE)
-trunc_days <- function(object, ...){
-  UseMethod("trunc_days")
+#' rmst("LAS21", syn_cands, 365, TRUE)
+rmst <- function(object, ...){
+  UseMethod("rmst")
 }
 
 #' @param cand_data candidate data
 #' @param cap cap for truncation survival
 #' @param wl TRUE (waitlist) or FALSE (post_transplant)
 #'
-#' @rdname trunc_days
+#' @rdname rmst
 #' @importFrom dplyr filter
 #' @importFrom dplyr mutate
 #' @export
-trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE, ...){
+rmst.character <- function(object, cand_data, cap = NA, wl = TRUE, ...){
 
   model <- match.arg(toupper(object), c("LAS15", "LAS21", "CAS23"))
   if(wl){
@@ -60,7 +60,7 @@ trunc_days.character <- function(object, cand_data, cap = NA, wl = TRUE, ...){
 
   surv <- filter(surv, .data$Days <= cap)
   surv1 <- f1(cand_data) |>
-    mutate(expected = mean_survival(lp, surv$Survival))
+    mutate(expected = expected_survival(lp, surv$Survival))
   return(surv1)
 }
 
