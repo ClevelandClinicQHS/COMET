@@ -80,6 +80,7 @@ calc_wl_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
   bili <- eval_tidy(bili, data)
   ecmo <- eval_tidy(ecmo, data)
 
+  if(any(duplicated(c_id))){stop(paste0(sum(duplicated(c_id)), " candidates have duplicated c_id value\nPlease give each candidate a unique identifier"))}
 
   data2 <- tibble(c_id, dx_grp, dx, age, bmi, funstat, walk6m, o2rest, pap_syst,
                   pap_mean, pco2_15, pco2, cont_mech, creat, bili, ecmo) |>
@@ -200,6 +201,8 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
   creat <- eval_tidy(creat, data)
   ci <- eval_tidy(ci, data)
   ecmo <- eval_tidy(ecmo, data)
+
+  if(any(duplicated(c_id))){stop(paste0(sum(duplicated(c_id)), " candidates have duplicated c_id value\nPlease give each candidate a unique identifier"))}
 
   data2 <- tibble(c_id, dx_grp, dx, age,  funstat, cont_mech, creat, ci, walk6m, pap_mean, ecmo) |>
     ## adds the missing values for variables if they aren't give

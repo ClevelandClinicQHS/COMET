@@ -56,12 +56,12 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
   ct <- concat2(COMET, min_enroll_date = min_enroll_date, max_enroll_date = max_enroll_date,
                 wl_censor_date = wl_censor_date, post_tx_censor_date = post_tx_censor_date)
 
-  dd <- COMET$non_used_donors
+  dd <- filter(COMET$non_used_donors, .data$non_used_day <= wl_censor_date)
 
   dd1 <- dplyr::filter(dd, .data$don_org == "DLU" & .data$organs_non_used == 1) |>
-    dplyr::left_join(select(ct, .data$d_id, .data$offer_rank), by = c("d_id")) |>
+    dplyr::left_join(select(ct, "d_id", "offer_rank"), by = c("d_id")) |>
     dplyr::mutate(offers = .data$offers - .data$offer_rank) |>
-    dplyr::select(-.data$offer_rank) |>
+    dplyr::select(-"offer_rank") |>
     dplyr::bind_rows(dd)
 
   dd1 <- dplyr::summarise(dd1, nu_med_offer = median(.data$offers, na.rm = TRUE), nu_orgs = sum(.data$organs_non_used))

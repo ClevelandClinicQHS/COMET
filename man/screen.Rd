@@ -88,7 +88,8 @@ las_offers <- las_offer_rank(height_match, abo_match,
  count_match, pra_match, las_dists, overall_ranking = las_rank)
 cas_rank <- calculate_sub_cas(syn_cands, wl_model = "CAS23",
  post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
-  bio_weight = 0.15, pld_weight = 0.05, peds_weight = 0.2)
+ bio_weight = 0.15, pld_weight = 0.05, peds_weight = 0.2,
+ wl_cap = 365, post_tx_cap = 1826)
 cas_offers <- cas_offer_rank(height_match, abo_match, count_match,
  pra_match, cas_dists, overall_ranking = cas_rank)
 }

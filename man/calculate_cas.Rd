@@ -82,7 +82,7 @@ Calculate the subCAS (non-distance related metrics)
 calculate_sub_cas(data = syn_cands, wl_model = "CAS23",
  post_tx_model = "CAS23", wl_weight = .25,
  post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
- pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
+ pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1826)
 
 calculate_cas_dist(syn_matches, efficiency_weight = 0.1)
 }

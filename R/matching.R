@@ -27,7 +27,7 @@
 #'   post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
 #' match_cas(syn_cands, syn_dons, wl_model = "CAS23",
 #'  post_tx_model = "CAS23", wl_weight =.25,
-#'   post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,
+#'   post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1826,
 #'  bio_weight = .15, pld_weight = 0.05,
 #'  peds_weight = 0.2, efficiency_weight = 0.1)
 match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight = NA, wl_cap = NA, post_tx_weight = NA, post_tx_cap = NA, checks = TRUE){
@@ -40,7 +40,7 @@ match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
 
   las_scores <- calculate_las(cands, wl_model = wl_model, post_tx_model = post_tx_model, wl_weight = wl_weight,
                                wl_cap = wl_cap, post_tx_weight = post_tx_weight, post_tx_cap = post_tx_cap, checks = checks) |>
-    mutate(ov_rank = rank(-lu_score))
+    mutate(ov_rank = rank(-.data$lu_score))
 
   matches <- las_offer_rank(hm, bm, pm, dm, cm, overall_ranking = las_scores)
   if(nrow(matches) > 0L){
@@ -49,13 +49,13 @@ match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
   }
 
   ## acceptance
-  don_ov <- select(dons, d_id, don_org)
-  can_ov <- select(cands, c_id, surg_type)
+  don_ov <- select(dons, "d_id", "don_org")
+  can_ov <- select(cands, "c_id", "surg_type")
 
   matches <- left_join(matches, can_ov, by = "c_id") |>
     left_join(don_ov, by = "d_id") |>
-    arrange(d_id, offer_rank) |>
-    nest(.by = c(d_id, don_org))
+    arrange(.data$d_id, .data$offer_rank) |>
+    nest(.by = c(.data$d_id, .data$don_org))
 
   return(matches)
 
@@ -92,6 +92,7 @@ match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
 #' @importFrom dplyr arrange
 #' @importFrom tidyr nest
 #' @importFrom dplyr near
+#' @importFrom rlang .data
 match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight = NA, wl_cap = NA,
                         post_tx_weight = NA, post_tx_cap = NA, bio_weight = NA, peds_weight = NA,
                       pld_weight = NA, efficiency_weight = NA, abo_weight = NA, height_weight = NA,
@@ -114,22 +115,18 @@ match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
                               pld_weight = pld_weight, abo_weight = abo_weight, height_weight = height_weight, cpra_weight = cpra_weight, checks = checks)
 
   matches <- cas_offer_rank(hm, bm, pm, dm, cm, overall_ranking = cas_ov, efficiency_weight = efficiency_weight, cost_weight = cost_weight, distance_weight = distance_weight, checks = checks)
-  # if(nrow(matches) == 0){
-  #   return(matches)
-  # }
-  # matches <- acceptance_prob(matches, dons = dons, cands = cands)
+
   if(nrow(matches) > 0L){
-    # return(matches)
     matches <- acceptance_prob(matched_data = matches, dons = dons, cands = cands)
   }
 
-  don_ov <- select(dons, d_id, don_org)
-  can_ov <- select(cands, c_id, surg_type)
+  don_ov <- select(dons, "d_id", "don_org")
+  can_ov <- select(cands, "c_id", "surg_type")
 
   matches <- left_join(matches, can_ov, by = "c_id") |>
     left_join(don_ov, by = "d_id") |>
-    arrange(d_id, offer_rank) |>
-    nest(.by = c(d_id, don_org))
+    arrange(.data$d_id, .data$offer_rank) |>
+    nest(.by = c(.data$d_id, .data$don_org))
 
   return(matches)
 

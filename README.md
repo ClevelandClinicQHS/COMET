@@ -30,13 +30,13 @@ library(COMET)
 r1 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.091253 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.984511 mins
 
 r2 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
-                     wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
+                     wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826,
                      bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.657694 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 4.745483 mins
 ```
 
 A simple way to evaluate the COMET runs, one can also look at the
@@ -51,7 +51,7 @@ eval_simulation(r1)
 #>   post_tx_years   tx_ppy   wld_ppy   ptd_ppy med_dist     pt_1yr pt_2yr med_wlt
 #> 1      1444.019 1.134039 0.1129521 0.1391948  200.713 0.08801159      0      80
 #>   med_ptt med_offer don_count don_util nu_med_offer nu_orgs
-#> 1     187         6      2884     2718          127     688
+#> 1     187         6      2884     2718           NA       0
 
 eval_simulation(r2)
 #>   can_count tx_count wait_death removal cens wait_death_yrs post_tx_death
@@ -59,7 +59,7 @@ eval_simulation(r2)
 #>   post_tx_years   tx_ppy   wld_ppy   ptd_ppy med_dist     pt_1yr pt_2yr med_wlt
 #> 1      1452.402 1.128228 0.1105304 0.1225556 379.4788 0.08744557      0      74
 #>   med_ptt med_offer don_count don_util nu_med_offer nu_orgs
-#> 1     189         7      2884     2718           96     652
+#> 1     189         7      2884     2718           NA       0
 
 ## See results by diagnosis group
 eval_simulation(r1, group = dx_grp)
@@ -74,15 +74,15 @@ eval_simulation(r1, group = dx_grp)
 #> 3            13      112.0164 1.4748543 0.14014453 0.1160544 199.6450
 #> 4           120      806.5216 1.6560141 0.20936900 0.1487871 193.0029
 #>       pt_1yr pt_2yr med_wlt med_ptt med_offer don_count don_util nu_med_offer
-#> 1 0.09478673      0     137   200.5        13      2884     2718          127
-#> 2 0.10655738      0     103   194.5         4      2884     2718          127
-#> 3 0.05429864      0      83   184.0         6      2884     2718          127
-#> 4 0.08767471      0      62   179.0         4      2884     2718          127
+#> 1 0.09478673      0     137   200.5        13      2884     2718           NA
+#> 2 0.10655738      0     103   194.5         4      2884     2718           NA
+#> 3 0.05429864      0      83   184.0         6      2884     2718           NA
+#> 4 0.08767471      0      62   179.0         4      2884     2718           NA
 #>   nu_orgs
-#> 1     688
-#> 2     688
-#> 3     688
-#> 4     688
+#> 1       0
+#> 2       0
+#> 3       0
+#> 4       0
 eval_simulation(r2, group = dx_grp)
 #>   dx_grp can_count tx_count wait_death removal cens wait_death_yrs
 #> 1      A      1207      898         28      31  250      1105.8042
@@ -95,15 +95,15 @@ eval_simulation(r2, group = dx_grp)
 #> 3            14     143.75633 2.1682493 0.07200828 0.09738702 379.4836
 #> 4            99     734.64750 1.4395505 0.20776002 0.13475851 384.5771
 #>       pt_1yr pt_2yr med_wlt med_ptt med_offer don_count don_util nu_med_offer
-#> 1 0.10356347      0     113   214.5        11      2884     2718           96
-#> 2 0.07200000      0     110   184.0         7      2884     2718           96
-#> 3 0.11808118      0      39   187.0         3      2884     2718           96
-#> 4 0.07318741      0      63   177.5         6      2884     2718           96
+#> 1 0.10356347      0     113   214.5        11      2884     2718           NA
+#> 2 0.07200000      0     110   184.0         7      2884     2718           NA
+#> 3 0.11808118      0      39   187.0         3      2884     2718           NA
+#> 4 0.07318741      0      63   177.5         6      2884     2718           NA
 #>   nu_orgs
-#> 1     652
-#> 2     652
-#> 3     652
-#> 4     652
+#> 1       0
+#> 2       0
+#> 3       0
+#> 4       0
 ```
 
 One can also mix and match the models and weights under the LAS/CAS
@@ -116,12 +116,12 @@ mortality receives the same weight as post-transplant (1 to 1).
 r3 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.276705 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.264484 mins
 
 r4 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.338412 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.892879 mins
 ```
 
 ## A more indepth demonstration to show what is going on behind the scenes
@@ -138,7 +138,7 @@ syn_dons <- gen_and_spawn_donors(days = 10)
 head(syn_cands)
 #> # A tibble: 6 × 47
 #>    c_id center listing_day  male dx_grp race_eth age_at_listing airway  oxygen
-#>   <int> <fct>        <dbl> <int> <chr>  <fct>             <dbl>  <dbl>   <dbl>
+#>   <int> <fct>        <int> <int> <chr>  <fct>             <dbl>  <dbl>   <dbl>
 #> 1     1 7                1     0 B      NH White           64.3  1.70   0.0632
 #> 2     2 8                1     0 D      NH Black           66.8  1.27  -0.402 
 #> 3     3 15               1     1 D      NH White           67.6 -0.158  0.637 
@@ -195,12 +195,12 @@ l <- list("current_candidates" = r2cc,
 
 l_1 <- iteration(401, syn_cands, syn_dons, include_matches = FALSE, updated_list = l, match_alg = match_cas,
                  wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
-                 wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+                 wl_cap = 365, post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 l_2 <- iteration(402, syn_cands, syn_dons, include_matches = FALSE, updated_list = l_1, match_alg = match_cas,
                  wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
-                 wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+                 wl_cap = 365, post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 nrow(l_2$waitlist_death_database) - nrow(l_1$waitlist_death_database)
@@ -219,7 +219,7 @@ for(i in 401:410){
   l_i <- iteration(i,
                    syn_cands, syn_dons, include_matches = FALSE, updated_list = l_i,
                    match_alg = match_cas,  wl_model = "CAS23", post_tx_model = "CAS23",
-                   wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
+                   wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826,
                    bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
   
 }
@@ -325,7 +325,7 @@ identify_removals(patients = r2cc, elapsed_time = days_on_waitlist, cap = 2365)
 
 ## post-transplant deaths
 update_patients(r2rd, model = "CAS23r", 
-                elapsed_time = days_after_tx, pre_tx = FALSE, cap = 1825, date = 401)
+                elapsed_time = days_after_tx, pre_tx = FALSE, cap = 1826, date = 401)
 #> $Dead
 #> # A tibble: 0 × 9
 #> # ℹ 9 variables: c_id <dbl>, lp <dbl>, days_after_tx <dbl>, dx_grp <chr>,
@@ -392,7 +392,7 @@ screening, matching and acceptance.
 dons_401 <- dplyr::filter(syn_dons, recovery_day == 401)
 
 mtc <- match_cas(cands = r2cc, dons = dons_401, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25,
-                 post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825, bio_weight = .15,
+                 post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826, bio_weight = .15,
                  pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
 
 mtc
@@ -498,7 +498,7 @@ the `ov_rank`
 ``` r
 ## ranking
 lr1 <- calculate_sub_cas(r2cc, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25,
-                         post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825, bio_weight = .15,
+                         post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826, bio_weight = .15,
                          pld_weight = 0.05, peds_weight = 0.2)
 
 lr1
@@ -540,7 +540,7 @@ offs
 #>     c_id  d_id match_single match_double abo_exact distance_nm lu_score ov_rank
 #>    <dbl> <int> <lgl>        <lgl>        <lgl>           <dbl>    <dbl>   <dbl>
 #>  1  -999  2885 TRUE         TRUE         TRUE            1834.    0.219    1019
-#>  2  -998  2885 FALSE        TRUE         TRUE             253.    0.260    1029
+#>  2  -998  2885 FALSE        TRUE         TRUE             253.    0.259    1029
 #>  3  -942  2885 TRUE         TRUE         TRUE             389.    0.250    1057
 #>  4  -941  2885 FALSE        TRUE         TRUE             486.    0.252    1047
 #>  5  -867  2885 TRUE         TRUE         TRUE             482.    0.276     805
@@ -558,7 +558,7 @@ acceptance_prob(offs, dons = dons_401, cands = r2cc)
 #>     c_id  d_id match_single match_double abo_exact distance_nm lu_score ov_rank
 #>    <dbl> <int> <lgl>        <lgl>        <lgl>           <dbl>    <dbl>   <dbl>
 #>  1  -999  2885 TRUE         TRUE         TRUE            1834.    0.219    1019
-#>  2  -998  2885 FALSE        TRUE         TRUE             253.    0.260    1029
+#>  2  -998  2885 FALSE        TRUE         TRUE             253.    0.259    1029
 #>  3  -942  2885 TRUE         TRUE         TRUE             389.    0.250    1057
 #>  4  -941  2885 FALSE        TRUE         TRUE             486.    0.252    1047
 #>  5  -867  2885 TRUE         TRUE         TRUE             482.    0.276     805
@@ -575,7 +575,7 @@ transplant_candidates(matches = mtc)
 #>    d_id don_org  c_id match_single match_double abo_exact distance_nm lu_score
 #>   <int> <fct>   <dbl> <lgl>        <lgl>        <lgl>           <dbl>    <dbl>
 #> 1  2885 DLU      3087 TRUE         TRUE         TRUE             427.    0.283
-#> 2  2886 DLU      2795 TRUE         FALSE        TRUE             935.    0.267
+#> 2  2886 DLU      2795 TRUE         FALSE        TRUE             935.    0.266
 #> # ℹ 7 more variables: ov_rank <dbl>, pcost <dbl>, offer_rank <dbl>, pred <dbl>,
 #> #   accept <int>, surg_type <fct>, organs_rec <dbl>
 ```
@@ -613,7 +613,7 @@ the subsequent offer, called `all_matches`
 ``` r
 l_1m <- iteration(401, syn_cands, syn_dons, include_matches = TRUE, updated_list = l, match_alg = match_cas,
                  wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
-                 wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+                 wl_cap = 365, post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 l_1m$all_matches
@@ -735,20 +735,20 @@ rmst("LAS21", cand_data = r2cc, cap = 365, wl = TRUE)
 #>  9  -959  3.26     338.
 #> 10  -956  4.23     300.
 #> # ℹ 1,063 more rows
-rmst("LAS21", cand_data = r2cc, cap = 365, wl = FALSE)
+rmst("CAS23", cand_data = r2cc, cap = 1826, wl = FALSE)
 #> # A tibble: 1,073 × 3
 #>     c_id    lp expected
 #>    <dbl> <dbl>    <dbl>
-#>  1  -999 1.45      325.
-#>  2  -998 0.914     341.
-#>  3  -997 0.802     343.
-#>  4  -993 1.41      326.
-#>  5  -990 0.724     345.
-#>  6  -989 0.922     341.
-#>  7  -987 0.935     340.
-#>  8  -977 0.889     341.
-#>  9  -959 0.815     343.
-#> 10  -956 1.51      322.
+#>  1  -999 1.08     1212.
+#>  2  -998 1.00     1248.
+#>  3  -997 0.649    1391.
+#>  4  -993 1.53      980.
+#>  5  -990 0.623    1401.
+#>  6  -989 0.591    1412.
+#>  7  -987 0.938    1276.
+#>  8  -977 1.00     1247.
+#>  9  -959 0.733    1360.
+#> 10  -956 1.67      905.
 #> # ℹ 1,063 more rows
 ```
 

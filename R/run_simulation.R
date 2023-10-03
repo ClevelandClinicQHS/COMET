@@ -23,7 +23,7 @@
 #' r2 <- run_simulation(days = 20, can_start = 1000,
 #'  match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
 #'  wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365,
-#'   post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+#'   post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
 #'    peds_weight = 0.2, efficiency_weight = 0.1)
 #'  }
 run_simulation <- function(days, can_start = 1250,
@@ -46,28 +46,29 @@ run_simulation <- function(days, can_start = 1250,
       dy <- ceiling(x/350)+10
       dy <- dy*50
       q1 <- gen_and_spawn_candidates(days = dy) |>
-        dplyr::left_join(odd3, by = dplyr::join_by(dx_grp))
+        dplyr::left_join(odd3, by = "dx_grp")
 
       q1lu <- calculate_las(q1, wl_model = "LAS15", post_tx_model = "LAS15", wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365) |>
-        dplyr::select(c_id, lu_score) |>
-        dplyr::left_join(q1, by = dplyr::join_by(c_id)) |>
-        dplyr::slice_sample(n = x*3, weight_by = dx_weight) |>
-        dplyr::slice_sample(n = x, weight_by = (lu_score^(-3)))
+        dplyr::select("c_id", "lu_score") |>
+        dplyr::left_join(q1, by = "c_id") |>
+        dplyr::slice_sample(n = x*3, weight_by = .data$dx_weight) |>
+        dplyr::slice_sample(n = x, weight_by = (.data$lu_score^(-3)))
 
       q1o <- sample(1:x, x, prob = q1lu$lu_score)
 
       q2 <- q1lu[q1o,] |>
-        dplyr::select(-listing_day) |>
-        tidyr::nest(.by = dx_grp) |>
-        dplyr::left_join(prior_dist_gammas, by = dplyr::join_by(dx_grp)) |>
-        dplyr::mutate(listing_day = purrr::pmap(list(data, shape, rate), ~sort(round(-rgamma(n = nrow(..1), shape = ..2, rate = ..3))))) |>
-        dplyr::select(dx_grp, data, listing_day) |>
-        tidyr::unnest(cols = c(data, listing_day)) |>
-        dplyr::arrange(listing_day) |>
-        dplyr::relocate(listing_day, .after = c_id) |>
+        dplyr::select(-"listing_day") |>
+        tidyr::nest(.by = "dx_grp") |>
+        dplyr::left_join(prior_dist_gammas, by = "dx_grp") |>
+        dplyr::mutate(listing_day = mapply(function(x, y, z) sort(round(-rgamma(n = nrow(x), shape = y, rate = z))), .data$data, .data$shape, .data$rate)) |>
+        # dplyr::mutate(listing_day = purrr::pmap(list(.data$data, .data$shape, .data$rate), ~sort(round(-rgamma(n = nrow(..1), shape = ..2, rate = ..3))))) |>
+        dplyr::select("dx_grp", "data", "listing_day") |>
+        tidyr::unnest(cols = c("data", "listing_day")) |>
+        dplyr::arrange(.data$listing_day) |>
+        dplyr::relocate("listing_day", .after = "c_id") |>
         dplyr::mutate(c_id = -dplyr::n() + dplyr::row_number()-1) |>
-        dplyr::arrange(c_id) |>
-        dplyr::select(-c(lu_score, dx_weight))
+        dplyr::arrange(.data$c_id) |>
+        dplyr::select(-c("lu_score", "dx_weight"))
 
       return(q2)
 
@@ -95,7 +96,7 @@ run_simulation <- function(days, can_start = 1250,
 
   cl <- dplyr::bind_rows(old_candidates, new_candidates)
 
-  dl <- dplyr::filter(new_donors, don_util == 1)
+  dl <- dplyr::filter(new_donors, .data$don_util == 1)
 
   ## creating empty lists
   current_candidates_d <- tibble()
@@ -104,24 +105,24 @@ run_simulation <- function(days, can_start = 1250,
 
   # recipient_d <- tibble()
   recipient_d <- cl |>
-    dplyr::filter(c_id == -Inf) |>
+    dplyr::filter(.data$c_id == -Inf) |>
     dplyr::mutate(transplant_day = NA_real_)
 
   waitlist_death_d <- cl |>
-    dplyr::filter(c_id == -Inf) |>
+    dplyr::filter(.data$c_id == -Inf) |>
     dplyr::mutate(death_day = NA_real_, days_on_waitlist = NA_real_, removal_day = NA_real_)
 
   post_tx_death_d <- cl |>
-    dplyr::filter(c_id == -Inf) |>
+    dplyr::filter(.data$c_id == -Inf) |>
     dplyr::mutate(transplant_day = NA_real_, d_id = NA_real_, death_day = NA_real_)
 
   non_used_donors <- dl |>
-    dplyr::filter(d_id == -Inf) |>
-    dplyr::select(d_id) |>
+    dplyr::filter(.data$d_id == -Inf) |>
+    dplyr::select("d_id") |>
     dplyr::mutate(non_used_day = NA_real_, offers = NA_integer_)
 
   all_matches <- match_f(cands = old_candidates, dons = head(dl, 5), ...) |>
-    dplyr::filter(d_id == -Inf)
+    dplyr::filter(.data$d_id == -Inf)
 
   iter0 <- list(
     current_candidates = old_candidates,

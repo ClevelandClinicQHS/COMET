@@ -35,7 +35,7 @@ devtools::install_github("ClevelandClinicQHS/COMET")
 
 ## Basic example
 This will simulate the 2015 Lung Allocation Score (LAS) policy for 400 days (`r1`) and then the same scenario under the Composite Allocaiton Score (CAS) policy (`r2`).
-```{r example, cache=TRUE}
+```{r example}
 library(COMET)
 
 r1 <- run_simulation(days = 400, can_start = 1000,
@@ -44,7 +44,7 @@ r1 <- run_simulation(days = 400, can_start = 1000,
 
 r2 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
-                     wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
+                     wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826,
                      bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1, seed = 26638)
 
 ```
@@ -62,7 +62,7 @@ eval_simulation(r2, group = dx_grp)
 ```
 
 One can also mix and match the models and weights under the LAS/CAS policies. `r3` simulates the but the LAS policy but with the CAS waitlist and post-transplant mortality models (post-transplant survival truncated at 1 year). `r4` is the same scenario as `r3`, but waitlist mortality receives the same weight as post-transplant (1 to 1).
-```{r example2, cache=TRUE}
+```{r example2}
 r3 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
@@ -107,12 +107,12 @@ l <- list("current_candidates" = r2cc,
 
 l_1 <- iteration(401, syn_cands, syn_dons, include_matches = FALSE, updated_list = l, match_alg = match_cas,
                  wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
-                 wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+                 wl_cap = 365, post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 l_2 <- iteration(402, syn_cands, syn_dons, include_matches = FALSE, updated_list = l_1, match_alg = match_cas,
                  wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
-                 wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+                 wl_cap = 365, post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 nrow(l_2$waitlist_death_database) - nrow(l_1$waitlist_death_database)
@@ -120,13 +120,13 @@ nrow(l_2$post_tx_death_database)-nrow(l_1$post_tx_death_database)
 ```
 
 Looking in depth, `r nrow(l_2$waitlist_death_database)-nrow(l_1$waitlist_death_database)` died on the waiting list, and `r nrow(l_2$post_tx_death_database)-nrow(l_1$post_tx_death_database)` died post transplant on Day 402 in this scenario. The following would run ten days sequentially
-```{r}
+```{r full_iterate}
 l_i <- l
 for(i in 401:410){
   l_i <- iteration(i,
                    syn_cands, syn_dons, include_matches = FALSE, updated_list = l_i,
                    match_alg = match_cas,  wl_model = "CAS23", post_tx_model = "CAS23",
-                   wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825,
+                   wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826,
                    bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
   
 }
@@ -153,7 +153,7 @@ identify_removals(patients = r2cc, elapsed_time = days_on_waitlist, cap = 2365)
 
 ## post-transplant deaths
 update_patients(r2rd, model = "CAS23r", 
-                elapsed_time = days_after_tx, pre_tx = FALSE, cap = 1825, date = 401)
+                elapsed_time = days_after_tx, pre_tx = FALSE, cap = 1826, date = 401)
 
 ```
 
@@ -164,7 +164,7 @@ update_patients(r2rd, model = "CAS23r",
 dons_401 <- dplyr::filter(syn_dons, recovery_day == 401)
 
 mtc <- match_cas(cands = r2cc, dons = dons_401, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25,
-                 post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825, bio_weight = .15,
+                 post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826, bio_weight = .15,
                  pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
 
 mtc
@@ -173,7 +173,7 @@ mtc
 
 #### Screening
 These functions are designed to input candidates and donors respectively. Here are displayed screening for height (`hm1`), blood type (`am1`), count (`cm1` double vs single transplant), and a distance calculation (`lm1`). One can also create addition functions for screening
-```{r screeing}
+```{r screening}
 ## within matching
 ## there is screening
 ## Screening is done for height, blood type, organ count,
@@ -197,10 +197,10 @@ lm1
 
 In our simulation you will see to rankings `ov_rank` which stands for overall ranking and `offer_rank`. `ov_rank` is the candidates rank with respective to all candidates on that day based on their LAS/CAS score, regardless of donor/offer. `offer_rank` is the rank of the candidate with respect to all compatible candidates to the given donor. The part of the CAS score that does not change called the "sub-CAS" calculates the `ov_rank`
 
-```{r}
+```{r over rank}
 ## ranking
 lr1 <- calculate_sub_cas(r2cc, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25,
-                         post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1825, bio_weight = .15,
+                         post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826, bio_weight = .15,
                          pld_weight = 0.05, peds_weight = 0.2)
 
 lr1
@@ -208,7 +208,7 @@ lr1
 
 #### Offering and Acceptance
 Once all of the screening criteria, the candidates are matched on all screening criteria and made the offers in successive order based on either the CAS or LAS policy. There is an `acceptance_prop` function which will calculate the acceptance probability and run binomial acceptance for whether or not the candidate will accept the organ. And lastly `transplant_candidates` finds the first candidate that accepts the donor lung and transplants them so the donor identifier `d_id` is tracked with the candidate.
-```{r}
+```{r offers}
 
 ## matching and offering rank
 ## Pra screening is not currently implemented,
@@ -225,15 +225,15 @@ transplant_candidates(matches = mtc)
 ## Other tips and tricks
 
 You will notice a `pra_screen` function. This is a place-holder for now that returns a grid of every candidate and donor pairing. Future implementation will incorporate PRA screening criteria.
-```{r}
+```{r pra}
 pra_screen(cands = r2cc, dons = dons_401)
 ```
 
 If you want to return the matches along with the simulated output. All one has to do in the `run_simulation` or `iteration` function is set `include_matches = TRUE`. The output can be seen below is a nested tibble with a vector of donor ids (`d_id`) that are ranked in order for the subsequent offer, called `all_matches`
-```{r}
+```{r in_match}
 l_1m <- iteration(401, syn_cands, syn_dons, include_matches = TRUE, updated_list = l, match_alg = match_cas,
                  wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25, post_tx_weight = 0.25,
-                 wl_cap = 365, post_tx_cap = 1825, bio_weight = .15, pld_weight = 0.05,
+                 wl_cap = 365, post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 l_1m$all_matches
@@ -241,14 +241,14 @@ l_1m$all_matches
 
 ## A few helpful tips
 `eval_simulation` behind the seens runs a function callled `concat2`. It concatenates the several candidates/recipients datasests to one and calculates survival data as well. By default it will use the minimum and maximum number of days simulated from `all_candidates` in a COMET object, but those can also be specified if one wanted to exclude candidates after day 30 `min_enroll_date` and before day 300 days `max_enroll_date` or censor post-transplant early at day 330 `post_tx_censor_date`. Waitlist censoring `wl_censor_date` is also possible to change, but we would recommend keeping it the same as the `max_enroll_date`. 
-```{r}
+```{r concat}
 concat2(r1)
 concat2(r1, min_enroll_date = 31, max_enroll_date = 300, wl_censor_date = 300, post_tx_censor_date = 330)
 
 ```
 
 The function `spec_day` will allow one to grab the waiting list on a specific day.
-```{r}
+```{r spec}
 spec_day(r1, day = 300)
 ```
 
@@ -256,11 +256,11 @@ spec_day(r1, day = 300)
 
 ```{r rmst}
 rmst("LAS21", cand_data = r2cc, cap = 365, wl = TRUE)
-rmst("LAS21", cand_data = r2cc, cap = 365, wl = FALSE)
+rmst("CAS23", cand_data = r2cc, cap = 1826, wl = FALSE)
 ```
 
 One can calculate RMST if one supplies a vector of survival times, or one can calculate the survival given the raw survival value on a given day. For example below we will use Day 364 of the CAS23 waitlist survival model which has a baseline survival value of 0.994390.
-```{r exp}
+```{r exp_surv}
 expected_survival(lp = c(0, 1, -0.5), 0.994390)
 ```
 

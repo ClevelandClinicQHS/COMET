@@ -42,7 +42,7 @@
 #' calculate_sub_cas(data = syn_cands, wl_model = "CAS23",
 #'  post_tx_model = "CAS23", wl_weight = .25,
 #'  post_tx_weight = .25, bio_weight = .15, peds_weight = .2,
-#'  pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1825)
+#'  pld_weight = 0.05, wl_cap = 365, post_tx_cap = 1826)
 #'
 #' calculate_cas_dist(syn_matches, efficiency_weight = 0.1)
 calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = NA, post_tx_weight = NA, bio_weight = NA,
@@ -66,11 +66,23 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
     if(is.na(bio_weight3)){
       stop("cpra_weight is missing")
     }
+    if(is.na(wl_weight)){
+      stop("wl_weight is missing")
+    }
+    if(is.na(post_tx_weight)){
+      stop("post_tx_weight is missing")
+    }
+    if(is.na(wl_cap)){
+      stop("wl_weight is missing")
+    }
+    if(is.na(post_tx_cap)){
+      stop("post_tx_weight is missing")
+    }
     if(!is.character(wl_model)){
-      stop("\"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
+      stop("Only \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
     }
     if((!is.character(post_tx_model))){
-      stop("\"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
+      stop("Only \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
     }
   }
 
@@ -90,7 +102,7 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
         pld_weight * .data$pld,
       ov_rank = rank(-.data$lu_score)
     ) |>
-    select(.data$c_id, .data$lu_score, .data$ov_rank)
+    select("c_id", "lu_score", "ov_rank")
 
   return(data)
 }
@@ -118,7 +130,7 @@ calculate_cas_dist <- function(match_data, efficiency_weight = NA, cost_weight =
     stop("cost_weight is missing")
   }
   if(is.na(efficiency_weight2)){
-    stop("Distance_weight is missing")
+    stop("distance_weight is missing")
   }
   }
 

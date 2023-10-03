@@ -34,7 +34,6 @@ calculate_las <- function(wl_data, wl_model = NULL, post_tx_model = NULL,  wl_ca
                           wl_weight = NA, post_tx_weight = NA, checks = TRUE){
 
   if(checks){
-
     if((!is.character(wl_model))){
       stop("\"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
     }
@@ -79,9 +78,9 @@ scale_pre_post <- function(data, pre, post, pre_weight = NA, post_weight = NA, p
   data2 <- data |>
     mutate(raw_las = (post_weight * {{ post }}) - (pre_weight * {{ pre }}),
            # las_0_100 = custom_scale(raw_las, min = d.min, max = d.max) * 100,
-           lu_score = custom_scale(raw_las, min = d.min, max = d.max),
+           lu_score = custom_scale(.data$raw_las, min = d.min, max = d.max),
            .keep = "unused") |>
-    select(-raw_las)
+    select(-"raw_las")
 
   return(data2)
 }

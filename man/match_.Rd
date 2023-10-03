@@ -88,7 +88,7 @@ match_las(syn_cands, syn_dons, wl_model = "LAS15",
   post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
 match_cas(syn_cands, syn_dons, wl_model = "CAS23",
  post_tx_model = "CAS23", wl_weight =.25,
-  post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1825,
+  post_tx_weight = .25, wl_cap = 365, post_tx_cap = 1826,
  bio_weight = .15, pld_weight = 0.05,
  peds_weight = 0.2, efficiency_weight = 0.1)
 }

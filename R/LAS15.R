@@ -62,6 +62,7 @@ calc_wl_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
   ci <- eval_tidy(ci, data)
   diab <- eval_tidy(diab, data)
 
+  if(any(duplicated(c_id))){stop(paste0(sum(duplicated(c_id)), " candidates have duplicated c_id value\nPlease give each candidate a unique identifier"))}
 
   data2 <- tibble(c_id, dx_grp, dx, age, bmi, funstat, walk6m, o2rest, pap_syst,
                          pap_mean, pco2_15, pco2, cont_mech, creat, bili, cvp, bili_50, fvc, ci, diab) |>
@@ -180,6 +181,8 @@ calc_post_tx_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
   o2rest <- eval_tidy(o2rest, data)
   funstat <- eval_tidy(funstat, data)
   creat_150 <- eval_tidy(creat_150, data)
+
+  if(any(duplicated(c_id))){stop(paste0(sum(duplicated(c_id)), " candidates have duplicated c_id value\nPlease give each candidate a unique identifier"))}
 
   data2 <- tibble(c_id, dx_grp, dx, age, cont_mech, creat, ci, walk6m, pap_mean, o2rest, funstat, creat_150) |>
     ## adds the missing values for variables if they aren't given

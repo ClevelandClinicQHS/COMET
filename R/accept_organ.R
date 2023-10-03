@@ -21,10 +21,10 @@
 #'  acceptance_prob(dons = syn_dons, cands = syn_cands)
 acceptance_prob <- function(matched_data, dons, cands){
 
-  can_need <- select(cands, .data$c_id, .data$center) |>
+  can_need <- select(cands, "c_id", "center") |>
     mutate(center2 = factor(ifelse(.data$center %in% accpt_centers, .data$center, -99), levels = c(-99, accpt_centers)))
 
-  don_need <- select(dons, .data$d_id, .data$smoke_hist, .data$age, .data$don_dcd) |>
+  don_need <- select(dons, "d_id", "smoke_hist", "age", "don_dcd") |>
     mutate(age_55 = (.data$age > 55))
 
   mz1 <- matched_data |>

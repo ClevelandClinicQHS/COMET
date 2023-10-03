@@ -25,11 +25,11 @@
 #
 # ## Check this
 # mz <- match_cas(canwl = t_can, don_avl = t_don, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25,
-#                 post_tx_weight = 0.25,wl_cap = 365,post_tx_cap = 1825,bio_weight = 0.15, peds_weight = 0.2,
+#                 post_tx_weight = 0.25,wl_cap = 365,post_tx_cap = 1826,bio_weight = 0.15, peds_weight = 0.2,
 #                 pld_weight = 0.05, efficiency_weight = .1)
 #
 # mla <- match_las(canwl = t_can, don_avl = t_don, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = 0.25,
-#                 post_tx_weight = 0.25,wl_cap = 365,post_tx_cap = 1825)
+#                 post_tx_weight = 0.25,wl_cap = 365,post_tx_cap = 1826)
 #
 # ##
 # calc_wl_las15(t_can)

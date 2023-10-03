@@ -14,6 +14,7 @@
 #' @importFrom dplyr slice_head
 #' @importFrom dplyr bind_cols
 #' @importFrom dplyr bind_rows
+#' @importFrom rlang .data
 #'
 #' @examples
 #' mz <- match_las(syn_cands, syn_dons, wl_model = "LAS15", post_tx_model = "LAS15",
@@ -23,18 +24,21 @@ transplant_candidates <- function(matches, rec_ids = NA, max_offer = NA){
 
   rec_ids <- rec_ids
   new_ids <- NA
-  tr <- tidyr::unnest(matches, cols = c(data)) |>  mutate(organs_rec = 0) |>  filter(d_id == -Inf) |> ungroup()
+  tr <- tidyr::unnest(matches, cols = c(.data$data)) |>
+    mutate(organs_rec = 0) |>
+    filter(.data$d_id == -Inf) |>
+    ungroup()
 
   for(i in 1:nrow(matches)){
 
     ## prevent candidates from getting transplanted twice
-    d_of_org <- matches$data[[i]] |> filter(!(c_id  %in% rec_ids))
+    d_of_org <- matches$data[[i]] |> filter(!(.data$c_id  %in% rec_ids))
 
     d_org <- matches$don_org[i]
 
     if(d_org != "DLU"){
 
-      d_of_org <- filter(d_of_org, surg_type != "D")
+      d_of_org <- filter(d_of_org, .data$surg_type != "D")
     }
 
     if(nrow(d_of_org) == 0){next}
@@ -48,7 +52,7 @@ transplant_candidates <- function(matches, rec_ids = NA, max_offer = NA){
 
     if(any(d_of_org$accept == 1)){
 
-      d_of_org <- filter(d_of_org, accept == 1)
+      d_of_org <- filter(d_of_org, .data$accept == 1)
 
       of_x <- min(which(d_of_org$accept == 1))
 
@@ -62,7 +66,7 @@ transplant_candidates <- function(matches, rec_ids = NA, max_offer = NA){
         if(tx_o0$surg_type %in% c("E","D") & tx_o0$match_double){break}
         if(tx_o0$surg_type %in% c("S","E") & tx_o0$match_single){break}
 
-        d_of_org <- filter(d_of_org, c_id != tx_o0$c_id)
+        d_of_org <- filter(d_of_org, .data$c_id != tx_o0$c_id)
 
         if(nrow(d_of_org)==0){
           tx_o0 <- NULL
@@ -98,14 +102,14 @@ transplant_candidates <- function(matches, rec_ids = NA, max_offer = NA){
 
         tr$organs_rec[nrow(tr)] <- 1
 
-       ## Make sure we don't transplant the person twice
-        d_of_org <- filter(d_of_org, !(c_id %in% rec_ids))
+       ## Make sure a candidate is not transplanted twice
+        d_of_org <- filter(d_of_org, !(.data$c_id %in% rec_ids))
 
         if(nrow(d_of_org) == 0){next}
 
         if(all(!d_of_org$match_single)){next}
         ## Make sure they are able to receive the single offer
-        d_of_org <- filter(d_of_org, match_single)
+        d_of_org <- filter(d_of_org, .data$match_single)
 
         if(all(d_of_org$surg_type == "D")){next}
 
