@@ -3,3 +3,7 @@
 ^README\.Rmd$
 ^LICENSE\.md$
 ^CITATION\.cff$
+R/rests.R
+R/checkers.R
+sims_compar.R
+cas2.R

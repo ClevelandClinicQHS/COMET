@@ -12,4 +12,5 @@ R/new_implements.R
 R/checkers.R
 R/cas2.R
 R/tests.R
+R/simulation_eval.R
 README_cache
