@@ -121,7 +121,6 @@ calc_wl_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = dx, ag
           dx %in% c(1519, 1613)                                         ~ -0.2091170018125500, # pulmonary Fibrosis, not idiopathic:
           dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~ -0.4577749354638600, # sarcoidosis w/ PAP  > 30mmHg (group D)
           dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~  0.9330846239906700, # sarcoidosis w/ PAP <= 30mmHg (group A)
-          # TRUE ~ 0
           .default = 0
         ) +
         ## FVC
@@ -198,7 +197,6 @@ calc_post_tx_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
     ## truncates variables
     mutate(walk6m = if_else(walk6m < 0, 0, walk6m),
            creat = if_else(creat > 40, 40, creat)
-           # ci = if_else(ci > 5, 5, ci)
     )
 
   ## calculate post_tx las
@@ -231,7 +229,6 @@ calc_post_tx_las15 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
           dx %in% c(1519, 1613)                                         ~ -0.0723596761367600, # pulmonary Fibrosis, not idiopathic:
           dx == 1605 & dx_grp == "D" & pap_mean > 30                    ~ -0.0437880049066331, # sarcoidosis w/ PAP  > 30mmHg (group D)
           dx == 1605 & dx_grp == "A" & (pap_mean <= 30|is.na(pap_mean)) ~ -0.1389363636019300, # sarcoidosis w/ PAP <= 30mmHg (group A)
-          # TRUE ~ 0
           .default = 0
         ) +
         # ## oxygen at rest

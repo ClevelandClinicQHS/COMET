@@ -17,19 +17,26 @@
 #'
 #' @examples
 #'\dontrun{
+#'# Please ensure that data package is downloaded before running this example.
+#'# If it is not, see the ‘COMET’ package readme for details
+#'# on installing the required data package.
+#'if (requireNamespace("cometdata", quietly = TRUE)) {
 #' r1 <- run_simulation(days = 20, can_start = 1000,
 #'  match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
-#'   wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
+#'  wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365)
 #' r2 <- run_simulation(days = 20, can_start = 1000,
 #'  match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
 #'  wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365,
-#'   post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
-#'    peds_weight = 0.2, efficiency_weight = 0.1)
+#'  post_tx_cap = 1826, bio_weight = .15, pld_weight = 0.05,
+#'  peds_weight = 0.2, efficiency_weight = 0.1)
+#'  }
 #'  }
 run_simulation <- function(days, can_start = 1250,
                            match_alg = match_cas(),
                            ...,
                            seed = NULL, desired = "random", return_params = FALSE, include_matches = FALSE){
+
+  data_present()
 
   call1 <- match.call(expand.dots = TRUE)
 
@@ -61,7 +68,6 @@ run_simulation <- function(days, can_start = 1250,
         tidyr::nest(.by = "dx_grp") |>
         dplyr::left_join(prior_dist_gammas, by = "dx_grp") |>
         dplyr::mutate(listing_day = mapply(function(x, y, z) sort(round(-rgamma(n = nrow(x), shape = y, rate = z))), .data$data, .data$shape, .data$rate)) |>
-        # dplyr::mutate(listing_day = purrr::pmap(list(.data$data, .data$shape, .data$rate), ~sort(round(-rgamma(n = nrow(..1), shape = ..2, rate = ..3))))) |>
         dplyr::select("dx_grp", "data", "listing_day") |>
         tidyr::unnest(cols = c("data", "listing_day")) |>
         dplyr::arrange(.data$listing_day) |>
@@ -98,31 +104,16 @@ run_simulation <- function(days, can_start = 1250,
 
   dl <- dplyr::filter(new_donors, .data$don_util == 1)
 
-  ## creating empty lists
-  current_candidates_d <- tibble()
-  # cl |>
-  #   dplyr::filter(c_id == -Inf)
+  ## creating empty list
+  recipient_d <- dplyr::tibble(c_id = 0)[0,]
 
-  # recipient_d <- tibble()
-  recipient_d <- cl |>
-    dplyr::filter(.data$c_id == -Inf) |>
-    dplyr::mutate(transplant_day = NA_real_)
+  waitlist_death_d <- dplyr::tibble()
 
-  waitlist_death_d <- cl |>
-    dplyr::filter(.data$c_id == -Inf) |>
-    dplyr::mutate(death_day = NA_real_, days_on_waitlist = NA_real_, removal_day = NA_real_)
+  post_tx_death_d <- dplyr::tibble()
 
-  post_tx_death_d <- cl |>
-    dplyr::filter(.data$c_id == -Inf) |>
-    dplyr::mutate(transplant_day = NA_real_, d_id = NA_real_, death_day = NA_real_)
+  non_used_donors <- dplyr::tibble()
 
-  non_used_donors <- dl |>
-    dplyr::filter(.data$d_id == -Inf) |>
-    dplyr::select("d_id") |>
-    dplyr::mutate(non_used_day = NA_real_, offers = NA_integer_)
-
-  all_matches <- match_f(cands = old_candidates, dons = head(dl, 5), ...) |>
-    dplyr::filter(.data$d_id == -Inf)
+  all_matches <- dplyr::tibble()
 
   iter0 <- list(
     current_candidates = old_candidates,
@@ -134,13 +125,11 @@ run_simulation <- function(days, can_start = 1250,
   )
 
   ## iteration
-
   test_i <- iter0
   ds <- 1:days
   ### For progress bar in timing may eventually remove
   qs <- ceiling(stats::quantile(ds, probs = seq(.1, 1, .1)))
 
-  #################
   for(i in ds){
     test_i <- iteration(i,
                         cl, dl, include_matches = include_matches, updated_list = test_i
@@ -170,7 +159,6 @@ run_simulation <- function(days, can_start = 1250,
 
   if(return_params){
     pp <- list("params" = append(new_donors_p$params, new_candidates_p$params))
-    # return(params)
     l <- append(pp, l)
   }
 
@@ -179,7 +167,3 @@ run_simulation <- function(days, can_start = 1250,
   return(l)
 
 }
-
-
-######
-

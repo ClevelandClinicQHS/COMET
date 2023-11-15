@@ -6,7 +6,7 @@ Authors@R: c(person("Paul", "Gunsalus", email = "gunsalp@ccf.org", role = c("aut
              person("Mark", "Swiler", email = "swilerm@ccf.org", role = "ctb", comment = c(ORCID = "0000-0001-7070-671X")),
              person("Johnie", "Rose", email = "rosej15@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-7458-9303")),
              person("Jarrod", "Dalton", email = "daltonj@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-8336-1212")))
-Description: COMET provides an open source simulation to model the United States lung allocation process within synthetic candidate and donor populations.
+Description: COMET provides an open source simulation to model the United States lung allocation process within synthetic candidate and donor populations. This package interacts with data that is available in the 'cometdata' package. To access this data run "remotes::install_github('https://github.com/ClevelandClinicQHS/cometdata', type = 'source')".
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -24,6 +24,7 @@ Imports:
     tidyr (>= 1.3.0)
 Suggests:
     survival,
+    cometdata (>= 0.1.0),
     testthat (>= 3.0.0)
 Depends: 
     R (>= 4.2.0)

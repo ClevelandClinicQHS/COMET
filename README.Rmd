@@ -23,18 +23,18 @@ The goal of COMET is to simulate provide an open source framework to simulate th
 ## Installation
 
 You can install the development version of COMET like so:
-```{r, include=FALSE}
-library(COMET)
-```
-
-
 ```{r, eval=FALSE}
 # install.packages("devtools")
 devtools::install_github("ClevelandClinicQHS/COMET")
 ```
 
+You will be prompted to install this package if it is not installed already. It is needed for `run_simulation` and `gen_and_spawn_candidates/gen_and_spawn_donors`
+```{r, eval=FALSE}
+devtools::install_github("ClevelandClinicQHS/cometdata")
+```
+
 ## Basic example
-This will simulate the 2015 Lung Allocation Score (LAS) policy for 400 days (`r1`) and then the same scenario under the Composite Allocaiton Score (CAS) policy (`r2`).
+This will simulate the 2015 Lung Allocation Score (LAS) policy for 400 days (`r1`) and then the same scenario under the Composite Allocation Score (CAS) policy (`r2`).
 ```{r example}
 library(COMET)
 

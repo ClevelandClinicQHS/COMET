@@ -46,10 +46,8 @@ calculate_las <- function(wl_data, wl_model = NULL, post_tx_model = NULL,  wl_ca
 
   post_tx <- rmst(post_tx_model, cand_data = wl_data, cap = post_tx_cap, wl = FALSE)
 
-  ## joins pre and post las
   both <- left_join(wl, post_tx, by = "c_id", suffix = c(".wl",".ptx"))
 
-  ## sclaes the data
   scaled <- scale_pre_post(both, pre = .data$expected.wl, post = .data$expected.ptx,
                            pre_cap = wl_cap, post_cap = post_tx_cap,
                            pre_weight = wl_weight, post_weight = post_tx_weight)
@@ -69,15 +67,12 @@ custom_scale <- function(x, min, max){
 #' @importFrom dplyr select
 scale_pre_post <- function(data, pre, post, pre_weight = NA, post_weight = NA, pre_cap = NA, post_cap = NA){
 
-  ## max number for the las i.e living the whole Post transplant and dying immediately
   d.max <- (post_weight * post_cap)
-  ## min number of days
+
   d.min <- (-pre_weight * pre_cap)
 
-  ## scales wl and post_tx to 0 to 100
   data2 <- data |>
     mutate(raw_las = (post_weight * {{ post }}) - (pre_weight * {{ pre }}),
-           # las_0_100 = custom_scale(raw_las, min = d.min, max = d.max) * 100,
            lu_score = custom_scale(.data$raw_las, min = d.min, max = d.max),
            .keep = "unused") |>
     select(-"raw_las")

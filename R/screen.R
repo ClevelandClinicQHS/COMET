@@ -58,7 +58,6 @@ height_screen <- function(cands, dons){
 
   cand_x <- left_join(cands, single_rg, by = "dx_grp") |>
     left_join(double_rg, by = "dx_grp") |>
-    ## The .data$ are here so satisfy CRAN and prevent other bugs
     mutate(s_lower = .data$hgt_in + .data$s_lower,
            s_upper = .data$hgt_in + .data$s_upper,
            d_lower = .data$hgt_in + .data$d_lower,
@@ -67,18 +66,8 @@ height_screen <- function(cands, dons){
 
   don_x <- select(dons, "d_id", hgt_in_d = "hgt_in", "don_org")
 
-  ## This is hear to make the satisfy the CRAN checks
-  # x <- y <- NULL
-  ##
-  # by3 <- join_by(between(x$hgt_in_d, y$s_lower, y$s_upper))
-  # by4 <- join_by(between(x$hgt_in_d, y$d_lower, y$d_upper))
-  # by3 <- join_by(between("hgt_in_d", "s_lower", "s_upper"))
-  # by4 <- join_by(between("hgt_in_d", "d_lower", "d_upper"))
   s_match <- inner_join(don_x, cand_x, by = join_by(between("hgt_in_d", "s_lower", "s_upper")))
   d_match <- inner_join(don_x, cand_x, by = join_by(between("hgt_in_d", "d_lower", "d_upper")))
-
-  # s_match <- inner_join(cand_x, don_x, by = join_by(between(hgt_in_d, s_lower, s_upper)))
-  # d_match <- inner_join(cand_x, don_x, by = join_by(between(hgt_in_d, d_lower, d_upper)))
 
   ## Just as a checker
   height_match <- bind_rows(s_match, d_match) |>
@@ -171,8 +160,6 @@ dist_calc <- function(cands, dons){
 
 }
 
-
-
 #' @param ... tibbles of screening conditions, height, blood, pra, distance, etc
 #' @param overall_ranking tibble containing overall ranking by candidate
 #'
@@ -193,7 +180,6 @@ las_offer_rank <- function(..., overall_ranking){
 
   l <- list(...)
 
-  # all_x <- reduce(l, inner_join, by = c("d_id", "c_id")) |>
   all_x <- Reduce(function(x,y) inner_join(x, y, by = c("c_id", "d_id")), l) |>
     left_join(overall_ranking, by = "c_id") |>
     group_by(.data$d_id) |>
@@ -225,15 +211,11 @@ cas_offer_rank <- function(..., overall_ranking, efficiency_weight = 0.10, cost_
 
   l <- list(...)
 
-
-  # all_x <- reduce(l, inner_join, by = c("d_id", "c_id")) |>
   all_x <- Reduce(function(x,y) inner_join(x, y, by = c("c_id", "d_id")), l) |>
     left_join(overall_ranking, by = "c_id") |>
     calculate_cas_dist(match_data = _, efficiency_weight = efficiency_weight,
                        cost_weight = cost_weight, distance_weight = distance_weight, checks = checks) |>
-    # group_by(.data$d_id) |>
-    mutate(offer_rank = rank(-.data$lu_score), .by = .data$d_id) #|>
-    # ungroup()
+    mutate(offer_rank = rank(-.data$lu_score), .by = .data$d_id)
 
   return(all_x)
 

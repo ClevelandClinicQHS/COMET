@@ -37,6 +37,7 @@
 #' }
 #'
 #' @importFrom rlang .data
+#' @importFrom stats median
 #'
 #' @export
 #'
@@ -83,7 +84,6 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
                      tx_ppy = .data$tx_count/.data$wait_death_yrs,
                      wld_ppy = .data$wait_death/.data$wait_death_yrs,
                      ptd_ppy = .data$post_tx_death/.data$post_tx_years,
-                     ## added
                      med_dist = median(.data$distance_nm, na.rm = TRUE),
                      pt_1yr = mean(.data$post_tx_time > 365, na.rm = TRUE),
                      pt_2yr = mean(.data$post_tx_time > 730, na.rm = TRUE),
@@ -157,9 +157,7 @@ concat2 <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl_censor_
     ## will do nothing if set to the max
     dplyr::mutate(days_after_tx = if_else(!is.na(.data$transplant_day) & .data$transplant_day >= post_tx_censor_date & is.na(.data$death_day), NA_real_, post_tx_censor_date - .data$transplant_day),
                   transplant_day = if_else(!is.na(.data$transplant_day) & .data$transplant_day > wl_censor_date, NA_real_, .data$transplant_day),
-                  # death_day = if_else(!is.na(death_day) & death_day >= post_tx_censor_date, NA_real_, death_day),
                   removal_day = if_else(!is.na(.data$removal_day) & .data$removal_day > wl_censor_date, NA_real_, .data$removal_day),
-                  # death_day = if_else((is.na(transplant_day) & death_day >= wl_censor_date), NA_real_, death_day),
                   death_day = case_when((is.na(.data$transplant_day) & .data$death_day > wl_censor_date) ~ NA_real_,
                                         !is.na(.data$death_day) & .data$death_day > post_tx_censor_date ~ NA_real_,
                                         .default = .data$death_day
@@ -179,8 +177,6 @@ concat2 <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl_censor_
                                                     wait_death == 1 ~ death_day,
                                                     removal == 1 ~ removal_day,
                                                     tx == 0 & wait_death == 0 & removal == 0 ~ NA_real_),
-                  # wait_death_time = dplyr::case_when(!is.na(wait_death_day) ~ wait_death_day - listing_day,
-                                                     # .default = waitlist_date - listing_day),
                   wait_death_time = dplyr::case_when(!is.na(wait_death_day) ~ wait_death_day - .data$listing_day,
                                                      .default = wl_censor_date - .data$listing_day),
                   time_to_transplant = .data$transplant_day - .data$listing_day,
@@ -189,7 +185,6 @@ concat2 <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl_censor_
                   post_tx_day = .data$post_tx_time + .data$transplant_day) |>
     dplyr::arrange(.data$c_id)
 
-  # vctrs::vec_assigr1
   return(alls)
 }
 

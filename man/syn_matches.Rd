@@ -30,6 +30,6 @@ This was calculate using the following code
 \code{match_las(syn_cands, syn_dons, wl_model = "LAS15", post_tx_model = "LAS15",
  wl_weight = 2, wl_cap = 365, post_tx_weight = 1, post_tx_cap = 365) |>
  tidyr::unnest(cols = data)|>
-  dplyr::select(d_id:lu_score)}
+ dplyr::select(d_id:lu_score)}
 }
 \keyword{datasets}

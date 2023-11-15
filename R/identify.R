@@ -43,7 +43,6 @@ update_patients <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE,
     removed <- patients[0,]
   }
 
-  ## change this to find_deaths()
   deaths <- identify_deaths(patients, model = model, elapsed_time = {{elapsed_time}}, pre_tx = pre_tx, cap = cap, date = date)
 
   dead <- filter(deaths, .data$death == 1)
@@ -141,10 +140,8 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE,
   }
   lp_data <- lp_f(patients)
 
-
   if(cap > max(surv_rt$Days)){cap <- max(surv_rt$Days)}
 
-  # lp_val <- sym(colnames(lp_data)[str_which(colnames(lp_data), "c_id", negate = TRUE)])
   lp_val <- sym(colnames(lp_data)[-grep("c_id", colnames(lp_data))])
 
   lp_data2 <- lp_data

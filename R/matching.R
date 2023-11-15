@@ -44,7 +44,6 @@ match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
 
   matches <- las_offer_rank(hm, bm, pm, dm, cm, overall_ranking = las_scores)
   if(nrow(matches) > 0L){
-    # return(matches) ## changed this 8/4/23
     matches <- acceptance_prob(matched_data = matches, dons = dons, cands = cands)
   }
 
@@ -98,11 +97,6 @@ match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
                       pld_weight = NA, efficiency_weight = NA, abo_weight = NA, height_weight = NA,
                       cpra_weight = NA, cost_weight = NA, distance_weight = NA, checks = TRUE
 ){
-
-  # weights_x <- wl_weight + post_tx_weight + bio_weight + peds_weight + pld_weight + efficiency_weight
-  # if(!near(weights_x, 1)){
-  #   warning("Weights do not sum to 1")
-  # }
 
   hm <- height_screen(cands, dons)
   bm <- abo_screen(cands, dons)

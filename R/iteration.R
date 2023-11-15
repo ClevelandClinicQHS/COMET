@@ -24,9 +24,7 @@
 #' @importFrom rlang .data
 #'
 iteration <- function(date, candidate_database, donor_database, include_matches,
-                       ## Things that will change after each iteration excluding date
                        updated_list,
-                       ## arguments for matching
                        match_alg, ...
 )
 {
@@ -131,7 +129,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
     recipient_database <- post_tx_alive
     new_candidates <- filter(candidate_database, .data$listing_day == date)
 
-    ## if no new candidates procee
+    ## if no new candidates proceed
 
     current_candidates <- alive
     if(nrow(new_candidates) > 0L){
@@ -165,8 +163,6 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
     if(nrow(new_candidates) > 0L){
       current_candidates <- bind_rows(current_candidates, new_candidates)
     }
-    ## added 8/4/23add current candidates
-
     l <- list(current_candidates = current_candidates,
               recipient_database = recipient_database,
               waitlist_death_database = waitlist_death_database,
@@ -180,40 +176,13 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
   ## Matching
   matches <- match_alg(alive, donors_avl, ...)
 
-  # if(nrow(matches) == 0) {
-  #
-  #   ## Adds new candidates to for the next day
-  #   ## added this 8/4/23 because if no matches skips to next day, but didn't add new patients
-  #   new_candidates <- filter(candidate_database, listing_day == date)
-  #
-  #   ## if no new candidates proceed
-  #   if(nrow(new_candidates) > 0L){
-  #     current_candidates <- bind_rows(current_candidates, new_candidates)
-  #   }
-  #
-  #   ## makes sure this is updated
-  #   recipient_database <- post_tx_alive
-  #   current_candidates <- alive
-  #
-  #   l <- list(current_candidates = current_candidates,
-  #             recipient_database = recipient_database,
-  #             waitlist_death_database = waitlist_death_database,
-  #             post_tx_death_database = post_tx_death_database,
-  #             non_used_donors = non_used_donors,
-  #             all_matches = all_matches
-  #   )
-  #   return(l)
-  # }
-
   if(include_matches){
     matches1 <- dplyr::mutate(ungroup(matches), data = lapply(.data$data, function(x) dplyr::select(x, "c_id")))
     all_matches <- bind_rows(all_matches, matches1)
-  }else{ ## added the else 8/4/23 for
+  }else{
     all_matches <- matches[0,]
   }
 
-  ## transplant candidate to accepted donor
-  ## changed 8/4/23 to have if(nrow(matches) >0L)
   if(nrow(matches) > 0L){
     tr <- transplant_candidates(matches, recipient_database$c_id)
 

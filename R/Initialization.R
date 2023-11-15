@@ -22,6 +22,8 @@ gen_and_spawn_donors <- function(desired = "random", days,
   if(!(desired %in% c("mean", "random")))stop('desired must be "random" or "mean"')
   if(!is.logical(return_params))stop('return_params must be "TRUE" or "FALSE"')
 
+  data_present()
+
   gen_count <- generate_params("don_count", desired = desired)
   gen_sex <- generate_params("don_sex", desired = desired)
   gen_race <- generate_params("don_race", desired = desired)
@@ -70,6 +72,8 @@ gen_and_spawn_candidates <- function(desired = "random", days,
   if(!(desired %in% c("mean", "random")))stop('desired must be "random" or "mean"')
   if(!is.logical(return_params))stop('return_params must be "TRUE" or "FALSE"')
 
+  data_present()
+
   gen_count <- generate_params("can_count", desired = desired)
   gen_sex <- generate_params("can_sex", desired = desired)
   gen_age <- generate_params("can_age", desired = desired)
@@ -89,13 +93,13 @@ gen_and_spawn_candidates <- function(desired = "random", days,
   gen_mpap <- generate_params("can_meanpap", desired = desired)
   gen_o2f <- generate_params("can_o2freq", desired = desired)
   gen_vent <- generate_params("can_vent", desired = desired)
-  ##
+
   gen_suppo2 <- generate_params("can_suppo2", desired = desired)
   gen_walk6m <- generate_params("can_walk6m", desired = desired)
   gen_surg <- generate_params("can_surg", desired = desired)
   gen_bili <- generate_params("can_bili", desired = desired)
   gen_creat <- generate_params("can_creat", desired = desired)
-  ##
+
   gen_spap <- generate_params("can_systpap", desired = desired)
   gen_ci <- generate_params("can_ci", desired = desired)
   gen_fstat <- generate_params("can_funstat", desired = desired)
@@ -106,7 +110,6 @@ gen_and_spawn_candidates <- function(desired = "random", days,
   gen_specA <- generate_params("can_specA", desired = desired)
   gen_specD <- generate_params("can_specD", desired = desired)
 
-  ##
   gen_lam <- generate_params("can_lam", desired = desired)
   gen_eisen <- generate_params("can_eisen", desired = desired)
   gen_cvp <- generate_params("can_cvp", desired = desired)
@@ -177,8 +180,13 @@ gen_and_spawn_candidates <- function(desired = "random", days,
 #' @importFrom rlang .data
 generate_params <- function(characteristic, desired = "random"){
 
+  small_ids <- cometdata:::small_ids
+  all_ids <- cometdata:::all_ids
+  ot_ids <- cometdata:::ot_ids
+  mx_id <- cometdata:::mx_id
+
   char_sel <- characteristic
-  l1 <- all_params_dist[[char_sel]]
+  l1 <- cometdata:::all_params_dist[[char_sel]]
 
   d_o <- c("means","random")
 
@@ -191,37 +199,24 @@ generate_params <- function(characteristic, desired = "random"){
   }
 
   if(any(grepl("^theta\\[\\d+\\]$", names(params)))){
-  # if(any(str_detect(names(params), "^theta\\[\\d+\\]$"))){
-    # while(any(params[str_which(names(params), "^theta\\[\\d+\\]$")]<0) | any(params[str_which(names(params), "^theta\\[\\d+\\]$")]>1)){
     while(any(params[grep("^theta\\[\\d+\\]$", names(params))]<0) | any(params[grep("^theta\\[\\d+\\]$", names(params))]>1)){
-
-    #    params <- MASS::mvrnorm(n = 1, mu = l1[[1]], Sigma = l1[[2]])
       params_x <- MASS::mvrnorm(n = 1000, mu = l1[[1]], Sigma = l1[[2]])
       params_x2 <- params_x[, grep("^theta\\[\\d+\\]$", names(params))]
-      # params2 <- which(map_lgl(1:nrow(params_x), ~(sum(params_x2[.x,]<0) + sum(params_x2[.x,]>1))==0))
       params2 <- which(sapply(1:nrow(params_x),  function(x) (sum(params_x2[x, ] < 0) + sum(params_x2[x, ] > 1)) == 0))
       if(length(params2)==0L){params <- params}else{
         params <- params_x[min(params2),]
       }
-
-
     }
   }
 
 
   if(any(grepl("^c\\[\\d+\\]$", names(params)))){
-  # if(any(str_detect(names(params), "^c\\[\\d+\\]$"))){
-    # while(is.unsorted(params[str_which(names(params), "^c\\[\\d+\\]$")])){
     while(is.unsorted(params[grep("^c\\[\\d+\\]$", names(params))])){
       params <- MASS::mvrnorm(n = 1, mu = l1[[1]], Sigma = l1[[2]])
     }
   }
 
   if(any(grepl("^c\\[\\d+\\]$", names(params))) & any(grepl("^theta\\[\\d+\\]$", names(params)))){
-  # if(any(str_detect(names(params), "^c\\[\\d+\\]$")) & any(str_detect(names(params), "^theta\\[\\d+\\]$"))){
-    # while(is.unsorted(params[str_which(names(params), "^c\\[\\d+\\]$")]) |
-    #       any(params[str_which(names(params), "^theta\\[\\d+\\]$")]<0) |
-    #       any(params[str_which(names(params), "^theta\\[\\d+\\]$")]>1)){
     while(is.unsorted(params[grep("^c\\[\\d+\\]$", names(params))]) |
           any(params[grep("^theta\\[\\d+\\]$", names(params))]<0) |
           any(params[grep("^theta\\[\\d+\\]$", names(params))]>1)){
@@ -229,12 +224,8 @@ generate_params <- function(characteristic, desired = "random"){
     }
   }
   if(any(grepl("^cs\\[\\d+,\\d+]$", names(params)))){
-  # if(any(str_detect(names(params), "^cs\\[\\d+,\\d+]$"))){
-    # ncols = max(as.numeric(str_extract(names(params), "(?<=,)\\d+")), na.rm = TRUE)
-    # c_pars <- str_detect(names(params), "^cs\\[\\d+,\\d+]$")
     c_pars <- grepl("^cs\\[\\d+,\\d+]$", names(params))
     ncols <- max(as.numeric(regmatches(names(params), m = regexpr("(?<=,)\\d+", text = names(params), perl = TRUE))), na.rm = TRUE)
-    # ncols <- max(as.numeric(regmatches(names(params), m = regexpr("(?<=,)\\d+", text = names(params))), na.rm = TRUE))
     tmp_mat <- matrix(params[c_pars],
                       ncol = ncols)
     uns_ck <- apply(tmp_mat, 2, is.unsorted)
@@ -248,11 +239,9 @@ generate_params <- function(characteristic, desired = "random"){
     }
   }
 
-  # if(any(str_detect(names(params), "^lambda\\[\\d+\\]$"))){
   if(any(grepl("lambda\\[\\d+", names(params)))){
     while(any(params < 0)){
       params <- MASS::mvrnorm(n = 1, mu = l1[[1]], Sigma = l1[[2]])
-      # params_x <- MASS::mvrnorm(n = 1000, mu = l1[[1]], Sigma = l1[[2]])
     }
   }
 
@@ -279,38 +268,28 @@ generate_params <- function(characteristic, desired = "random"){
     params <- params[order(factor(names(params), levels = paste0("lambda[", all_ids, "]")))]
   }
   if(char_sel %in% c("don_cod","don_race")){
-    # small_param <- params[str_which(names(params), paste0("betas\\[", mx_id,",\\d+\\]"))]
     small_param <- params[grep(paste0("betas\\[", mx_id,",\\d+\\]"), names(params))]
     zeros <- rep(small_param, length(small_ids))
-    # names(zeros) <- pmap_chr(expand.grid("betas[", small_ids, ",", seq_along(small_param),"]") |>
-    #                            arrange(.data$Var2, .data$Var4), paste0)
     names(zeros) <- c(sapply(small_ids, function(x) sapply(seq_along(small_param), function(y) paste0("betas[", x, ",", y, "]")), simplify = TRUE))
 
-    # ot_params <- params[str_which(names(params), paste0("betas\\[", mx_id,",\\d+\\]"), negate = TRUE)]
     ot_params <- params[-grep(paste0("betas\\[", mx_id,",\\d+\\]"), names(params))]
-    # names(ot_params) <- pmap_chr(expand.grid("betas[", ot_ids, ",", seq_along(small_param),"]"), paste0)
     names(ot_params) <- c(sapply(seq_along(small_param), function(x) sapply(ot_ids, function(y) paste0("betas[", y, ",", x, "]")), simplify = TRUE))
 
 
     params <- c(ot_params, zeros)
-    # params <- params[order(factor(names(params), levels = pmap_chr(expand.grid("betas[", all_ids, ",", seq_along(small_param),"]"), paste0)))]
     params <- params[order(factor(names(params), levels = c(sapply(seq_along(small_param), function(x) sapply(all_ids, function(y) paste0("betas[", y, ",", x, "]")), simplify = TRUE))))]
 
   }
 
-  ## central venous pressue is different structure
+  ## these are of a different structure
   if(char_sel %in% c("can_cvp", "can_count", "can_suppo2")){
     return(params)
   }
 
-
-  # if(any(str_detect(names(params), ","))){
   if(any(grepl(",", names(params)))){
-    # params <- matrix(params, ncol = max(as.numeric(str_extract(names(params), "(?<=,)\\d+")), na.rm = TRUE),
-    #                  nrow = max(as.numeric(str_extract(names(params), "\\d+(?=,)")), na.rm = TRUE))
     params <- matrix(params, ncol = max(as.numeric(regmatches(names(params), m = regexpr("(?<=,)\\d+", text = names(params), perl = TRUE))), na.rm = TRUE),
                      nrow = max(as.numeric(regmatches(names(params), m = regexpr("\\d+(?=,)", text = names(params), perl = TRUE))), na.rm = TRUE)
-                     )
+    )
   }
 
   return(params)
@@ -381,31 +360,21 @@ spawn_donors <- function(days, daily_lambdas_center, sex_thetas,
   race_mm <- hospital_mm %*% race_mat_beta[,-1]
   race_odds <- t(apply(race_mm, 1, function(x) exp(x)/(1+sum(exp(x)))))
 
-  # hgt_betas <- hgt_params[str_which(names(hgt_params), "betas")]
-  # hgt_sigma <- hgt_params[str_which(names(hgt_params), "sigma")]
   hgt_betas <- hgt_params[grep("betas", names(hgt_params))]
   hgt_sigma <- hgt_params[grep("sigma", names(hgt_params))]
   hgt_ms <- model.matrix(~don_gender, data = df_g) %*% hgt_betas
 
-  ## Height and Race
   df_g2 <- df_g |>
     mutate(
       race_eth = factor(sapply(ov_nv, function(x) sample(race_levels, size = 1, prob = c(1 - sum(race_odds[x, ]), race_odds[x, ]))), levels = race_levels),
-      # hgt_in = plyr::round_any(rnorm(n = ov_n, mean = hgt_ms, sd = hgt_sigma)/2.54, 0.5),
       hgt_in = round(rnorm(n = ov_n, mean = hgt_ms, sd = hgt_sigma)/2.54/0.5)*0.5,
       hgt_cm = .data$hgt_in * 2.54,
       cod = factor(sapply(ov_nv, function(x) sample(cod_levels, size = 1, prob = c(1 - sum(cod_odds[x, ]), cod_odds[x, ]))), levels = cod_levels)
     )
 
-
-  ## Blood type
   abo_levels <- c("A", "AB", "B", "O")
   abo_bm <- t(apply(model.matrix(~race_eth, data = df_g2) %*% abo_mat_beta[,-1], 1, function(x) exp(x)/(1 + sum(exp(x)))))
 
-  ##   AGE
-  # age_betas <- age_params[str_which(names(age_params), "beta")]
-  # age_sigma <- age_params[str_which(names(age_params), "sigma")]
-  # age_skew <- age_params[str_which(names(age_params), "skew")]
   age_betas <- age_params[grep("beta", names(age_params))]
   age_sigma <- age_params[grep("sigma", names(age_params))]
   age_skew <- age_params[grep("skew", names(age_params))]
@@ -463,7 +432,7 @@ spawn_donors <- function(days, daily_lambdas_center, sex_thetas,
 #' @importFrom stats rbinom
 #' @importFrom stats rpois
 #' @importFrom rlang .data
-spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_beta, #dx_mat_beta,
+spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_beta,
                              abo_mat_beta,
                              age_params,  hgt_params, wgt_params, wgt_params_c, diab_params,
                              airway_params, oxygen_params, resp_mat_beta, surg_mat_beta,
@@ -476,7 +445,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
 
   if(days <= 1L)stop("days must be greater than 1")
 
-  # Centers <- 1:max(as.numeric(str_extract(names(daily_lambdas_center), "\\d+")))
   Centers <- 1:max(as.numeric(regmatches(names(daily_lambdas_center), m = regexpr("\\d+", text = names(daily_lambdas_center)))))
   names(Centers) <- Centers
 
@@ -484,8 +452,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     as.data.frame() |>
     mutate(listing_day = row_number()) |>
     pivot_longer(-"listing_day", names_sep = ",", names_to = c("center", "dx_num"),
-                 # names_transform = list("center" = ~as.numeric(str_extract(.x, "\\d+")),
-                 #                        "dx_num" = ~as.numeric(str_extract(.x, "\\d+")))) |>
                  names_transform = list("center" = ~as.numeric(regmatches(.x, m = regexpr("\\d+", text = .x))),
                                         "dx_num" = ~as.numeric(regmatches(.x, m = regexpr("\\d+", text = .x))))) |>
     filter(.data$value > 0)
@@ -494,8 +460,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     v2 <- filter(df_b, .data$value > 1)
     colnames(v2) <- NULL
 
-    # v2_f <- purrr::pmap(v2, ~tibble(center = rep(..2, ..4), listing_day = ..1, dx_num = ..3)) |>
-    #   purrr::list_rbind()
     v2_f <- apply(v2, 1,  function(x) tibble(center = x[2], listing_day = as.integer(x[1]), dx_num = x[3], .rows = x[4])) |>
       bind_rows()
 
@@ -531,46 +495,22 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     mutate(
       race_eth = factor(sapply(ov_nv,
                                function(x) sample(race_levels, size = 1, prob = race_odds[x, ])), levels = race_levels),
-      ## age
-      # age_at_listing = plyr::round_any(
-      #   sapply(.data$dx_num,
-      #          function(x) rsamp(sn::rsn, n = 1, limits = c(18, 85),
-      #                            # xi = age_params[str_which(names(age_params), "xi")][x],
-      #                            # omega = age_params[str_which(names(age_params), "omega")][x],
-      #                            # alpha = age_params[str_which(names(age_params), "alpha")][x])),
-      #                            xi = age_params[grep("xi", names(age_params))][x],
-      #                            omega = age_params[grep("omega", names(age_params))][x],
-      #                            alpha = age_params[grep("alpha", names(age_params))][x])),
-      #   (1/365)),
       age_at_listing = round(
         sapply(.data$dx_num,
                function(x) rsamp(sn::rsn, n = 1, limits = c(18, 85),
-                                 # xi = age_params[str_which(names(age_params), "xi")][x],
-                                 # omega = age_params[str_which(names(age_params), "omega")][x],
-                                 # alpha = age_params[str_which(names(age_params), "alpha")][x])),
+
                                  xi = age_params[grep("xi", names(age_params))][x],
                                  omega = age_params[grep("omega", names(age_params))][x],
                                  alpha = age_params[grep("alpha", names(age_params))][x]))/(1/365))*(1/365),
     ) |>
     left_join(as_tibble(dx_s), by = c("can_gender", "dx_grp"))
 
-  # hgt_betas <- hgt_params[str_which(names(hgt_params), "betas")]
-  # hgt_sigma <- hgt_params[str_which(names(hgt_params), "sigma")]
   hgt_betas <- hgt_params[grep("betas", names(hgt_params))]
   hgt_sigma <- hgt_params[grep("sigma", names(hgt_params))]
   hgt_ms <- model.matrix(~can_gender + dx_grp, data = df_g2) %*% hgt_betas
 
   abo_levels <- c("A", "AB", "B", "O")
   abo_odds <- calc_multi_odds(model.matrix(~race_eth, data = df_g2) %*% abo_mat_beta[,-1])
-
-  # airway_xis <- airway_params[str_which(names(airway_params), "tau")]
-  # airway_sigs <- airway_params[str_which(names(airway_params), "sigmas")]
-  # airway_skews <- airway_params[str_which(names(airway_params), "skews")]
-  #
-  # oxygen_nus <- oxygen_params[str_which(names(oxygen_params), "nu")]
-  # oxygen_taus <- oxygen_params[str_which(names(oxygen_params), "tau")]
-  # oxygen_beta <- oxygen_params[str_which(names(oxygen_params), "beta")]
-  # oxygen_sig <- oxygen_params[str_which(names(oxygen_params), "sigma")]
 
   airway_xis <- airway_params[grep("tau", names(airway_params))]
   airway_sigs <- airway_params[grep("sigmas", names(airway_params))]
@@ -581,7 +521,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   oxygen_beta <- oxygen_params[grep("beta", names(oxygen_params))]
   oxygen_sig <- oxygen_params[grep("sigma", names(oxygen_params))]
 
-  ## I might store this elsewhere
   rtc <- function(n, df, sigma = 1, mean = 0){
     y <- stats::rt(n=n, df = df) * sigma + mean
     return(y)
@@ -596,19 +535,9 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
       abo =  factor(sapply(ov_nv, function(x) sample(abo_levels, size = 1, prob = abo_odds[x, ])),
                     levels = abo_levels),
 
-      ## Height will be rounded to nearest 0.5 inch and converted to centimeters
-      # hgt_in = plyr::round_any(sapply(hgt_ms, function(x) rnorm(n = 1, mean = x, sd = hgt_sigma))/2.54, .5),
-      hgt_in = round(sapply(hgt_ms, function(x) rnorm(n = 1, mean = x, sd = hgt_sigma))/2.54/.5)*.5,
-      # hgt_in = round(rnorm(n = 1, mean = hgt_ms, sd = hgt_sigma)/2.54/.5)*.5,
-      hgt_cm = .data$hgt_in * 2.54
+        hgt_in = round(sapply(hgt_ms, function(x) rnorm(n = 1, mean = x, sd = hgt_sigma))/2.54/.5)*.5,
+       hgt_cm = .data$hgt_in * 2.54
     )
-
-  # wgt_betas <- wgt_params[str_which(names(wgt_params), "betas")]
-  # wgt_sigma <- wgt_params[str_which(names(wgt_params), "sigma")]
-  #
-  # wgt_betas_c <- wgt_params_c[str_which(names(wgt_params_c), "betas")]
-  # wgt_sigma_c <- wgt_params_c[str_which(names(wgt_params_c), "sigma")]
-  # wgt_skew_c <- wgt_params_c[str_which(names(wgt_params_c), "skew")]
 
   wgt_betas <- wgt_params[grep("betas", names(wgt_params))]
   wgt_sigma <- wgt_params[grep("sigma", names(wgt_params))]
@@ -645,10 +574,8 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
              bmi = .data$wgt_kg/((.data$hgt_cm/100)^2))
   }
 
-  ## Diabmetes
   diab_odds <- plogis(model.matrix(~male + age_at_listing + race_eth + race_eth:male, data = df_g3) %*% diab_params)
 
-  ## Respiratory Support Cluster Odds
   rc_odds <- calc_multi_odds(model.matrix(~male + dx_grp + factor(dx_sex_int, levels = 1:8) + age_at_listing + airway + oxygen, data = df_g3) %*% (resp_mat_beta)[,-1])
 
   ## interaction of diagnosis group and respiratory support cluster
@@ -657,7 +584,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
                      dx_rc = as.integer(c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16)))
 
   ## Adding suregey type
-  ## Double (D), ## Single (S) or Either (E)
+  ## Double (D), Single (S) or Either (E)
   surg_lvs <- c("D", "E", "S")
 
   surg_odds <- calc_multi_odds(model.matrix(~dx_grp, data = df_g3) %*% surg_mat_beta[,-1])
@@ -673,7 +600,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
 
   air_mat <- model.matrix(~airway + can_gender + dx_grp + age_at_listing + airway:dx_grp + age_at_listing:dx_grp, data = df_g4)
   oxy_mat <- model.matrix(~oxygen + can_gender + dx_grp + age_at_listing + oxygen:dx_grp + age_at_listing:dx_grp, data = df_g4)
-  ## PCO2 and PO2 are special
+  ## PCO2 and PO2 are different matrices
   air_mat2 <- model.matrix(~airway + can_gender + dx_grp + airway:dx_grp, data = df_g4)
   oxy_mat2 <- model.matrix(~oxygen + can_gender + dx_grp + oxygen:dx_grp, data = df_g4)
 
@@ -682,19 +609,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   walk6m_mat <- model.matrix(~can_gender + dx_grp + resp_supp + age_at_listing + airway + oxygen + dx_grp:resp_supp + age_at_listing:dx_grp, data = df_g4)
 
   ##airway
-  # fev_beta_m <- fev_params[str_which(names(fev_params), "betas")]
-  # fev_sigma <- fev_params[str_which(names(fev_params), "sigma")]
-  # fvc_beta_m <- fvc_params[str_which(names(fvc_params), "betas")]
-  # fvc_sigma <- fvc_params[str_which(names(fvc_params), "sigma")]
-  # pco2_beta_m <- pco2_params[str_which(names(pco2_params), "betas")]
-  # pco2_sigma <- pco2_params[str_which(names(pco2_params), "sigma")]
-  # ## oxygen
-  # pf_beta_m <- pf_params[str_which(names(pf_params), "betas")]
-  # pf_sigma <- pf_params[str_which(names(pf_params), "sigma")]
-  # po2_beta_m <- po2_params[str_which(names(po2_params), "betas")]
-  # po2_sigma <- po2_params[str_which(names(po2_params), "sigma")]
-  # mpap_beta_m <- mpap_params[str_which(names(mpap_params), "betas")]
-  # mpap_sigma <- mpap_params[str_which(names(mpap_params), "sigma")]
   fev_beta_m <- fev_params[grep("betas", names(fev_params))]
   fev_sigma <- fev_params[grep("sigma", names(fev_params))]
   fvc_beta_m <- fvc_params[grep("betas", names(fvc_params))]
@@ -709,19 +623,12 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   mpap_beta_m <- mpap_params[grep("betas", names(mpap_params))]
   mpap_sigma <- mpap_params[grep("sigma", names(mpap_params))]
 
-  # supp_o2_odds <- calc_multi_odds(supp_o2_mat)
   o2f_odds <- calc_multi_odds(resp_mat %*% o2_freq_mat[,-1])
   vent_odds <- calc_multi_odds(resp_mat %*% vent_mat_beta[,-1])
 
-  ## levels
   o2f_levels <- c("At Rest", "At Night",  "While Exercising", "None")
   vent_levels <- c("BiPap", "Mechanical", "None", "CPAP")
 
-  ## Six Minute Walk
-  # walk6m_theta <- walk6m_params[str_which(names(walk6m_params), "theta")]
-  # walk6m_sigma <- walk6m_params[str_which(names(walk6m_params), "sigma")]
-  # walk6m_beta <- walk6m_params[str_which(names(walk6m_params), "beta")]
-  # walk6m_skew <- walk6m_params[str_which(names(walk6m_params), "skew")]
   walk6m_theta <- walk6m_params[grep("theta", names(walk6m_params))]
   walk6m_sigma <- walk6m_params[grep("sigma", names(walk6m_params))]
   walk6m_beta <- walk6m_params[grep("beta", names(walk6m_params))]
@@ -748,17 +655,10 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
       ## Extra
       walk6m = round(sapply(walk6m_ms, function(x) sn::rsn(n = 1, xi = x, omega = walk6m_sigma, alpha = walk6m_skew)) *
                        sapply(.data$dx_rc, function(x) rbinom(n = 1, size = 1, prob = 1 - walk6m_theta[x])), 0),
-      ##### Limit to positive scope here(?)
-      # walk6m = round(sapply(walk6m_ms, function(x) rsamp(sn::rsn, n = 1, limits = c(0,5000), xi = x, omega = walk6m_sigma, alpha = walk6m_skew)) *
-      #                  sapply(dx_rc, function(x) rbinom(n = 1, size = 1, prob = 1 - walk6m_theta[x])), 0),
-
     ) |>
-    ## in case there are a few negative values
     mutate(walk6m = ifelse(.data$walk6m < 0, 0, .data$walk6m))
 
   ## resp support
-  # supp_o2_betas <- supp_o2_params[str_which(names(supp_o2_params), "beta")]
-  # supp_o2_ints <- supp_o2_params[str_which(names(supp_o2_params), "cs")]
   supp_o2_betas <- supp_o2_params[grep("beta", names(supp_o2_params))]
   supp_o2_ints <- supp_o2_params[grep("cs", names(supp_o2_params))]
 
@@ -768,15 +668,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   supp_o2_mat <- apply(mapply(function(x, y) plogis(x - y), resp_mat2 %*% supp_o2_betas, df5_supp_o2_ints, SIMPLIFY = TRUE)
                        , 2, function(x) lag(x, 1, default = 1) - x)
 
-  # ## Bilirubin
-  # bili_betas <- bili_params[str_which(names(bili_params), "betas")]
-  # bili_sigma <- bili_params[str_which(names(bili_params), "sigma")]
-  # ## Creatinie
-  # creat_betas <- creat_params[str_which(names(creat_params), "betas")]
-  # creat_sigma <- creat_params[str_which(names(creat_params), "sigma")]
-  # ## Systolic PAP
-  # spap_betas <- spap_params[str_which(names(spap_params), "betas")]
-  # spap_sigma <- spap_params[str_which(names(spap_params), "sigma")]
+  ## Bilirubin
   bili_betas <- bili_params[grep("betas", names(bili_params))]
   bili_sigma <- bili_params[grep("sigma", names(bili_params))]
   ## Creatinie
@@ -788,13 +680,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   spap_sigmas <- rep(spap_sigma[1], ov_n)
   spap_sigmas[which(df_g5$dx_grp == "B")] <- spap_sigma[2]
   ## Cardiac Index
-  # ci_betas <- ci_params[str_which(names(ci_params), "betas")]
-  # ci_sigma <- ci_params[str_which(names(ci_params), "sigma")]
-  # ## Central Venous Pressure
-  # cvp_betas <- cvp_params[str_which(names(cvp_params), "betas")]
-  # cvp_beta_mat <- matrix(cvp_betas, ncol = max(as.numeric(str_extract(names(cvp_betas), "(?<=,)\\d+")), na.rm = TRUE),
-  #                        nrow = max(as.numeric(str_extract(names(cvp_betas), "\\d+(?=,)")), na.rm = TRUE))
-  # cvp_alphas <- cvp_params[str_which(names(cvp_params), "alpha")]
   ci_betas <- ci_params[grep("betas", names(ci_params))]
   ci_sigma <- ci_params[grep("sigma", names(ci_params))]
   ## Central Venous Pressure
@@ -830,8 +715,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
                                                    shape = cvp_mat[x,] %*% cvp_beta_mat[, cvp_g[x]],
                                                    rate = cvp_alphas[cvp_g[x]])), 0)
     )
-
-  # return(df_g5b)
 
   df_g5b_p15 <- filter(df_g5b, .data$pco2 >= 46)
   df_g5b_p15r <- filter(df_g5b, .data$pco2 < 46) |>  mutate(pco2_15 = 0)
@@ -873,7 +756,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   if(nrow(df_g6ar) > 0L){
     df_g6ar_f <- filter(df_g6ar, .data$male == 0)
     lam_odds <- plogis(model.matrix(~ 1, data = df_g6ar_f) %*% lam_params)
-    # df_g6ar_f <- mutate(df_g6ar_f, lymphan = sapply(lam_odds, function(x) rbinom(n = 1, size = 1, prob = x)))
     df_g6ar_f <- mutate(df_g6ar_f, lymphan = rbinom(n = length(lam_odds), size = 1, prob = lam_odds))
     lamA <- filter(df_g6ar_f, .data$lymphan == 1)
     df_g6ar2 <- filter(df_g6ar, !(.data$c_id %in% lamA$c_id))
@@ -884,11 +766,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
 
   if(nrow(df_g6ar2) > 0L){
 
-    # ar_odds <- t(apply(model.matrix(~center, data = df_g6ar2) %*% ar_mat_beta[,-1], 1, function(x) exp(x)/(1+sum(exp(x)))))
-
     ar_odds <- calc_binom_odds(model.matrix(~center, data = df_g6ar2) %*% ar_mat_beta[,-1])
-
-    # return(ar_odds)
 
     df_g6ar2 <- df_g6ar2 |>
       ## if more than two diseases
@@ -897,14 +775,10 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     ga_sas <- sapply(ar_levels[-length(ar_levels)],  function(x) ifelse(df_g6ar2$ga_sd == x, 1, 0))
 
     if(class(ga_sas)[1] == "numeric"){
-      # ga_sas = dplyr::tibble(bronch = ga_sas)
-      # ga_sas <- tibble(ga_sas)
-      # colnames(ga_sas) <- names(ar_levels)[-length(ar_levels)]
 
       ga_sas <- tibble(ga_sas) |> mutate(name = names(ar_levels[-length(ar_levels)])) |>
         tidyr::pivot_wider(values_from = ga_sas)
-      # ga_sas <- tibble::as_tibble_row(ga_sas)
-      # colnames(ga_sas) <- gsub("\\..*", "", colnames(ga_sas))
+
     }
 
     df_g6ar2 <- cbind(df_g6ar2, ga_sas)
@@ -923,8 +797,7 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
 
   if(nrow(df_g6b) >0L){
     eisen_odds <- plogis(model.matrix(~ 1, data = df_g6b) %*% eisen_params)
-    # df_g6b2 <- mutate(df_g6b, eisen = sapply(eisen_odds, function(x) rbinom(n = 1, size = 1, prob = x)))
-    df_g6b2 <- mutate(df_g6b, eisen = rbinom(n = length(eisen_odds), size = 1, prob = eisen_odds))
+     df_g6b2 <- mutate(df_g6b, eisen = rbinom(n = length(eisen_odds), size = 1, prob = eisen_odds))
   }else{
     df_g6b2 <- mutate(df_g6b, eisen = 0)
   }
@@ -952,8 +825,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   }
   if(nrow(df_g6dr) > 0L){
 
-    # dr_odds <- t(apply(model.matrix(~center, data = df_g6dr) %*% dr_mat_beta[,-1], 1, function(x) exp(x)/(1+sum(exp(x)))))
-
     dr_odds <- calc_multi_odds(model.matrix(~center, data = df_g6dr) %*% dr_mat_beta[,-1])
 
     df_g6dr <- df_g6dr |>
@@ -962,10 +833,9 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
     gd_sds <- sapply(dr_levels[-length(dr_levels)],  function(x) ifelse(df_g6dr$gd_sd == x, 1, 0))
 
     if(class(gd_sds)[1] == "numeric"){
-      # gd_sds <- tibble::as_tibble_row(gd_sds)
-      # colnames(gd_sds) <- gsub("\\..*", "", colnames(gd_sds))
-      gd_sds <- tibble(gd_sds) |> mutate(name = names(dr_levels[-length(dr_levels)])) |> tidyr::pivot_wider(values_from = gd_sds)
-      # colnames(gd_sds) <- names(dr_levels)[-length(dr_levels)]
+      gd_sds <- tibble(gd_sds) |>
+        mutate(name = names(dr_levels[-length(dr_levels)])) |>
+        tidyr::pivot_wider(values_from = gd_sds)
     }
 
     df_g6dr <- cbind(df_g6dr, gd_sds)
@@ -993,7 +863,6 @@ spawn_candidates <- function(days, daily_lambdas_center, sex_thetas, race_mat_be
   df_g00 <- df_g8 |>
     mutate(age = .data$age_at_listing,
            hgt_cm1 = round(.data$hgt_cm, 0),
-           ## max height for unos
            # hgt_cm1 = ifelse(hgt_cm1 > 223, 223, ifelse(hgt_cm1 < 63, 63, hgt_cm1)),
            o2rest = ifelse(.data$o2_freq == "At Rest", .data$o2, 0),
            cont_mech = ifelse(.data$vent == "Mechanical", 1, 0),

@@ -279,15 +279,12 @@ calc_post_tx_cas23 <- function(data = NULL, c_id = c_id, dx_grp = dx_grp, dx = d
           funstat == 1 ~ -0.005304128,
           ## total
           funstat == 3 ~  0.074378407,
-          # TRUE ~ 0
           .default = 0
         ) +
         ## diagnosis group
         case_when(
-
           dx_grp == "A" ~ -0.098901796,
           dx_grp == "C" ~ -0.167126401,
-          # TRUE ~ 0
           .default = 0
         ) +
         ## continuous mechanical ventilation
