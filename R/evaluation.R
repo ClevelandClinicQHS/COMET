@@ -54,6 +54,8 @@ eval_simulation <- function(COMET, min_enroll_date = 1, max_enroll_date = NA, wl
 
   if(!is(COMET, "COMET")){stop("Must supply a COMET object")}
 
+  if(is.na(wl_censor_date)) wl_censor_date <- max(COMET$all_candidates$listing_day)
+
   ct <- concat2(COMET, min_enroll_date = min_enroll_date, max_enroll_date = max_enroll_date,
                 wl_censor_date = wl_censor_date, post_tx_censor_date = post_tx_censor_date)
 

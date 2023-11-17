@@ -18,10 +18,18 @@ You can install the development version of COMET like so:
 devtools::install_github("ClevelandClinicQHS/COMET")
 ```
 
+You will be prompted to install this package if it is not installed
+already. It is needed for `run_simulation` and
+`gen_and_spawn_candidates/gen_and_spawn_donors`
+
+``` r
+devtools::install_github("ClevelandClinicQHS/cometdata")
+```
+
 ## Basic example
 
 This will simulate the 2015 Lung Allocation Score (LAS) policy for 400
-days (`r1`) and then the same scenario under the Composite Allocaiton
+days (`r1`) and then the same scenario under the Composite Allocation
 Score (CAS) policy (`r2`).
 
 ``` r
@@ -30,13 +38,13 @@ library(COMET)
 r1 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.984511 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.620258 mins
 
 r2 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826,
                      bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 4.745483 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.084634 mins
 ```
 
 A simple way to evaluate the COMET runs, one can also look at the
@@ -47,63 +55,63 @@ is reported run `help('eval_simulation')`.
 # see how many were transplanted, donor count, waitlist deaths
 eval_simulation(r1)
 #>   can_count tx_count wait_death removal cens wait_death_yrs post_tx_death
-#> 1      4248     2761        275     132 1080       2434.661           201
-#>   post_tx_years   tx_ppy   wld_ppy   ptd_ppy med_dist     pt_1yr pt_2yr med_wlt
-#> 1      1444.019 1.134039 0.1129521 0.1391948  200.713 0.08801159      0      80
+#> 1      4325     2709        297     141 1178       2411.967           211
+#>   post_tx_years  tx_ppy  wld_ppy   ptd_ppy med_dist     pt_1yr pt_2yr med_wlt
+#> 1       1400.06 1.12315 0.123136 0.1507078 204.0456 0.08194906      0      77
 #>   med_ptt med_offer don_count don_util nu_med_offer nu_orgs
-#> 1     187         6      2884     2718           NA       0
+#> 1     183         7      2827     2654        154.5     617
 
 eval_simulation(r2)
 #>   can_count tx_count wait_death removal cens wait_death_yrs post_tx_death
-#> 1      4248     2756        270     149 1073       2442.768           178
+#> 1      4325     2690        273     125 1237       2442.491           174
 #>   post_tx_years   tx_ppy   wld_ppy   ptd_ppy med_dist     pt_1yr pt_2yr med_wlt
-#> 1      1452.402 1.128228 0.1105304 0.1225556 379.4788 0.08744557      0      74
+#> 1      1415.871 1.101334 0.1117711 0.1228925 373.0126 0.08252788      0      77
 #>   med_ptt med_offer don_count don_util nu_med_offer nu_orgs
-#> 1     189         7      2884     2718           NA       0
+#> 1     189         7      2827     2654          122     637
 
 ## See results by diagnosis group
 eval_simulation(r1, group = dx_grp)
 #>   dx_grp can_count tx_count wait_death removal cens wait_death_yrs
-#> 1      A      1207      844         31      39  293      1142.9733
-#> 2      B       258      122         24      23   89       191.3676
-#> 3      C       350      221         21       9   99       149.8453
-#> 4      D      2433     1574        199      61  599       950.4750
-#>   post_tx_death post_tx_years    tx_ppy    wld_ppy   ptd_ppy med_dist
-#> 1            59      461.2786 0.7384249 0.02712224 0.1279054 222.5336
-#> 2             9       64.2026 0.6375166 0.12541311 0.1401812 155.5433
-#> 3            13      112.0164 1.4748543 0.14014453 0.1160544 199.6450
-#> 4           120      806.5216 1.6560141 0.20936900 0.1487871 193.0029
+#> 1      A      1226      861         26      29  310      1090.7598
+#> 2      B       279      144         25      26   84       162.3847
+#> 3      C       340      191         29      12  108       152.5832
+#> 4      D      2480     1513        217      74  676      1006.2396
+#>   post_tx_death post_tx_years    tx_ppy   wld_ppy    ptd_ppy med_dist
+#> 1            60     450.52430 0.7893581 0.0238366 0.13317817 222.9906
+#> 2            18      74.49692 0.8867832 0.1539554 0.24162073 181.6068
+#> 3             8     100.80767 1.2517764 0.1900603 0.07935904 191.0525
+#> 4           125     774.23135 1.5036181 0.2156544 0.16145045 198.4964
 #>       pt_1yr pt_2yr med_wlt med_ptt med_offer don_count don_util nu_med_offer
-#> 1 0.09478673      0     137   200.5        13      2884     2718           NA
-#> 2 0.10655738      0     103   194.5         4      2884     2718           NA
-#> 3 0.05429864      0      83   184.0         6      2884     2718           NA
-#> 4 0.08767471      0      62   179.0         4      2884     2718           NA
+#> 1 0.07665505      0   122.5   192.0        12      2827     2654        154.5
+#> 2 0.10416667      0    76.0   181.5         6      2827     2654        154.5
+#> 3 0.07853403      0    71.5   198.0         5      2827     2654        154.5
+#> 4 0.08327826      0    64.0   179.0         5      2827     2654        154.5
 #>   nu_orgs
-#> 1       0
-#> 2       0
-#> 3       0
-#> 4       0
+#> 1     617
+#> 2     617
+#> 3     617
+#> 4     617
 eval_simulation(r2, group = dx_grp)
 #>   dx_grp can_count tx_count wait_death removal cens wait_death_yrs
-#> 1      A      1207      898         28      31  250      1105.8042
-#> 2      B       258      125         22      23   88       196.3833
-#> 3      C       350      271          9       6   64       124.9856
-#> 4      D      2433     1462        211      89  671      1015.5948
+#> 1      A      1226      886         27      27  286      1048.5448
+#> 2      B       279      136         22      16  105       175.8631
+#> 3      C       340      257         13       6   64       123.6769
+#> 4      D      2480     1411        211      76  782      1094.4066
 #>   post_tx_death post_tx_years    tx_ppy    wld_ppy    ptd_ppy med_dist
-#> 1            52     510.65845 0.8120786 0.02532094 0.10182931 378.9343
-#> 2            13      63.34018 0.6365103 0.11202582 0.20524098 349.3513
-#> 3            14     143.75633 2.1682493 0.07200828 0.09738702 379.4836
-#> 4            99     734.64750 1.4395505 0.20776002 0.13475851 384.5771
+#> 1            45     501.64545 0.8449806 0.02574997 0.08970479 361.1846
+#> 2            12      69.56605 0.7733288 0.12509730 0.17249793 294.1683
+#> 3            11     141.53046 2.0779946 0.10511257 0.07772179 370.7179
+#> 4           106     703.12936 1.2892832 0.19279855 0.15075462 395.7196
 #>       pt_1yr pt_2yr med_wlt med_ptt med_offer don_count don_util nu_med_offer
-#> 1 0.10356347      0     113   214.5        11      2884     2718           NA
-#> 2 0.07200000      0     110   184.0         7      2884     2718           NA
-#> 3 0.11808118      0      39   187.0         3      2884     2718           NA
-#> 4 0.07318741      0      63   177.5         6      2884     2718           NA
+#> 1 0.10496614      0     103   213.5        10      2827     2654          122
+#> 2 0.08823529      0      97   175.0         8      2827     2654          122
+#> 3 0.10116732      0      33   202.0         4      2827     2654          122
+#> 4 0.06449327      0      69   176.0         7      2827     2654          122
 #>   nu_orgs
-#> 1       0
-#> 2       0
-#> 3       0
-#> 4       0
+#> 1     637
+#> 2     637
+#> 3     637
+#> 4     637
 ```
 
 One can also mix and match the models and weights under the LAS/CAS
@@ -116,12 +124,12 @@ mortality receives the same weight as post-transplant (1 to 1).
 r3 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.264484 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.530677 mins
 
 r4 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.892879 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.538058 mins
 ```
 
 ## A more indepth demonstration to show what is going on behind the scenes
@@ -137,14 +145,14 @@ syn_cands <- gen_and_spawn_candidates(days = 10)
 syn_dons <- gen_and_spawn_donors(days = 10)
 head(syn_cands)
 #> # A tibble: 6 × 47
-#>    c_id center listing_day  male dx_grp race_eth age_at_listing airway  oxygen
-#>   <int> <fct>        <int> <int> <chr>  <fct>             <dbl>  <dbl>   <dbl>
-#> 1     1 7                1     0 B      NH White           64.3  1.70   0.0632
-#> 2     2 8                1     0 D      NH Black           66.8  1.27  -0.402 
-#> 3     3 15               1     1 D      NH White           67.6 -0.158  0.637 
-#> 4     4 33               1     1 D      NH White           45.1  0.430  0.688 
-#> 5     5 42               1     0 A      NH White           55.7 -0.782  0.112 
-#> 6     6 18               2     1 D      Asian              78.2  0.552  0.327 
+#>    c_id center listing_day  male dx_grp race_eth age_at_listing   airway  oxygen
+#>   <int> <fct>        <int> <int> <chr>  <fct>             <dbl>    <dbl>   <dbl>
+#> 1     1 7                1     0 B      NH White           61.4  1.44    -0.330 
+#> 2     2 8                1     0 D      NH Black           44.9 -0.269   -0.0946
+#> 3     3 15               1     1 D      NH White           55.0  0.390    1.24  
+#> 4     4 33               1     1 D      NH White           78.0  0.00234  0.757 
+#> 5     5 42               1     0 A      NH White           65.4 -0.885    0.364 
+#> 6     6 18               2     1 D      Hispanic           65.8  0.0885  -0.322 
 #> # ℹ 38 more variables: abo <chr>, hgt_in <dbl>, hgt_cm <dbl>, wgt_kg <dbl>,
 #> #   bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>, fev1 <dbl>,
 #> #   fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>, o2_freq <dbl>,
@@ -156,12 +164,12 @@ head(syn_dons)
 #> # A tibble: 6 × 16
 #>    d_id hospital recovery_day  male race_eth hgt_in hgt_cm cod   abo     age
 #>   <int>    <dbl>        <int> <int> <fct>     <dbl>  <dbl> <fct> <fct> <dbl>
-#> 1     1     1394            1     0 NH White   59     150. 2     A        48
-#> 2     2      385            1     1 NH White   73.5   187. 3     B        51
-#> 3     3     1102            2     0 NH White   67.5   171. 1     O        28
-#> 4     4     1180            2     0 Hawaiian   61.5   156. 3     O        29
-#> 5     5     1392            2     1 NH White   66     168. 2     A        59
-#> 6     6      162            2     0 NH White   66     168. 3     A        46
+#> 1     1     1078            1     1 Asian      68     173. 2     O        35
+#> 2     2     1413            1     1 Hispanic   70     178. 3     O        30
+#> 3     3     1638            1     0 NH White   61.5   156. 3     O        20
+#> 4     4      467            1     1 Hispanic   64     163. 2     B        40
+#> 5     5      833            1     0 NH White   67     170. 2     O        44
+#> 6     6      945            1     1 NH White   65     165. 2     A        53
 #> # ℹ 6 more variables: don_org <fct>, smoke_hist <int>, gt_20pkyr <chr>,
 #> #   don_dcd <int>, don_util <int>, organs_avl <dbl>
 ```
@@ -204,12 +212,12 @@ l_2 <- iteration(402, syn_cands, syn_dons, include_matches = FALSE, updated_list
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 nrow(l_2$waitlist_death_database) - nrow(l_1$waitlist_death_database)
-#> [1] 3
+#> [1] 1
 nrow(l_2$post_tx_death_database)-nrow(l_1$post_tx_death_database)
-#> [1] 0
+#> [1] 1
 ```
 
-Looking in depth, 3 died on the waiting list, and 0 died post transplant
+Looking in depth, 1 died on the waiting list, and 1 died post transplant
 on Day 402 in this scenario. The following would run ten days
 sequentially
 
@@ -249,49 +257,52 @@ Within `update_patients` are
 update_patients(patients = r2cc, model = "CAS23r", 
                 elapsed_time = days_on_waitlist, pre_tx = TRUE, cap = 365, date = 401)
 #> $Dead
-#> # A tibble: 0 × 10
-#> # ℹ 10 variables: c_id <dbl>, lp <dbl>, days_on_waitlist <dbl>, dx_grp <chr>,
-#> #   days_ago <dbl>, Survival_y <dbl>, Survival_x <dbl>, cond_x <dbl>,
-#> #   death <int>, max_days <dbl>
+#> # A tibble: 3 × 10
+#>    c_id    lp days_on_waitlist dx_grp days_ago Survival_y Survival_x cond_x
+#>   <dbl> <dbl>            <dbl> <chr>     <dbl>      <dbl>      <dbl>  <dbl>
+#> 1   966  2.40              281 B           280      0.996      0.996  1.00 
+#> 2  1128  4.48              259 D           258      0.997      0.997  0.999
+#> 3  3304  4.16                3 D             2      1.00       1.00   0.999
+#> # ℹ 2 more variables: death <int>, max_days <dbl>
 #> 
 #> $Alive
-#> # A tibble: 1,073 × 10
+#> # A tibble: 1,233 × 10
 #>     c_id    lp days_on_waitlist dx_grp days_ago Survival_y Survival_x cond_x
 #>    <dbl> <dbl>            <dbl> <chr>     <dbl>      <dbl>      <dbl>  <dbl>
-#>  1   305  1.24              364 A           363      0.995      0.995  1.00 
-#>  2   315  3.15              362 D           361      0.995      0.995  1.00 
-#>  3   321  1.73              361 A           360      0.995      0.995  1.00 
-#>  4   326  4.13              360 D           359      0.995      0.995  0.999
-#>  5   332  3.70              360 D           359      0.995      0.995  0.999
-#>  6   333  3.64              360 B           359      0.995      0.995  0.999
-#>  7   336  4.63              359 D           358      0.995      0.995  0.998
-#>  8   347  4.10              357 D           356      0.995      0.995  0.999
-#>  9   353  1.55              356 A           355      0.995      0.995  1.00 
-#> 10   364  2.60              355 A           354      0.995      0.995  1.00 
-#> # ℹ 1,063 more rows
+#>  1   284  4.75              364 B           363      0.995      0.995  0.998
+#>  2   286  4.67              364 B           363      0.995      0.995  0.998
+#>  3   292  3.83              363 B           362      0.995      0.995  0.999
+#>  4   295  4.40              363 D           362      0.995      0.995  0.999
+#>  5   296  4.61              363 D           362      0.995      0.995  0.999
+#>  6   304  3.03              362 D           361      0.995      0.995  1.00 
+#>  7   307  2.53              362 A           361      0.995      0.995  1.00 
+#>  8   320  4.02              361 D           360      0.995      0.995  0.999
+#>  9   323  3.81              360 A           359      0.995      0.995  0.999
+#> 10   343  4.42              359 D           358      0.995      0.995  0.999
+#> # ℹ 1,223 more rows
 #> # ℹ 2 more variables: death <int>, max_days <dbl>
 #> 
 #> $Removed
-#> # A tibble: 0 × 8
-#> # ℹ 8 variables: c_id <dbl>, dx_grp <chr>, days_on_waitlist <dbl>,
-#> #   days_ago <dbl>, Survival_y <dbl>, Survival_x <dbl>, cond_x <dbl>,
-#> #   removal <int>
+#> # A tibble: 1 × 8
+#>    c_id dx_grp days_on_waitlist days_ago Survival_y Survival_x cond_x removal
+#>   <dbl> <chr>             <dbl>    <dbl>      <dbl>      <dbl>  <dbl>   <int>
+#> 1  3259 B                     9        8      0.992      0.993  0.999       1
 #> 
 #> $new_char
-#> # A tibble: 1,073 × 48
+#> # A tibble: 1,237 × 48
 #>    dx_grp  c_id listing_day center  male race_eth age_at_listing  airway  oxygen
 #>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>   <dbl>   <dbl>
-#>  1 B       -999       -4605 7          0 NH White           53.5  0.233   0.679 
-#>  2 A       -998       -3842 21         0 NH White           65.7 -0.347   0.0699
-#>  3 A       -997       -3618 55         1 Asian              56.3 -0.0723 -0.241 
-#>  4 A       -993       -3052 18         1 NH White           72.1 -1.15   -0.0170
-#>  5 A       -990       -2703 42         0 NH White           63.0  1.34    0.184 
-#>  6 A       -989       -2697 33         0 NH White           64.1  0.0716 -0.536 
-#>  7 A       -987       -2492 8          1 Hispanic           63.9 -0.501   0.0506
-#>  8 A       -977       -2127 1          0 NH White           67.4 -0.220   0.0270
-#>  9 D       -959       -1819 33         1 NH White           52.8  0.489   0.155 
-#> 10 D       -956       -1782 13         1 NH White           75.3  1.53    1.06  
-#> # ℹ 1,063 more rows
+#>  1 A       -999       -5731 26         1 Asian              56.3 -0.941   0.0101
+#>  2 A       -990       -2575 44         0 NH White           66.9 -0.781   0.0624
+#>  3 A       -989       -2467 47         0 NH White           63.8 -0.487  -0.200 
+#>  4 A       -987       -2300 17         1 NH White           59.1 -0.0230 -0.190 
+#>  5 D       -984       -2238 23         1 NH White           67.1  1.38    0.203 
+#>  6 A       -982       -2124 16         0 NH White           60.5  0.0386 -0.0573
+#>  7 A       -979       -1978 34         0 NH White           67.6 -0.591   0.429 
+#>  8 A       -978       -1970 21         1 NH White           63.9 -1.06    0.111 
+#>  9 A       -969       -1816 49         0 NH White           61.4 -0.399   0.195 
+#> 10 A       -967       -1802 24         0 NH White           62.6 -0.703   0.462 
+#> # ℹ 1,227 more rows
 #> # ℹ 39 more variables: abo <chr>, hgt_in <dbl>, hgt_cm <dbl>, wgt_kg <dbl>,
 #> #   bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>, fev1 <dbl>,
 #> #   fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>, o2_freq <dbl>,
@@ -301,20 +312,20 @@ update_patients(patients = r2cc, model = "CAS23r",
 
 identify_deaths(patients = r2cc, model = "CAS23r",
                 elapsed_time = days_on_waitlist, pre_tx = TRUE, cap = 365, date = 401)
-#> # A tibble: 1,073 × 10
+#> # A tibble: 1,237 × 10
 #>     c_id    lp days_on_waitlist dx_grp days_ago Survival_y Survival_x cond_x
 #>    <dbl> <dbl>            <dbl> <chr>     <dbl>      <dbl>      <dbl>  <dbl>
-#>  1   305  1.24              364 A           363      0.995      0.995  1.00 
-#>  2   315  3.15              362 D           361      0.995      0.995  1.00 
-#>  3   321  1.73              361 A           360      0.995      0.995  1.00 
-#>  4   326  4.13              360 D           359      0.995      0.995  0.999
-#>  5   332  3.70              360 D           359      0.995      0.995  0.999
-#>  6   333  3.64              360 B           359      0.995      0.995  0.999
-#>  7   336  4.63              359 D           358      0.995      0.995  0.998
-#>  8   347  4.10              357 D           356      0.995      0.995  0.999
-#>  9   353  1.55              356 A           355      0.995      0.995  1.00 
-#> 10   364  2.60              355 A           354      0.995      0.995  1.00 
-#> # ℹ 1,063 more rows
+#>  1   284  4.75              364 B           363      0.995      0.995  0.998
+#>  2   286  4.67              364 B           363      0.995      0.995  0.998
+#>  3   292  3.83              363 B           362      0.995      0.995  0.999
+#>  4   295  4.40              363 D           362      0.995      0.995  0.999
+#>  5   296  4.61              363 D           362      0.995      0.995  0.999
+#>  6   304  3.03              362 D           361      0.995      0.995  1.00 
+#>  7   307  2.53              362 A           361      0.995      0.995  1.00 
+#>  8   320  4.02              361 D           360      0.995      0.995  0.999
+#>  9   323  3.81              360 A           359      0.995      0.995  0.999
+#> 10   343  4.42              359 D           358      0.995      0.995  0.999
+#> # ℹ 1,227 more rows
 #> # ℹ 2 more variables: death <int>, max_days <dbl>
 
 identify_removals(patients = r2cc, elapsed_time = days_on_waitlist, cap = 2365)
@@ -327,31 +338,30 @@ identify_removals(patients = r2cc, elapsed_time = days_on_waitlist, cap = 2365)
 update_patients(r2rd, model = "CAS23r", 
                 elapsed_time = days_after_tx, pre_tx = FALSE, cap = 1826, date = 401)
 #> $Dead
-#> # A tibble: 0 × 9
-#> # ℹ 9 variables: c_id <dbl>, lp <dbl>, days_after_tx <dbl>, dx_grp <chr>,
-#> #   days_ago <dbl>, Survival_y <dbl>, Survival_x <dbl>, cond_x <dbl>,
-#> #   death <int>
+#> # A tibble: 1 × 9
+#>    c_id    lp days_after_tx dx_grp days_ago Survival_y Survival_x cond_x death
+#>   <dbl> <dbl>         <dbl> <chr>     <dbl>      <dbl>      <dbl>  <dbl> <int>
+#> 1   491 0.677           164 D           163      0.965      0.965   1.00     1
 #> 
 #> $Alive
-#> # A tibble: 2,578 × 9
-#>     c_id      lp days_after_tx dx_grp days_ago Survival_y Survival_x cond_x
-#>    <dbl>   <dbl>         <dbl> <chr>     <dbl>      <dbl>      <dbl>  <dbl>
-#>  1  -996  0.180            332 A           331      0.938      0.938   1.00
-#>  2  -994  0.162            382 D           381      0.930      0.930   1.00
-#>  3  -992  0.0928           353 C           352      0.935      0.935   1.00
-#>  4  -991  0.850            316 A           315      0.940      0.940   1.00
-#>  5  -985  0.165            349 B           348      0.935      0.936   1.00
-#>  6  -983  0.643            369 A           368      0.933      0.933   1.00
-#>  7  -981  0.667            313 A           312      0.941      0.941   1.00
-#>  8  -979  0.0603           362 A           361      0.934      0.934   1.00
-#>  9  -976  0.401            368 D           367      0.933      0.933   1.00
-#> 10  -973 -0.150            371 A           370      0.932      0.933   1.00
-#> # ℹ 2,568 more rows
-#> # ℹ 1 more variable: death <int>
+#> # A tibble: 2,515 × 9
+#>     c_id     lp days_after_tx dx_grp days_ago Survival_y Survival_x cond_x death
+#>    <dbl>  <dbl>         <dbl> <chr>     <dbl>      <dbl>      <dbl>  <dbl> <int>
+#>  1 -1000  0.423           303 B           302      0.942      0.942   1.00     0
+#>  2  -998  0.296           384 A           383      0.930      0.930   1.00     0
+#>  3  -995  0.481           363 D           362      0.934      0.934   1.00     0
+#>  4  -986  0.494           308 A           307      0.941      0.941   1.00     0
+#>  5  -985  0.274           366 A           365      0.933      0.933   1.00     0
+#>  6  -980  0.652           375 A           374      0.932      0.932   1.00     0
+#>  7  -975  0.493           338 A           337      0.937      0.937   1.00     0
+#>  8  -974 -0.180           347 D           346      0.936      0.936   1.00     0
+#>  9  -972  0.513           345 A           344      0.936      0.936   1.00     0
+#> 10  -968  0.287           383 D           382      0.930      0.930   1.00     0
+#> # ℹ 2,505 more rows
 #> 
 #> $Removed
 #> # A tibble: 0 × 62
-#> # ℹ 62 variables: dx_grp <chr>, c_id <dbl>, listing_day <dbl>, center <fct>,
+#> # ℹ 62 variables: c_id <dbl>, dx_grp <chr>, listing_day <dbl>, center <fct>,
 #> #   male <int>, race_eth <fct>, age_at_listing <dbl>, airway <dbl>,
 #> #   oxygen <dbl>, abo <chr>, hgt_in <dbl>, hgt_cm <dbl>, wgt_kg <dbl>,
 #> #   bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>, fev1 <dbl>,
@@ -360,24 +370,24 @@ update_patients(r2rd, model = "CAS23r",
 #> #   pap_syst <dbl>, ci <dbl>, funstat <dbl>, ecmo <dbl>, cvp <dbl>, …
 #> 
 #> $new_char
-#> # A tibble: 2,578 × 62
-#>    dx_grp  c_id listing_day center  male race_eth age_at_listing airway  oxygen
-#>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>  <dbl>   <dbl>
-#>  1 B      -1000       -4606 38         0 Hispanic           43.4  1.94  -0.466 
-#>  2 A       -996       -3305 30         1 NH White           43.5 -0.848  0.0260
-#>  3 D       -994       -3178 18         1 NH White           35.8  1.45  -0.205 
-#>  4 C       -992       -2827 61         0 NH White           35.0 -0.615  0.493 
-#>  5 A       -991       -2749 3          1 NH White           60.3  0.120  0.707 
-#>  6 B       -988       -2510 45         0 NH White           57.6  1.22   0.0661
-#>  7 B       -986       -2434 41         0 NH White           37.2  0.976 -0.340 
-#>  8 B       -985       -2381 8          0 NH Black           40.2  0.416 -0.272 
-#>  9 A       -983       -2281 33         0 NH White           63.7 -0.459  0.0942
-#> 10 A       -982       -2260 54         1 NH White           52.0 -0.309 -0.118 
-#> # ℹ 2,568 more rows
-#> # ℹ 53 more variables: abo <chr>, hgt_in <dbl>, hgt_cm <dbl>, wgt_kg <dbl>,
-#> #   bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>, fev1 <dbl>,
-#> #   fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>, o2_freq <dbl>,
-#> #   vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
+#> # A tibble: 2,516 × 62
+#>     c_id dx_grp listing_day center  male race_eth age_at_listing   airway
+#>    <dbl> <chr>        <dbl> <fct>  <int> <fct>             <dbl>    <dbl>
+#>  1 -1000 B            -5908 61         1 NH White           30.3  0.940  
+#>  2  -998 A            -3757 8          0 Hispanic           50.3 -0.949  
+#>  3  -997 A            -3713 45         1 NH White           65.5 -0.00918
+#>  4  -995 D            -3298 40         0 NH White           30.9  0.857  
+#>  5  -994 A            -3200 55         1 NH White           58.1 -0.802  
+#>  6  -992 A            -2816 46         0 NH Black           51.4 -0.105  
+#>  7  -991 D            -2704 2          0 NH White           47.8 -0.244  
+#>  8  -988 A            -2423 22         0 NH White           63.8 -0.0923 
+#>  9  -986 A            -2245 24         0 NH White           59.8 -0.664  
+#> 10  -985 A            -2244 55         1 NH White           52.4 -0.586  
+#> # ℹ 2,506 more rows
+#> # ℹ 54 more variables: oxygen <dbl>, abo <chr>, hgt_in <dbl>, hgt_cm <dbl>,
+#> #   wgt_kg <dbl>, bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>,
+#> #   fev1 <dbl>, fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>,
+#> #   o2_freq <dbl>, vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
 #> #   pap_syst <dbl>, ci <dbl>, funstat <dbl>, ecmo <dbl>, cvp <dbl>,
 #> #   pco2_15 <dbl>, pra <dbl>, pld <dbl>, creat_150 <dbl>, bili_50 <dbl>, …
 ```
@@ -396,11 +406,15 @@ mtc <- match_cas(cands = r2cc, dons = dons_401, wl_model = "CAS23", post_tx_mode
                  pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1)
 
 mtc
-#> # A tibble: 2 × 3
+#> # A tibble: 6 × 3
 #>    d_id don_org data               
 #>   <int> <fct>   <list>             
-#> 1  2885 DLU     <tibble [115 × 12]>
-#> 2  2886 DLU     <tibble [10 × 12]>
+#> 1  2828 LUR     <tibble [174 × 12]>
+#> 2  2829 DLU     <tibble [398 × 12]>
+#> 3  2830 LUL     <tibble [127 × 12]>
+#> 4  2831 DLU     <tibble [82 × 12]> 
+#> 5  2832 DLU     <tibble [637 × 12]>
+#> 6  2833 DLU     <tibble [219 × 12]>
 ```
 
 #### Screening
@@ -417,74 +431,74 @@ screening
 ## Screening is done for height, blood type, organ count,
 hm1 <- height_screen(cands = r2cc, dons = dons_401)
 hm1
-#> # A tibble: 482 × 4
+#> # A tibble: 3,423 × 4
 #>     c_id  d_id match_single match_double
 #>    <dbl> <int> <lgl>        <lgl>       
-#>  1  -999  2885 TRUE         TRUE        
-#>  2  -998  2885 FALSE        TRUE        
-#>  3  -997  2886 TRUE         TRUE        
-#>  4  -942  2885 TRUE         TRUE        
-#>  5  -941  2885 FALSE        TRUE        
-#>  6  -939  2885 TRUE         TRUE        
-#>  7  -912  2886 TRUE         TRUE        
-#>  8  -886  2885 FALSE        TRUE        
-#>  9  -873  2886 TRUE         TRUE        
-#> 10  -867  2885 TRUE         TRUE        
-#> # ℹ 472 more rows
+#>  1  -999  2828 TRUE         TRUE        
+#>  2  -999  2829 TRUE         FALSE       
+#>  3  -999  2831 TRUE         TRUE        
+#>  4  -999  2832 TRUE         TRUE        
+#>  5  -999  2833 TRUE         TRUE        
+#>  6  -990  2828 TRUE         TRUE        
+#>  7  -990  2829 TRUE         TRUE        
+#>  8  -990  2831 FALSE        TRUE        
+#>  9  -990  2832 TRUE         TRUE        
+#> 10  -990  2833 FALSE        TRUE        
+#> # ℹ 3,413 more rows
 ## returns if compabitible for single, double transplant, if a double transplant they will match for double lung
 am1 <- abo_screen(cands = r2cc, dons = dons_401)
 am1
-#> # A tibble: 414 × 3
+#> # A tibble: 5,445 × 3
 #>     c_id  d_id abo_exact
 #>    <dbl> <int> <lgl>    
-#>  1  -999  2885 TRUE     
-#>  2  -998  2885 TRUE     
-#>  3  -987  2885 TRUE     
-#>  4  -977  2885 TRUE     
-#>  5  -942  2885 TRUE     
-#>  6  -941  2885 TRUE     
-#>  7  -930  2885 TRUE     
-#>  8  -904  2885 TRUE     
-#>  9  -888  2885 TRUE     
-#> 10  -881  2886 TRUE     
-#> # ℹ 404 more rows
+#>  1  -999  2828 TRUE     
+#>  2  -999  2829 TRUE     
+#>  3  -999  2830 TRUE     
+#>  4  -999  2832 TRUE     
+#>  5  -990  2828 FALSE    
+#>  6  -990  2829 FALSE    
+#>  7  -990  2830 FALSE    
+#>  8  -990  2832 FALSE    
+#>  9  -990  2833 TRUE     
+#> 10  -989  2828 TRUE     
+#> # ℹ 5,435 more rows
 ## returns abo_exact abo compatible organs since that is a tie breaker in the LAS
 
 ## Ensure double with double, singles may take a double if only is assigned or either can
 cm1 <- count_screen(cands = r2cc, dons = dons_401)
 cm1
-#> # A tibble: 2,146 × 2
+#> # A tibble: 5,648 × 2
 #>     c_id  d_id
 #>    <dbl> <int>
-#>  1  -999  2885
-#>  2  -999  2886
-#>  3  -998  2885
-#>  4  -998  2886
-#>  5  -997  2885
-#>  6  -997  2886
-#>  7  -993  2885
-#>  8  -993  2886
-#>  9  -990  2885
-#> 10  -990  2886
-#> # ℹ 2,136 more rows
+#>  1  -999  2828
+#>  2  -999  2829
+#>  3  -999  2830
+#>  4  -999  2831
+#>  5  -999  2832
+#>  6  -999  2833
+#>  7  -990  2829
+#>  8  -990  2831
+#>  9  -990  2832
+#> 10  -990  2833
+#> # ℹ 5,638 more rows
 
 ## Distance calculation 
 lm1 <- dist_calc(cands = r2cc, dons = dons_401)
 lm1
-#> # A tibble: 2,146 × 3
+#> # A tibble: 7,422 × 3
 #>     c_id  d_id distance_nm
 #>    <dbl> <int>       <dbl>
-#>  1  -999  2885       1834.
-#>  2  -999  2886       2035.
-#>  3  -998  2885        253.
-#>  4  -998  2886        636.
-#>  5  -997  2885        664.
-#>  6  -997  2886        765.
-#>  7  -993  2885        399.
-#>  8  -993  2886        780.
-#>  9  -990  2885        247.
-#> 10  -990  2886        622.
-#> # ℹ 2,136 more rows
+#>  1  -999  2828        143.
+#>  2  -999  2829       1345.
+#>  3  -999  2830        767.
+#>  4  -999  2831        780.
+#>  5  -999  2832        596.
+#>  6  -999  2833       2063.
+#>  7  -990  2828       1167.
+#>  8  -990  2829        168.
+#>  9  -990  2830        668.
+#> 10  -990  2831        849.
+#> # ℹ 7,412 more rows
 ```
 
 In our simulation you will see to rankings `ov_rank` which stands for
@@ -502,20 +516,20 @@ lr1 <- calculate_sub_cas(r2cc, wl_model = "CAS23", post_tx_model = "CAS23", wl_w
                          pld_weight = 0.05, peds_weight = 0.2)
 
 lr1
-#> # A tibble: 1,073 × 3
+#> # A tibble: 1,237 × 3
 #>     c_id lu_score ov_rank
 #>    <dbl>    <dbl>   <dbl>
-#>  1  -999    0.175    1019
-#>  2  -998    0.173    1029
-#>  3  -997    0.198     667
-#>  4  -993    0.147    1069
-#>  5  -990    0.198     676
-#>  6  -989    0.200     588
-#>  7  -987    0.177    1012
-#>  8  -977    0.173    1031
-#>  9  -959    0.194     779
-#> 10  -956    0.137    1072
-#> # ℹ 1,063 more rows
+#>  1  -999    0.191     978
+#>  2  -990    0.161    1229
+#>  3  -989    0.184    1114
+#>  4  -987    0.207     455
+#>  5  -984    0.179    1158
+#>  6  -982    0.211     260
+#>  7  -979    0.198     797
+#>  8  -978    0.207     424
+#>  9  -969    0.193     949
+#> 10  -967    0.184    1100
+#> # ℹ 1,227 more rows
 ```
 
 #### Offering and Acceptance
@@ -536,46 +550,51 @@ tracked with the candidate.
 ## you'll notice that if you run the function it returns a combination of every candidate and donor
 offs <- cas_offer_rank(hm1, am1, cm1, lm1, overall_ranking = lr1, efficiency_weight = 0.1)
 offs
-#> # A tibble: 125 × 10
+#> # A tibble: 1,637 × 10
 #>     c_id  d_id match_single match_double abo_exact distance_nm lu_score ov_rank
 #>    <dbl> <int> <lgl>        <lgl>        <lgl>           <dbl>    <dbl>   <dbl>
-#>  1  -999  2885 TRUE         TRUE         TRUE            1834.    0.219    1019
-#>  2  -998  2885 FALSE        TRUE         TRUE             253.    0.259    1029
-#>  3  -942  2885 TRUE         TRUE         TRUE             389.    0.250    1057
-#>  4  -941  2885 FALSE        TRUE         TRUE             486.    0.252    1047
-#>  5  -867  2885 TRUE         TRUE         TRUE             482.    0.276     805
-#>  6  -866  2885 TRUE         TRUE         TRUE             402.    0.269     956
-#>  7  -788  2886 TRUE         TRUE         TRUE             712.    0.264     940
-#>  8  -777  2885 TRUE         TRUE         TRUE             482.    0.262     997
-#>  9  -740  2885 FALSE        TRUE         TRUE             163.    0.278     860
-#> 10  -596  2885 TRUE         TRUE         TRUE            1395.    0.260     577
-#> # ℹ 115 more rows
+#>  1  -999  2828 TRUE         TRUE         TRUE             143.    0.279     978
+#>  2  -999  2829 TRUE         FALSE        TRUE            1345.    0.252     978
+#>  3  -999  2832 TRUE         TRUE         TRUE             596.    0.273     978
+#>  4  -990  2829 TRUE         TRUE         FALSE            168.    0.249    1229
+#>  5  -990  2832 TRUE         TRUE         FALSE            745.    0.240    1229
+#>  6  -990  2833 FALSE        TRUE         TRUE             858.    0.237    1229
+#>  7  -989  2829 TRUE         TRUE         TRUE            1127.    0.252    1114
+#>  8  -989  2832 FALSE        TRUE         TRUE             453.    0.267    1114
+#>  9  -984  2829 TRUE         TRUE         TRUE             679.    0.258    1158
+#> 10  -984  2832 FALSE        TRUE         TRUE             281.    0.265    1158
+#> # ℹ 1,627 more rows
 #> # ℹ 2 more variables: pcost <dbl>, offer_rank <dbl>
 
 set.seed(26638)
 acceptance_prob(offs, dons = dons_401, cands = r2cc)
-#> # A tibble: 125 × 12
+#> # A tibble: 1,637 × 12
 #>     c_id  d_id match_single match_double abo_exact distance_nm lu_score ov_rank
 #>    <dbl> <int> <lgl>        <lgl>        <lgl>           <dbl>    <dbl>   <dbl>
-#>  1  -999  2885 TRUE         TRUE         TRUE            1834.    0.219    1019
-#>  2  -998  2885 FALSE        TRUE         TRUE             253.    0.259    1029
-#>  3  -942  2885 TRUE         TRUE         TRUE             389.    0.250    1057
-#>  4  -941  2885 FALSE        TRUE         TRUE             486.    0.252    1047
-#>  5  -867  2885 TRUE         TRUE         TRUE             482.    0.276     805
-#>  6  -866  2885 TRUE         TRUE         TRUE             402.    0.269     956
-#>  7  -788  2886 TRUE         TRUE         TRUE             712.    0.264     940
-#>  8  -777  2885 TRUE         TRUE         TRUE             482.    0.262     997
-#>  9  -740  2885 FALSE        TRUE         TRUE             163.    0.278     860
-#> 10  -596  2885 TRUE         TRUE         TRUE            1395.    0.260     577
-#> # ℹ 115 more rows
+#>  1  -999  2828 TRUE         TRUE         TRUE             143.    0.279     978
+#>  2  -999  2829 TRUE         FALSE        TRUE            1345.    0.252     978
+#>  3  -999  2832 TRUE         TRUE         TRUE             596.    0.273     978
+#>  4  -990  2829 TRUE         TRUE         FALSE            168.    0.249    1229
+#>  5  -990  2832 TRUE         TRUE         FALSE            745.    0.240    1229
+#>  6  -990  2833 FALSE        TRUE         TRUE             858.    0.237    1229
+#>  7  -989  2829 TRUE         TRUE         TRUE            1127.    0.252    1114
+#>  8  -989  2832 FALSE        TRUE         TRUE             453.    0.267    1114
+#>  9  -984  2829 TRUE         TRUE         TRUE             679.    0.258    1158
+#> 10  -984  2832 FALSE        TRUE         TRUE             281.    0.265    1158
+#> # ℹ 1,627 more rows
 #> # ℹ 4 more variables: pcost <dbl>, offer_rank <dbl>, pred <dbl>, accept <int>
 
 transplant_candidates(matches = mtc)
-#> # A tibble: 2 × 15
+#> # A tibble: 7 × 15
 #>    d_id don_org  c_id match_single match_double abo_exact distance_nm lu_score
 #>   <int> <fct>   <dbl> <lgl>        <lgl>        <lgl>           <dbl>    <dbl>
-#> 1  2885 DLU      3087 TRUE         TRUE         TRUE             427.    0.283
-#> 2  2886 DLU      2795 TRUE         FALSE        TRUE             935.    0.266
+#> 1  2828 LUR      -999 TRUE         TRUE         TRUE          143.       0.279
+#> 2  2829 DLU      3324 TRUE         FALSE        TRUE         1130.       0.352
+#> 3  2829 DLU      3158 TRUE         TRUE         FALSE           0.350    0.305
+#> 4  2830 LUL      2017 TRUE         FALSE        TRUE          142.       0.319
+#> 5  2831 DLU      3243 TRUE         TRUE         TRUE          262.       0.303
+#> 6  2832 DLU      3077 TRUE         TRUE         TRUE          248.       0.306
+#> 7  2833 DLU      2778 TRUE         TRUE         TRUE          220.       0.304
 #> # ℹ 7 more variables: ov_rank <dbl>, pcost <dbl>, offer_rank <dbl>, pred <dbl>,
 #> #   accept <int>, surg_type <fct>, organs_rec <dbl>
 ```
@@ -588,20 +607,20 @@ implementation will incorporate PRA screening criteria.
 
 ``` r
 pra_screen(cands = r2cc, dons = dons_401)
-#> # A tibble: 2,146 × 2
+#> # A tibble: 7,422 × 2
 #>     c_id  d_id
 #>    <dbl> <int>
-#>  1  -999  2885
-#>  2  -999  2886
-#>  3  -998  2885
-#>  4  -998  2886
-#>  5  -997  2885
-#>  6  -997  2886
-#>  7  -993  2885
-#>  8  -993  2886
-#>  9  -990  2885
-#> 10  -990  2886
-#> # ℹ 2,136 more rows
+#>  1  -999  2828
+#>  2  -999  2829
+#>  3  -999  2830
+#>  4  -999  2831
+#>  5  -999  2832
+#>  6  -999  2833
+#>  7  -990  2828
+#>  8  -990  2829
+#>  9  -990  2830
+#> 10  -990  2831
+#> # ℹ 7,412 more rows
 ```
 
 If you want to return the matches along with the simulated output. All
@@ -617,11 +636,15 @@ l_1m <- iteration(401, syn_cands, syn_dons, include_matches = TRUE, updated_list
                  peds_weight = 0.2, efficiency_weight = 0.1)
 
 l_1m$all_matches
-#> # A tibble: 2 × 3
+#> # A tibble: 6 × 3
 #>    d_id don_org data              
 #>   <int> <fct>   <list>            
-#> 1  2885 DLU     <tibble [115 × 1]>
-#> 2  2886 DLU     <tibble [10 × 1]>
+#> 1  2828 LUR     <tibble [174 × 1]>
+#> 2  2829 DLU     <tibble [398 × 1]>
+#> 3  2830 LUL     <tibble [127 × 1]>
+#> 4  2831 DLU     <tibble [82 × 1]> 
+#> 5  2832 DLU     <tibble [637 × 1]>
+#> 6  2833 DLU     <tibble [219 × 1]>
 ```
 
 ## A few helpful tips
@@ -639,45 +662,45 @@ possible to change, but we would recommend keeping it the same as the
 
 ``` r
 concat2(r1)
-#> # A tibble: 4,248 × 77
-#>    dx_grp  c_id listing_day center  male race_eth age_at_listing  airway  oxygen
-#>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>   <dbl>   <dbl>
-#>  1 B      -1000       -4606 38         0 Hispanic           43.4  1.94   -0.466 
-#>  2 B       -999       -4605 7          0 NH White           53.5  0.233   0.679 
-#>  3 A       -998       -3842 21         0 NH White           65.7 -0.347   0.0699
-#>  4 A       -997       -3618 55         1 Asian              56.3 -0.0723 -0.241 
-#>  5 A       -996       -3305 30         1 NH White           43.5 -0.848   0.0260
-#>  6 B       -995       -3252 38         0 NH White           56.0  1.23   -0.880 
-#>  7 D       -994       -3178 18         1 NH White           35.8  1.45   -0.205 
-#>  8 A       -993       -3052 18         1 NH White           72.1 -1.15   -0.0170
-#>  9 C       -992       -2827 61         0 NH White           35.0 -0.615   0.493 
-#> 10 A       -991       -2749 3          1 NH White           60.3  0.120   0.707 
-#> # ℹ 4,238 more rows
-#> # ℹ 68 more variables: abo <chr>, hgt_in <dbl>, hgt_cm <dbl>, wgt_kg <dbl>,
-#> #   bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>, fev1 <dbl>,
-#> #   fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>, o2_freq <dbl>,
-#> #   vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
+#> # A tibble: 4,325 × 77
+#>    dx_grp  c_id listing_day center  male race_eth age_at_listing   airway
+#>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>    <dbl>
+#>  1 B      -1000       -5908 61         1 NH White           30.3  0.940  
+#>  2 A       -999       -5731 26         1 Asian              56.3 -0.941  
+#>  3 A       -998       -3757 8          0 Hispanic           50.3 -0.949  
+#>  4 A       -997       -3713 45         1 NH White           65.5 -0.00918
+#>  5 A       -996       -3648 6          0 NH White           63.1 -0.668  
+#>  6 D       -995       -3298 40         0 NH White           30.9  0.857  
+#>  7 A       -994       -3200 55         1 NH White           58.1 -0.802  
+#>  8 D       -993       -3091 1          0 NH Black           41.7 -0.374  
+#>  9 A       -992       -2816 46         0 NH Black           51.4 -0.105  
+#> 10 D       -991       -2704 2          0 NH White           47.8 -0.244  
+#> # ℹ 4,315 more rows
+#> # ℹ 69 more variables: oxygen <dbl>, abo <chr>, hgt_in <dbl>, hgt_cm <dbl>,
+#> #   wgt_kg <dbl>, bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>,
+#> #   fev1 <dbl>, fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>,
+#> #   o2_freq <dbl>, vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
 #> #   pap_syst <dbl>, ci <dbl>, funstat <dbl>, ecmo <dbl>, cvp <dbl>,
 #> #   pco2_15 <dbl>, pra <dbl>, pld <dbl>, creat_150 <dbl>, bili_50 <dbl>, …
 concat2(r1, min_enroll_date = 31, max_enroll_date = 300, wl_censor_date = 300, post_tx_censor_date = 330)
-#> # A tibble: 3,180 × 77
-#>    dx_grp  c_id listing_day center  male race_eth age_at_listing  airway  oxygen
-#>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>   <dbl>   <dbl>
-#>  1 B      -1000       -4606 38         0 Hispanic           43.4  1.94   -0.466 
-#>  2 B       -999       -4605 7          0 NH White           53.5  0.233   0.679 
-#>  3 A       -997       -3618 55         1 Asian              56.3 -0.0723 -0.241 
-#>  4 A       -996       -3305 30         1 NH White           43.5 -0.848   0.0260
-#>  5 B       -995       -3252 38         0 NH White           56.0  1.23   -0.880 
-#>  6 D       -994       -3178 18         1 NH White           35.8  1.45   -0.205 
-#>  7 C       -992       -2827 61         0 NH White           35.0 -0.615   0.493 
-#>  8 A       -991       -2749 3          1 NH White           60.3  0.120   0.707 
-#>  9 A       -990       -2703 42         0 NH White           63.0  1.34    0.184 
-#> 10 B       -988       -2510 45         0 NH White           57.6  1.22    0.0661
-#> # ℹ 3,170 more rows
-#> # ℹ 68 more variables: abo <chr>, hgt_in <dbl>, hgt_cm <dbl>, wgt_kg <dbl>,
-#> #   bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>, fev1 <dbl>,
-#> #   fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>, o2_freq <dbl>,
-#> #   vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
+#> # A tibble: 3,221 × 77
+#>    dx_grp  c_id listing_day center  male race_eth age_at_listing   airway
+#>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>    <dbl>
+#>  1 B      -1000       -5908 61         1 NH White           30.3  0.940  
+#>  2 A       -999       -5731 26         1 Asian              56.3 -0.941  
+#>  3 A       -998       -3757 8          0 Hispanic           50.3 -0.949  
+#>  4 A       -997       -3713 45         1 NH White           65.5 -0.00918
+#>  5 A       -996       -3648 6          0 NH White           63.1 -0.668  
+#>  6 D       -995       -3298 40         0 NH White           30.9  0.857  
+#>  7 A       -994       -3200 55         1 NH White           58.1 -0.802  
+#>  8 D       -993       -3091 1          0 NH Black           41.7 -0.374  
+#>  9 A       -992       -2816 46         0 NH Black           51.4 -0.105  
+#> 10 D       -991       -2704 2          0 NH White           47.8 -0.244  
+#> # ℹ 3,211 more rows
+#> # ℹ 69 more variables: oxygen <dbl>, abo <chr>, hgt_in <dbl>, hgt_cm <dbl>,
+#> #   wgt_kg <dbl>, bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>,
+#> #   fev1 <dbl>, fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>,
+#> #   o2_freq <dbl>, vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
 #> #   pap_syst <dbl>, ci <dbl>, funstat <dbl>, ecmo <dbl>, cvp <dbl>,
 #> #   pco2_15 <dbl>, pra <dbl>, pld <dbl>, creat_150 <dbl>, bili_50 <dbl>, …
 ```
@@ -687,24 +710,24 @@ specific day.
 
 ``` r
 spec_day(r1, day = 300)
-#> # A tibble: 1,037 × 77
-#>    dx_grp  c_id listing_day center  male race_eth age_at_listing airway  oxygen
-#>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>  <dbl>   <dbl>
-#>  1 B      -1000       -4606 38         0 Hispanic           43.4  1.94  -0.466 
-#>  2 B       -995       -3252 38         0 NH White           56.0  1.23  -0.880 
-#>  3 A       -991       -2749 3          1 NH White           60.3  0.120  0.707 
-#>  4 A       -990       -2703 42         0 NH White           63.0  1.34   0.184 
-#>  5 B       -988       -2510 45         0 NH White           57.6  1.22   0.0661
-#>  6 A       -980       -2228 32         0 NH White           54.9 -0.190 -0.379 
-#>  7 A       -973       -2117 13         0 NH White           39.8 -0.274  0.254 
-#>  8 A       -960       -1826 41         1 NH White           58.0 -0.656  0.139 
-#>  9 A       -957       -1799 52         1 NH White           51.8 -0.175  0.642 
-#> 10 A       -951       -1716 39         0 NH White           68.7 -0.504  0.169 
-#> # ℹ 1,027 more rows
-#> # ℹ 68 more variables: abo <chr>, hgt_in <dbl>, hgt_cm <dbl>, wgt_kg <dbl>,
-#> #   bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>, fev1 <dbl>,
-#> #   fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>, o2_freq <dbl>,
-#> #   vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
+#> # A tibble: 1,143 × 77
+#>    dx_grp  c_id listing_day center  male race_eth age_at_listing   airway
+#>    <chr>  <dbl>       <dbl> <fct>  <int> <fct>             <dbl>    <dbl>
+#>  1 A       -997       -3713 45         1 NH White           65.5 -0.00918
+#>  2 A       -996       -3648 6          0 NH White           63.1 -0.668  
+#>  3 D       -995       -3298 40         0 NH White           30.9  0.857  
+#>  4 A       -989       -2467 47         0 NH White           63.8 -0.487  
+#>  5 A       -979       -1978 34         0 NH White           67.6 -0.591  
+#>  6 A       -978       -1970 21         1 NH White           63.9 -1.06   
+#>  7 A       -971       -1854 54         0 NH White           66.4 -0.457  
+#>  8 A       -970       -1828 59         1 NH White           65.5 -0.361  
+#>  9 B       -964       -1745 34         0 NH White           46.4  1.05   
+#> 10 C       -962       -1722 45         0 NH White           51.5 -0.307  
+#> # ℹ 1,133 more rows
+#> # ℹ 69 more variables: oxygen <dbl>, abo <chr>, hgt_in <dbl>, hgt_cm <dbl>,
+#> #   wgt_kg <dbl>, bmi <dbl>, resp_supp <fct>, surg_type <fct>, diab <int>,
+#> #   fev1 <dbl>, fvc <dbl>, pco2 <dbl>, pf <dbl>, po2 <dbl>, pap_mean <dbl>,
+#> #   o2_freq <dbl>, vent <fct>, walk6m <dbl>, o2 <int>, bili <dbl>, creat <dbl>,
 #> #   pap_syst <dbl>, ci <dbl>, funstat <dbl>, ecmo <dbl>, cvp <dbl>,
 #> #   pco2_15 <dbl>, pra <dbl>, pld <dbl>, creat_150 <dbl>, bili_50 <dbl>, …
 ```
@@ -721,35 +744,35 @@ linear predictor.
 
 ``` r
 rmst("LAS21", cand_data = r2cc, cap = 365, wl = TRUE)
-#> # A tibble: 1,073 × 3
+#> # A tibble: 1,237 × 3
 #>     c_id    lp expected
 #>    <dbl> <dbl>    <dbl>
-#>  1  -999  4.09     307.
-#>  2  -998  2.13     356.
-#>  3  -997  2.81     348.
-#>  4  -993  4.26     298.
-#>  5  -990  1.64     360.
-#>  6  -989  2.85     347.
-#>  7  -987  2.26     355.
-#>  8  -977  2.59     351.
-#>  9  -959  3.26     338.
-#> 10  -956  4.23     300.
-#> # ℹ 1,063 more rows
+#>  1  -999  3.48     332.
+#>  2  -990  2.35     354.
+#>  3  -989  2.78     348.
+#>  4  -987  3.26     338.
+#>  5  -984  3.72     324.
+#>  6  -982  1.97     357.
+#>  7  -979  2.67     350.
+#>  8  -978  3.28     338.
+#>  9  -969  1.99     357.
+#> 10  -967  1.88     358.
+#> # ℹ 1,227 more rows
 rmst("CAS23", cand_data = r2cc, cap = 1826, wl = FALSE)
-#> # A tibble: 1,073 × 3
+#> # A tibble: 1,237 × 3
 #>     c_id    lp expected
 #>    <dbl> <dbl>    <dbl>
-#>  1  -999 1.08     1212.
-#>  2  -998 1.00     1248.
-#>  3  -997 0.649    1391.
-#>  4  -993 1.53      980.
-#>  5  -990 0.623    1401.
-#>  6  -989 0.591    1412.
-#>  7  -987 0.938    1276.
-#>  8  -977 1.00     1247.
-#>  9  -959 0.733    1360.
-#> 10  -956 1.67      905.
-#> # ℹ 1,063 more rows
+#>  1  -999 0.792    1337.
+#>  2  -990 1.18     1166.
+#>  3  -989 0.907    1290.
+#>  4  -987 0.616    1403.
+#>  5  -984 1.04     1233.
+#>  6  -982 0.417    1470.
+#>  7  -979 0.813    1329.
+#>  8  -978 0.779    1342.
+#>  9  -969 0.715    1367.
+#> 10  -967 0.792    1337.
+#> # ℹ 1,227 more rows
 ```
 
 One can calculate RMST if one supplies a vector of survival times, or
