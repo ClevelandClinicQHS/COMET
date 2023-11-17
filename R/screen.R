@@ -213,7 +213,7 @@ cas_offer_rank <- function(..., overall_ranking, efficiency_weight = 0.10, cost_
 
   all_x <- Reduce(function(x,y) inner_join(x, y, by = c("c_id", "d_id")), l) |>
     left_join(overall_ranking, by = "c_id") |>
-    calculate_cas_dist(match_data = _, efficiency_weight = efficiency_weight,
+    calculate_cas_dist(efficiency_weight = efficiency_weight,
                        cost_weight = cost_weight, distance_weight = distance_weight, checks = checks) |>
     mutate(offer_rank = rank(-.data$lu_score), .by = .data$d_id)
 
