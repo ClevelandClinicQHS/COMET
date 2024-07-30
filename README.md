@@ -6,7 +6,7 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of COMET is to simulate provide an open source framework to
+The goal of COMET[^1] is to simulate provide an open source framework to
 simulate the United States Lung Allocation System
 
 ## Installation
@@ -38,13 +38,13 @@ library(COMET)
 r1 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "LAS15", post_tx_model = "LAS15",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.620258 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.496309 mins
 
 r2 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_cas, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 0.25, post_tx_weight = 0.25, wl_cap = 365, post_tx_cap = 1826,
                      bio_weight = .15, pld_weight = 0.05, peds_weight = 0.2, efficiency_weight = 0.1, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 3.084634 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.924365 mins
 ```
 
 A simple way to evaluate the COMET runs, one can also look at the
@@ -124,12 +124,12 @@ mortality receives the same weight as post-transplant (1 to 1).
 r3 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 2, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.530677 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.39724 mins
 
 r4 <- run_simulation(days = 400, can_start = 1000,
                      match_alg = match_las, wl_model = "CAS23", post_tx_model = "CAS23",
                      wl_weight = 1, post_tx_weight = 1, wl_cap = 365, post_tx_cap = 365, seed = 26638)
-#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.538058 mins
+#> 10% done 20% done 30% done 40% done 50% done 60% done 70% done 80% done 90% done 100% done Time difference of 2.409165 mins
 ```
 
 ## A more indepth demonstration to show what is going on behind the scenes
@@ -248,10 +248,10 @@ bilirubin, etc.)
 Within `update_patients` are
 
 - `identify_deaths` returns a dataset of those who died either on the
-  waiting list or post-transplant[^1]
+  waiting list or post-transplant[^2]
 
 - `identify_removals` returns a dataset of those who were removed on the
-  waiting list[^2]
+  waiting list[^3]
 
 ``` r
 update_patients(patients = r2cc, model = "CAS23r", 
@@ -785,11 +785,17 @@ expected_survival(lp = c(0, 1, -0.5), 0.994390)
 #> [1] 0.9943900 0.9848238 0.9965936
 ```
 
-[^1]: If one wonders what model is “CAS23r”, it is the baseline hazard
+[^1]: Rose, Johnie, Paul R. Gunsalus, Carli J. Lehr, Mark F. Swiler,
+    Jarrod E. Dalton, and Maryam Valapour. “A modular simulation
+    framework for organ allocation.” The Journal of Heart and Lung
+    Transplantation (2024).
+    <https://doi.org/10.1016/j.healun.2024.04.063>
+
+[^2]: If one wonders what model is “CAS23r”, it is the baseline hazard
     for the “CAS23” models ‘recalibrated’ after research and initial
     simulations runs showed that the “CAS23” model did not accurately
     simulate waitlist and post-transplant deaths.
 
-[^2]: Models for waitlist removal for other reasons are not part of the
+[^3]: Models for waitlist removal for other reasons are not part of the
     LAS/CAS and were modeled separately. The maximum day for this 2365
     days after being placed on the waiting list

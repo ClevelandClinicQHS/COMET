@@ -18,7 +18,7 @@ knitr::opts_chunk$set(
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of COMET is to simulate provide an open source framework to simulate the United States Lung Allocation System
+The goal of COMET^[Rose, Johnie, Paul R. Gunsalus, Carli J. Lehr, Mark F. Swiler, Jarrod E. Dalton, and Maryam Valapour. "A modular simulation framework for organ allocation." The Journal of Heart and Lung Transplantation (2024). https://doi.org/10.1016/j.healun.2024.04.063] is to simulate provide an open source framework to simulate the United States Lung Allocation System
 
 ## Installation
 
