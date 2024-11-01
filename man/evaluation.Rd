@@ -53,7 +53,7 @@ A few functions to help look at and evaluate the results from a COMET object.
 }
 \details{
 Data dictionary for \code{eval_simulation()}
-\itemize{
+\describe{
 \item{can_count}{ - total candidate count}
 \item{tx_count}{ - total number of transplants}
 \item{wait_death}{ - number of deaths on the waiting list}

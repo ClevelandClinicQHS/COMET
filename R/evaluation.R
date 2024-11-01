@@ -14,7 +14,7 @@
 #' @return \code{eval_simulation()} returns a tibble of summary statistics. See details for data dictionary
 #'
 #' @details Data dictionary for \code{eval_simulation()}
-#' \itemize{
+#' \describe{
 #' \item{can_count}{ - total candidate count}
 #' \item{tx_count}{ - total number of transplants}
 #' \item{wait_death}{ - number of deaths on the waiting list}

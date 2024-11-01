@@ -152,7 +152,8 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE,
     left_join(surv_rt, by = setNames("Days", ela_str)) |>
     left_join(surv_rt, by = c("days_ago" = "Days"), suffix = c("_y", "_x")) |>
     mutate(cond_x = (.data$Survival_y^exp(!!lp_val))/(.data$Survival_x^exp(!!lp_val)),
-           death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - .data$cond_x)
+           # death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - .data$cond_x)
+           death = rbinom(n = max(c(dplyr::row_number(),0)), size = 1, prob = pmin(pmax(1 - .data$cond_x, 0),1)),
     )
 
   if(any(dl[ela_str] >= 300)){
@@ -167,7 +168,8 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE,
         mutate(days_ago = {{elapsed_time}} - 1) |>
         left_join(wl_survpost365, by = c("days_ago" = "Days", "dx_grp"), suffix = c("_y", "_x")) |>
         mutate(cond_x = (.data$Survival_y/.data$Survival_x),
-               death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - .data$cond_x)
+               # death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - .data$cond_x)
+               death = rbinom(n = max(c(dplyr::row_number(),0)), size = 1, prob = pmin(pmax(1 - .data$cond_x, 0),1)),
         )
       dlr <- filter(dl, !(.data$c_id %in% dl_max$c_id))
       dl <- bind_rows(dlr, dl_max)
@@ -182,7 +184,8 @@ identify_deaths <- function(patients, model = NULL, elapsed_time, pre_tx = TRUE,
         left_join(surv_rt_rec, by = setNames("Days", ela_str)) |>
         left_join(surv_rt_rec, by = c("days_ago" = "Days"), suffix = c("_y", "_x")) |>
         mutate(cond_x = (.data$Survival_y^exp(!!lp_val))/(.data$Survival_x^exp(!!lp_val)),
-               death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - .data$cond_x),
+               # death = rbinom(n = max(dplyr::row_number()), size = 1, prob = 1 - .data$cond_x),
+               death = rbinom(n = max(c(dplyr::row_number(),0)), size = 1, prob = pmin(pmax(1 - .data$cond_x, 0),1)),
         )
 
       dlr <- filter(dl, !(.data$c_id %in% dl_pre$c_id))
