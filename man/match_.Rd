@@ -3,6 +3,7 @@
 \name{match_}
 \alias{match_}
 \alias{match_las}
+\alias{match_cas_pre_abo}
 \alias{match_cas}
 \title{LAS/CAS Matching}
 \usage{
@@ -15,6 +16,27 @@ match_las(
   wl_cap = NA,
   post_tx_weight = NA,
   post_tx_cap = NA,
+  checks = TRUE
+)
+
+match_cas_pre_abo(
+  cands,
+  dons,
+  wl_model = NA,
+  post_tx_model = NA,
+  wl_weight = NA,
+  wl_cap = NA,
+  post_tx_weight = NA,
+  post_tx_cap = NA,
+  bio_weight = NA,
+  peds_weight = NA,
+  pld_weight = NA,
+  efficiency_weight = NA,
+  abo_weight = NA,
+  height_weight = NA,
+  cpra_weight = NA,
+  cost_weight = NA,
+  distance_weight = NA,
   checks = TRUE
 )
 

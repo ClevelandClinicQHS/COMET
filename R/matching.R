@@ -92,7 +92,7 @@ match_las <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
 #' @importFrom tidyr nest
 #' @importFrom dplyr near
 #' @importFrom rlang .data
-match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight = NA, wl_cap = NA,
+match_cas_pre_abo <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight = NA, wl_cap = NA,
                         post_tx_weight = NA, post_tx_cap = NA, bio_weight = NA, peds_weight = NA,
                       pld_weight = NA, efficiency_weight = NA, abo_weight = NA, height_weight = NA,
                       cpra_weight = NA, cost_weight = NA, distance_weight = NA, checks = TRUE
@@ -104,7 +104,7 @@ match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
   dm <- dist_calc(cands, dons)
   cm <- count_screen(cands, dons)
 
-  cas_ov <- calculate_sub_cas(cands, wl_model = wl_model, post_tx_model = post_tx_model, wl_weight = wl_weight, wl_cap = wl_cap,
+  cas_ov <- calculate_sub_cas_pre_abo(cands, wl_model = wl_model, post_tx_model = post_tx_model, wl_weight = wl_weight, wl_cap = wl_cap,
                               post_tx_weight = post_tx_weight, post_tx_cap = post_tx_cap, bio_weight = bio_weight, peds_weight = peds_weight,
                               pld_weight = pld_weight, abo_weight = abo_weight, height_weight = height_weight, cpra_weight = cpra_weight, checks = checks)
 
@@ -126,3 +126,39 @@ match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight 
 
 }
 
+#' @export
+#'
+#' @rdname match_
+match_cas <- function(cands, dons, wl_model = NA, post_tx_model = NA, wl_weight = NA, wl_cap = NA,
+                              post_tx_weight = NA, post_tx_cap = NA, bio_weight = NA, peds_weight = NA,
+                              pld_weight = NA, efficiency_weight = NA, abo_weight = NA, height_weight = NA,
+                              cpra_weight = NA, cost_weight = NA, distance_weight = NA, checks = TRUE
+){
+  
+  hm <- height_screen(cands, dons)
+  bm <- abo_screen(cands, dons)
+  pm <- pra_screen(cands, dons)
+  dm <- dist_calc(cands, dons)
+  cm <- count_screen(cands, dons)
+  
+  cas_ov <- calculate_sub_cas(cands, wl_model = wl_model, post_tx_model = post_tx_model, wl_weight = wl_weight, wl_cap = wl_cap,
+                                      post_tx_weight = post_tx_weight, post_tx_cap = post_tx_cap, bio_weight = bio_weight, peds_weight = peds_weight,
+                                      pld_weight = pld_weight, abo_weight = abo_weight, height_weight = height_weight, cpra_weight = cpra_weight, checks = checks)
+  
+  matches <- cas_offer_rank(hm, bm, pm, dm, cm, overall_ranking = cas_ov, efficiency_weight = efficiency_weight, cost_weight = cost_weight, distance_weight = distance_weight, checks = checks)
+  
+  if(nrow(matches) > 0L){
+    matches <- acceptance_prob(matched_data = matches, dons = dons, cands = cands)
+  }
+  
+  don_ov <- select(dons, "d_id", "don_org")
+  can_ov <- select(cands, "c_id", "surg_type")
+  
+  matches <- left_join(matches, can_ov, by = "c_id") |>
+    left_join(don_ov, by = "d_id") |>
+    arrange(.data$d_id, .data$offer_rank) |>
+    nest(.by = c(.data$d_id, .data$don_org))
+  
+  return(matches)
+  
+}

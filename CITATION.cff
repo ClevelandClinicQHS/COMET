@@ -7,10 +7,13 @@ cff-version: 1.2.0
 message: 'To cite package "COMET" in publications use:'
 type: software
 license: MIT
-title: 'COMET: Computational Open-source Model for Transplantation'
+title: 'COMET: Computational Open-Source Model for Evaluating Transplantation'
 version: 0.1.0
 abstract: COMET provides an open source simulation to model the United States lung
-  allocation process within synthetic candidate and donor populations.
+  allocation process within synthetic candidate and donor populations. For additional
+  functionality, this package interacts with data that is available in the 'cometdata'
+  package. To access this data run "remotes::install_github('https://github.com/ClevelandClinicQHS/cometdata',
+  type = 'source')".
 authors:
 - family-names: Gunsalus
   given-names: Paul
@@ -55,7 +58,7 @@ references:
     given-names: Douglas
   - family-names: Chambers
     given-names: John
-  year: '2023'
+  year: '2024'
 - type: software
   title: rlang
   abstract: 'rlang: Functions for Base Types and Core R and ''Tidyverse'' Features'
@@ -69,7 +72,7 @@ references:
   - family-names: Wickham
     given-names: Hadley
     email: hadley@posit.co
-  year: '2023'
+  year: '2024'
   version: '>= 1.1.1'
 - type: software
   title: methods
@@ -79,7 +82,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
 - type: software
@@ -90,26 +93,9 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
-  version: '>= 4.2.3'
-- type: software
-  title: purrr
-  abstract: 'purrr: Functional Programming Tools'
-  notes: Imports
-  url: https://purrr.tidyverse.org/
-  repository: https://CRAN.R-project.org/package=purrr
-  authors:
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@rstudio.com
-    orcid: https://orcid.org/0000-0003-4757-117X
-  - family-names: Henry
-    given-names: Lionel
-    email: lionel@rstudio.com
-  year: '2023'
-  version: '>= 1.0.1'
 - type: software
   title: dplyr
   abstract: 'dplyr: A Grammar of Data Manipulation'
@@ -133,20 +119,8 @@ references:
     given-names: Davis
     email: davis@posit.co
     orcid: https://orcid.org/0000-0003-4777-038X
-  year: '2023'
+  year: '2024'
   version: '>= 1.1.0'
-- type: software
-  title: stringr
-  abstract: 'stringr: Simple, Consistent Wrappers for Common String Operations'
-  notes: Imports
-  url: https://stringr.tidyverse.org
-  repository: https://CRAN.R-project.org/package=stringr
-  authors:
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@rstudio.com
-  year: '2023'
-  version: '>= 1.5.0'
 - type: software
   title: Rcpp
   abstract: 'Rcpp: Seamless R and C++ Integration'
@@ -172,7 +146,7 @@ references:
     given-names: Douglas
   - family-names: Chambers
     given-names: John
-  year: '2023'
+  year: '2024'
   version: '>= 1.0.10'
 - type: software
   title: splines
@@ -182,7 +156,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
 - type: software
@@ -197,20 +171,8 @@ references:
     given-names: Adelchi
     email: adelchi.azzalini@unipd.it
     orcid: https://orcid.org/0000-0002-7583-1269
-  year: '2023'
+  year: '2024'
   version: '>= 2.1.1'
-- type: software
-  title: plyr
-  abstract: 'plyr: Tools for Splitting, Applying and Combining Data'
-  notes: Imports
-  url: http://had.co.nz/plyr
-  repository: https://CRAN.R-project.org/package=plyr
-  authors:
-  - family-names: Wickham
-    given-names: Hadley
-    email: hadley@rstudio.com
-  year: '2023'
-  version: '>= 1.8.8'
 - type: software
   title: MASS
   abstract: 'MASS: Support Functions and Datasets for Venables and Ripley''s MASS'
@@ -221,8 +183,7 @@ references:
   - family-names: Ripley
     given-names: Brian
     email: ripley@stats.ox.ac.uk
-  year: '2023'
-  version: '>= 7.3-58.2'
+  year: '2024'
 - type: software
   title: tidyr
   abstract: 'tidyr: Tidy Messy Data'
@@ -238,7 +199,7 @@ references:
     email: davis@posit.co
   - family-names: Girlich
     given-names: Maximilian
-  year: '2023'
+  year: '2024'
   version: '>= 1.3.0'
 - type: software
   title: survival
@@ -250,7 +211,38 @@ references:
   - family-names: Therneau
     given-names: Terry M
     email: therneau.terry@mayo.edu
-  year: '2023'
+  year: '2024'
+- type: software
+  title: cometdata
+  abstract: 'cometdata: Computational Open-source Model for Transplantation data'
+  notes: Suggests
+  authors:
+  - family-names: Gunsalus
+    given-names: Paul
+    email: gunsalp@ccf.org
+    orcid: https://orcid.org/0000-0001-6976-9094
+  - family-names: Rose
+    given-names: Johnie
+    email: rosej15@ccf.org
+    orcid: https://orcid.org/0000-0001-7458-9303
+  - family-names: Dalton
+    given-names: Jarrod
+    email: daltonj@ccf.org
+    orcid: https://orcid.org/0000-0001-8336-1212
+  year: '2024'
+  version: '>= 0.0.1'
+- type: software
+  title: testthat
+  abstract: 'testthat: Unit Testing for R'
+  notes: Suggests
+  url: https://testthat.r-lib.org
+  repository: https://CRAN.R-project.org/package=testthat
+  authors:
+  - family-names: Wickham
+    given-names: Hadley
+    email: hadley@posit.co
+  year: '2024'
+  version: '>= 3.0.0'
 - type: software
   title: 'R: A Language and Environment for Statistical Computing'
   notes: Depends
@@ -259,7 +251,7 @@ references:
   - name: R Core Team
   location:
     name: Vienna, Austria
-  year: '2023'
+  year: '2024'
   institution:
     name: R Foundation for Statistical Computing
-  version: '>= 4.2.0'
+  version: '>= 4.1.0'

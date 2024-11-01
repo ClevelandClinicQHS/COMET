@@ -1,12 +1,12 @@
 Package: COMET
 Type: Package
-Title: Computational Open-source Model for Transplantation
-Version: 0.1.0
+Title: Computational Open-Source Model for Evaluating Transplantation
+Version: 0.1.1
 Authors@R: c(person("Paul", "Gunsalus", email = "gunsalp@ccf.org", role = c("aut","cre"), comment = c(ORCID = "0000-0001-6976-9094")),
              person("Mark", "Swiler", email = "swilerm@ccf.org", role = "ctb", comment = c(ORCID = "0000-0001-7070-671X")),
              person("Johnie", "Rose", email = "rosej15@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-7458-9303")),
              person("Jarrod", "Dalton", email = "daltonj@ccf.org", role = "aut", comment = c(ORCID = "0000-0001-8336-1212")))
-Description: COMET provides an open source simulation to model the United States lung allocation process within synthetic candidate and donor populations. This package interacts with data that is available in the 'cometdata' package. To access this data run "remotes::install_github('https://github.com/ClevelandClinicQHS/cometdata', type = 'source')".
+Description: COMET provides an open source simulation to model the United States lung allocation process within synthetic candidate and donor populations. For additional functionality, this package interacts with data that is available in the 'cometdata' package. To access this data run "remotes::install_github('https://github.com/ClevelandClinicQHS/cometdata', type = 'source')".
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -26,6 +26,7 @@ Suggests:
     survival,
     cometdata (>= 0.0.1),
     testthat (>= 3.0.0)
+Additional_repositories: https://github.com/ClevelandClinicQHS
 Depends: 
     R (>= 4.1.0)
 Config/testthat/edition: 3

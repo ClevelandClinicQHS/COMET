@@ -97,7 +97,9 @@ calculate_sub_cas <- function(data, wl_model = "CAS23", post_tx_model = "CAS23",
     mutate(
       lu_score = wl_weight * (25^(1 - .data$expected.wl/wl_cap) - 1)/24 +
         post_tx_weight * .data$expected.ptx/post_tx_cap +
-        bio_weight1 * (100^.data$pabo - 1)/99 + bio_weight2 * (100^.data$pcpra - 1)/99 + bio_weight3 * (100^.data$phgt - 1)/99 +
+        bio_weight1 * abo_upscale(.data$pabo, power = 25, upscale = T, pre_upscale = T) +
+        bio_weight2 * (100^.data$pcpra - 1)/99 +
+        bio_weight3 * (100^.data$phgt - 1)/99 +
         peds_weight * as.numeric(.data$age < 18) +
         pld_weight * .data$pld,
       ov_rank = rank(-.data$lu_score)
@@ -149,5 +151,96 @@ calculate_cas_dist <- function(match_data, efficiency_weight = NA, cost_weight =
     )
 
   return(data)
+
+}
+
+#' @export
+#'
+#' @rdname calculate_cas
+calculate_sub_cas_pre_abo <- function(data, wl_model = "CAS23", post_tx_model = "CAS23", wl_weight = NA, post_tx_weight = NA, bio_weight = NA,
+                              peds_weight = NA, pld_weight = NA, wl_cap = NA, post_tx_cap = NA, abo_weight = NA, height_weight = NA, cpra_weight = NA, checks = TRUE){
+
+  if(!is.na(abo_weight) & !is.na(height_weight) & !is.na(cpra_weight)){
+    bio_weight1 <- abo_weight
+    bio_weight2 <- height_weight
+    bio_weight3 <- cpra_weight
+
+  }else{
+    bio_weight1 <- bio_weight2 <- bio_weight3 <- bio_weight/3
+  }
+  if(checks){
+    if(is.na(bio_weight1)){
+      stop("abo_weight is missing")
+    }
+    if(is.na(bio_weight2)){
+      stop("height_weight is missing")
+    }
+    if(is.na(bio_weight3)){
+      stop("cpra_weight is missing")
+    }
+    if(is.na(wl_weight)){
+      stop("wl_weight is missing")
+    }
+    if(is.na(post_tx_weight)){
+      stop("post_tx_weight is missing")
+    }
+    if(is.na(wl_cap)){
+      stop("wl_weight is missing")
+    }
+    if(is.na(post_tx_cap)){
+      stop("post_tx_weight is missing")
+    }
+    if(!is.character(wl_model)){
+      stop("Only \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for wl_model")
+    }
+    if((!is.character(post_tx_model))){
+      stop("Only \"LAS15\",\"LAS21\" or \"CAS23\" are acceptable options for post_tx_model")
+    }
+  }
+
+  wl <- rmst(wl_model, cand_data = data, cap = wl_cap, wl = TRUE)
+
+  post_tx <- rmst(post_tx_model, cand_data = data, cap = post_tx_cap, wl = FALSE)
+
+  data <- left_join(data, wl, by = "c_id") |>
+    left_join(post_tx, by = "c_id", suffix = c(".wl",".ptx"))
+
+  data <- data |>
+    mutate(
+      lu_score = wl_weight * (25^(1 - .data$expected.wl/wl_cap) - 1)/24 +
+        post_tx_weight * .data$expected.ptx/post_tx_cap +
+        bio_weight1 * (100^.data$pabo - 1)/99 + bio_weight2 * (100^.data$pcpra - 1)/99 + bio_weight3 * (100^.data$phgt - 1)/99 +
+        peds_weight * as.numeric(.data$age < 18) +
+        pld_weight * .data$pld,
+      ov_rank = rank(-.data$lu_score)
+    ) |>
+    select("c_id", "lu_score", "ov_rank")
+
+  return(data)
+}
+
+abo_upscale <- function(x, power, upscale = FALSE, pre_upscale = FALSE){
+
+  if(power <= 0){
+    stop("power must be > 0")
+  }
+  if(power == 1){
+    if(upscale){
+      return(x/0.500181752090149)
+    }
+    return(x)
+  }
+  xp <- (power^x - 1)/(power-1)
+  rg <- 0.500181752090149
+  if(upscale){
+    if(pre_upscale){
+      xp <- (power^(x/rg) - 1)/(power-1)
+    }else{
+      mv <- (power^rg - 1)/(power-1)
+      xp <- xp * (1/mv)
+    }
+  }
+
+  return(xp)
 
 }

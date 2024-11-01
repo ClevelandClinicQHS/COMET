@@ -4,6 +4,7 @@
 \alias{calculate_sub_cas}
 \alias{calculate_cas}
 \alias{calculate_cas_dist}
+\alias{calculate_sub_cas_pre_abo}
 \title{Calculate Composite Allocation Score (CAS)}
 \usage{
 calculate_sub_cas(
@@ -28,6 +29,23 @@ calculate_cas_dist(
   efficiency_weight = NA,
   cost_weight = NA,
   distance_weight = NA,
+  checks = TRUE
+)
+
+calculate_sub_cas_pre_abo(
+  data,
+  wl_model = "CAS23",
+  post_tx_model = "CAS23",
+  wl_weight = NA,
+  post_tx_weight = NA,
+  bio_weight = NA,
+  peds_weight = NA,
+  pld_weight = NA,
+  wl_cap = NA,
+  post_tx_cap = NA,
+  abo_weight = NA,
+  height_weight = NA,
+  cpra_weight = NA,
   checks = TRUE
 )
 }
