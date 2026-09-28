@@ -7,7 +7,7 @@
 run_simulation(
   days,
   can_start = 1250,
-  match_alg = match_cas(),
+  match_alg = match_cas,
   ...,
   seed = NULL,
   desired = "random",
