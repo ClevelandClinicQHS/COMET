@@ -18,7 +18,7 @@ using namespace Rcpp;
 //' ## Restricted Mean Survival Time
 //' expected_survival(lps, seq(1,.85, -.0005))
 // [[Rcpp::export]]
-NumericVector expected_survival(NumericVector lp, NumericVector surv_rate) {
+NumericVector expected_survival2(NumericVector lp, NumericVector surv_rate) {
    int n = surv_rate.size();
    int m = lp.size();
    NumericVector z(m);

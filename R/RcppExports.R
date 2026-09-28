@@ -17,6 +17,10 @@
 #' expected_survival(lps, 0.85)
 #' ## Restricted Mean Survival Time
 #' expected_survival(lps, seq(1,.85, -.0005))
+expected_survival2 <- function(lp, surv_rate) {
+    .Call(`_COMET_expected_survival2`, lp, surv_rate)
+}
+
 expected_survival <- function(lp, surv_rate) {
     .Call(`_COMET_expected_survival`, lp, surv_rate)
 }

@@ -59,8 +59,11 @@ rmst.character <- function(object, cand_data, cap = NA, wl = TRUE, ...){
   if(is.na(cap)){cap <- max(surv$Days)}
 
   surv <- filter(surv, .data$Days <= cap)
-  surv1 <- f1(cand_data) |>
-    mutate(expected = expected_survival(.data$lp, surv$Survival))
+  # surv1 <- f1(cand_data) |>
+    # mutate(expected = expected_survival(.data$lp, surv$Survival))
+
+  surv1 <- f1(cand_data)
+  surv1$expected <- expected_survival(surv1$lp, surv$Survival)
   return(surv1)
 }
 

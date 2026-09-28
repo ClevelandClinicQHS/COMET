@@ -13,17 +13,21 @@ License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 RoxygenNote: 7.3.3
-LinkingTo: Rcpp
+LinkingTo: 
+    Rcpp, 
+    RcppParallel
 Imports:
     rlang (>= 1.1.1),
     methods,
     stats,
     dplyr (>= 1.1.0),
-    Rcpp (>= 1.0.10),
+    Rcpp,
+    RcppParallel,
     splines,
-    sn (>= 2.1.1), 
+    sn (>= 2.1.1),
     MASS,
-    tidyr (>= 1.3.0)
+    tidyr (>= 1.3.0),
+    RcppParallel
 Suggests:
     survival,
     cometdata (>= 0.0.1),
