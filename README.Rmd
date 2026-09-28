@@ -261,6 +261,6 @@ rmst("CAS23", cand_data = r2cc, cap = 1826, wl = FALSE)
 
 One can calculate RMST if one supplies a vector of survival times, or one can calculate the survival given the raw survival value on a given day. For example below we will use Day 364 of the CAS23 waitlist survival model which has a baseline survival value of 0.994390.
 ```{r exp_surv}
-expected_survival(lp = c(0, 1, -0.5), 0.994390)
+COMET:::expected_survival(lp = c(0, 1, -0.5), 0.994390)
 ```
 
