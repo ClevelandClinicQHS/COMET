@@ -1,3 +1,7 @@
+# COMET 0.1.2
+
+* addeneded screening criteria to be less conservative
+
 # COMET 0.1.1
 
 * match_cas now uses the updated policy as of September 27, 2023

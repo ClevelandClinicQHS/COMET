@@ -54,7 +54,37 @@
 #'  wl_cap = 365, post_tx_cap = 1826)
 #' cas_offers <- cas_offer_rank(height_match, abo_match, count_match,
 #'  pra_match, cas_dists, overall_ranking = cas_rank)
-height_screen <- function(cands, dons){
+# height_screen <- function(cands, dons){
+#
+#   cand_x <- left_join(cands, single_rg, by = "dx_grp") |>
+#     left_join(double_rg, by = "dx_grp") |>
+#     mutate(s_lower = .data$hgt_in + .data$s_lower,
+#            s_upper = .data$hgt_in + .data$s_upper,
+#            d_lower = .data$hgt_in + .data$d_lower,
+#            d_upper = .data$hgt_in + .data$d_upper) |>
+#     rename("hgt_in_c" = "hgt_in")
+#
+#   don_x <- select(dons, "d_id", hgt_in_d = "hgt_in", "don_org")
+#
+#   s_match <- inner_join(don_x, cand_x, by = join_by(between("hgt_in_d", "s_lower", "s_upper")))
+#   d_match <- inner_join(don_x, cand_x, by = join_by(between("hgt_in_d", "d_lower", "d_upper")))
+#
+#   ## Just as a checker
+#   height_match <- bind_rows(s_match, d_match) |>
+#     distinct(.data$c_id, .data$d_id, .keep_all = TRUE) |>
+#     mutate(match_single = between(.data$hgt_in_d, .data$s_lower, .data$s_upper),
+#            match_double = between(.data$hgt_in_d, .data$d_lower, .data$d_upper)) |>
+#     ## if one only one lung must match a single
+#     filter(.data$don_org == "DLU" |(.data$match_single & .data$don_org %in% c("LUL", "LUR"))) |>
+#     ## if the candidate is only a double transplant, make sure they match with double lungs
+#     filter(!(!.data$match_double & .data$surg_type == "D")) |>
+#     select("c_id", "d_id", "match_single", "match_double") |>
+#     arrange(.data$c_id, .data$d_id)
+#
+#     return(height_match)
+#
+# }
+height_screen <- function(cands, dons, return_height = FALSE){
 
   cand_x <- left_join(cands, single_rg, by = "dx_grp") |>
     left_join(double_rg, by = "dx_grp") |>
@@ -69,6 +99,8 @@ height_screen <- function(cands, dons){
   s_match <- inner_join(don_x, cand_x, by = join_by(between("hgt_in_d", "s_lower", "s_upper")))
   d_match <- inner_join(don_x, cand_x, by = join_by(between("hgt_in_d", "d_lower", "d_upper")))
 
+  rv <- c("c_id", "d_id", "match_single", "match_double")
+
   ## Just as a checker
   height_match <- bind_rows(s_match, d_match) |>
     distinct(.data$c_id, .data$d_id, .keep_all = TRUE) |>
@@ -78,10 +110,16 @@ height_screen <- function(cands, dons){
     filter(.data$don_org == "DLU" |(.data$match_single & .data$don_org %in% c("LUL", "LUR"))) |>
     ## if the candidate is only a double transplant, make sure they match with double lungs
     filter(!(!.data$match_double & .data$surg_type == "D")) |>
-    select("c_id", "d_id", "match_single", "match_double") |>
+    # select("c_id", "d_id", "match_single", "match_double") |>
     arrange(.data$c_id, .data$d_id)
 
-    return(height_match)
+  if(return_height){
+    height_match <- select(height_match, "c_id", "d_id", "match_single", "match_double", "hgt_in_c", "hgt_in_d")
+  }else{
+    height_match <- select(height_match, "c_id", "d_id", "match_single", "match_double")
+  }
+
+  return(height_match)
 
 }
 
@@ -89,13 +127,28 @@ height_screen <- function(cands, dons){
 
 #' @rdname screen
 #' @export
-abo_screen <- function(cands, dons){
+# abo_screen <- function(cands, dons){
+#
+#   don_x <- inner_join(dons, abo_match_df, by = "abo", multiple = "all")
+#
+#   abo_match <- inner_join(cands, don_x, by = c("abo" = "match"), multiple = "all") |>
+#     mutate(abo_exact = (.data$abo == .data$abo.y)) |>
+#     select("c_id", "d_id", "abo_exact")
+#
+#   return(abo_match)
+# }
+abo_screen <- function(cands, dons, return_abo = FALSE){
 
   don_x <- inner_join(dons, abo_match_df, by = "abo", multiple = "all")
 
   abo_match <- inner_join(cands, don_x, by = c("abo" = "match"), multiple = "all") |>
-    mutate(abo_exact = (.data$abo == .data$abo.y)) |>
-    select("c_id", "d_id", "abo_exact")
+    mutate(abo_exact = (.data$abo == .data$abo.y)) #|>
+    # select("c_id", "d_id", "abo_exact")
+  if(return_abo){
+    abo_match <- select(abo_match, "c_id", "d_id", "abo_exact", "abo_c" = "abo", "abo_d" = "abo.y")
+  }else{
+    abo_match <- select(abo_match, "c_id", "d_id", "abo_exact")
+  }
 
   return(abo_match)
 }

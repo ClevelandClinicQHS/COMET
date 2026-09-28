@@ -2,6 +2,7 @@
 % Please edit documentation in R/COMET.R
 \docType{package}
 \name{COMET}
+\alias{COMET-package}
 \alias{COMET}
 \title{COMET-package}
 \description{
@@ -12,3 +13,20 @@ The COMET package provides a open source framework to simulate the lung allocati
 This project was funded by the National Heart, Lung, and Blood Institute of the National Institutes of Health (R01HL153175). The content is solely the responsibility of the authors and does not necessarily represent the official views of the National Institutes of Health.
 }
 
+\author{
+\strong{Maintainer}: Paul Gunsalus \email{gunsalp@ccf.org} (\href{https://orcid.org/0000-0001-6976-9094}{ORCID})
+
+Authors:
+\itemize{
+  \item Johnie Rose \email{rosej15@ccf.org} (\href{https://orcid.org/0000-0001-7458-9303}{ORCID})
+  \item Jarrod Dalton \email{daltonj@ccf.org} (\href{https://orcid.org/0000-0001-8336-1212}{ORCID})
+}
+
+Other contributors:
+\itemize{
+  \item Mark Swiler \email{swilerm@ccf.org} (\href{https://orcid.org/0000-0001-7070-671X}{ORCID}) [contributor]
+  \item Anyin Zhao \email{axz346@case.edu} (\href{https://orcid.org/0009-0008-3785-8568}{ORCID}) [contributor]
+  \item Xiaoge Zhang \email{xxz705@case.edu} (\href{https://orcid.org/0009-0007-9839-5854}{ORCID}) [contributor]
+}
+
+}

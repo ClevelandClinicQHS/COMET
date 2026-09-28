@@ -185,6 +185,7 @@ iteration <- function(date, candidate_database, donor_database, include_matches,
 
   if(nrow(matches) > 0L){
     tr <- transplant_candidates(matches, recipient_database$c_id)
+    # tr <- transplant_candidates2(matches, recipient_database$c_id)
 
     tr_x <- tr |>
       group_by(.data$d_id) |>

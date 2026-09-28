@@ -12,9 +12,9 @@
 \alias{cas_offer_rank}
 \title{Screen Candidates and Donors for Compatibility}
 \usage{
-height_screen(cands, dons)
+height_screen(cands, dons, return_height = FALSE)
 
-abo_screen(cands, dons)
+abo_screen(cands, dons, return_abo = FALSE)
 
 pra_screen(cands, dons)
 

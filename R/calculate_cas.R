@@ -143,7 +143,7 @@ calculate_cas_dist <- function(match_data, efficiency_weight = NA, cost_weight =
         as.numeric(.data$distance_nm > 67.17) * 104.44 * (.data$distance_nm - 67.17) -
         as.numeric(.data$distance_nm > 86.90) * 128.34 * (.data$distance_nm - 86.90),
       lu_score = .data$lu_score +
-        efficiency_weight1 * (1- .data$pcost/118981.1) +
+        efficiency_weight1 * (1- .data$pcost/116989.1) +
         efficiency_weight2 *
         (as.numeric(.data$distance_nm <= 45) +
            as.numeric(between(.data$distance_nm, 45, 90)) * (1 - 0.15/45 * (.data$distance_nm - 45)) +

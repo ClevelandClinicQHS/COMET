@@ -969,9 +969,21 @@ rsamp <- function(FUN, limits, ...){
 #
 # }
 
-calc_multi_odds <- function(mat){
+# calc_multi_odds <- function(mat){
+#   mat2 <- t(apply(mat, 1, function(x) exp(x)/(1 + sum(exp(x)))))
+#   mat2 <- cbind(1-rowSums(mat2), mat2)
+#   return(mat2)
+# }
+
+calc_multi_odds <- function (mat, floor = FALSE)
+{
   mat2 <- t(apply(mat, 1, function(x) exp(x)/(1 + sum(exp(x)))))
-  mat2 <- cbind(1-rowSums(mat2), mat2)
+  if (floor) {
+    mat2 <- cbind(1 - pmin(rowSums(mat2), 1L), mat2)
+  }
+  else {
+    mat2 <- cbind(1 - rowSums(mat2), mat2)
+  }
   return(mat2)
 }
 
