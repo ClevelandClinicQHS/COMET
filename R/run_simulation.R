@@ -32,7 +32,7 @@
 #'  }
 #'  }
 run_simulation <- function(days, can_start = 1250,
-                           match_alg = match_cas(),
+                           match_alg = match_cas,
                            ...,
                            seed = NULL, desired = "random", return_params = FALSE, include_matches = FALSE){
 
@@ -40,15 +40,28 @@ run_simulation <- function(days, can_start = 1250,
 
   call1 <- match.call(expand.dots = TRUE)
 
-  set.seed(seed = seed)
-  ## For timing purposes
-  tic <- Sys.time()
+  if (!is.null(seed)) set.seed(as.integer(seed))
+  ## overall timer start
+  tic_overall <- Sys.time()
+
+  # store logic decisions
+  decision_log <- c()
+
+  # deciding what matching score to use
   match_f <- match_alg
   m1 <- dplyr::quo_name(enquo(match_alg))
-  lu_f <- if(grepl("las", m1)){calculate_las}else{calculate_sub_cas}
+  # lu_f <- if(grepl("las", m1)){calculate_las}else{calculate_sub_cas}
+  # decision log for the matching score selection
+  decision_log <- c(decision_log, paste0("Matching algorithm detected: ",
+                                         " → using ",
+                                         if (grepl("las", m1)) "calculate_las" else "calculate_sub_cas"))
+
+  # old candidate generation timer start
+  tic_old <- Sys.time()
 
   if(is.numeric(can_start)){
-
+    #add decision log as model generate old candidates based on the start_can number
+    decision_log <- c(decision_log, paste0("can_start is numeric (", can_start, "), generating old candidates via cust_day()"))
     cust_day <- function(x){
       dy <- ceiling(x/350)+10
       dy <- dy*50
@@ -80,41 +93,59 @@ run_simulation <- function(days, can_start = 1250,
 
     }
 
-  old_candidates <- cust_day(can_start)
+    old_candidates <- cust_day(can_start)
 
   }else{
-
-  old_candidates <- can_start
-}
-  ## initializing
-  if(return_params){
-    new_candidates_p <- gen_and_spawn_candidates(days = days, desired = desired, return_params = TRUE)
-    new_donors_p <- gen_and_spawn_donors(days = days, desired = desired, return_params = TRUE)
-
-    new_candidates <- new_candidates_p$data
-    new_donors <- new_donors_p$data
-  }else{
-
-    new_candidates <- gen_and_spawn_candidates(days = days, desired = desired)
-
-    new_donors <- gen_and_spawn_donors(days = days, desired = desired)
+    # the can_start is not numeric, added to log
+    decision_log <- c(decision_log, "can_start is not numeric — using provided dataset for old candidates")
+    old_candidates <- can_start
   }
 
-  cl <- dplyr::bind_rows(old_candidates, new_candidates)
+  #timing for generating old candidate ends
+  toc_old <- Sys.time()
+  time_old_candidates <- as.numeric(difftime(toc_old, tic_old, units = "secs"))
 
+  ## initializing
+  # start timer for new candidate generation
+  tic_cand <- Sys.time()
+  if (return_params) {
+    decision_log <- c(decision_log, "return_params = TRUE — generating candidates with parameter recording")
+    new_candidates_p <- gen_and_spawn_candidates(days = days, desired = desired, return_params = TRUE)
+    new_candidates <- new_candidates_p$data
+  } else {
+    decision_log <- c(decision_log, "return_params = FALSE — generating candidates without parameter recording")
+    new_candidates <- gen_and_spawn_candidates(days = days, desired = desired)
+  }
+  # end timer for new candidate generation
+  toc_cand <- Sys.time()
+  time_new_candidates <- as.numeric(difftime(toc_cand, tic_cand, units = "secs"))
+
+  # start timer for new donor generation
+  tic_don <- Sys.time()
+  if (return_params) {
+    decision_log <- c(decision_log, "return_params = TRUE — generating donors with parameter recording")
+    new_donors_p <- gen_and_spawn_donors(days = days, desired = desired, return_params = TRUE)
+    new_donors <- new_donors_p$data
+  } else {
+    decision_log <- c(decision_log, "return_params = FALSE — generating donors without parameter recording")
+    new_donors <- gen_and_spawn_donors(days = days, desired = desired)
+  }
+  # end timer for new donor generation
+  toc_don <- Sys.time()
+  time_new_donors <- as.numeric(difftime(toc_don, tic_don, units = "secs"))
+
+  ## Combine everything to for candidate list and donor list
+  cl <- dplyr::bind_rows(old_candidates, new_candidates)
   dl <- dplyr::filter(new_donors, .data$don_util == 1)
 
-  ## creating empty list
+  ## creating empty list for initial state
   recipient_d <- dplyr::tibble(c_id = 0)[0,]
-
   waitlist_death_d <- dplyr::tibble()
-
   post_tx_death_d <- dplyr::tibble()
-
   non_used_donors <- dplyr::tibble()
-
   all_matches <- dplyr::tibble()
 
+  ## create the initial state
   iter0 <- list(
     current_candidates = old_candidates,
     recipient_database = recipient_d,
@@ -129,41 +160,89 @@ run_simulation <- function(days, can_start = 1250,
   ds <- 1:days
   ### For progress bar in timing may eventually remove
   qs <- ceiling(stats::quantile(ds, probs = seq(.1, 1, .1)))
+  ## Run main simulation
+  # start timer for main simulation
+  tic_sim <- Sys.time()
+  # storage for per-day timing results
+  daily_timings <- list()
 
   for(i in ds){
-    test_i <- iteration(i,
-                        cl, dl, include_matches = include_matches, updated_list = test_i
-                        , match_alg = match_alg, ...
+    day_result  <- iteration(i,
+                             cl, dl, include_matches = include_matches, updated_list = test_i
+                             , match_alg = match_alg, ...
 
     )
+    # record the detailed timing
+    test_i <- day_result
+    daily_timings[[i]] <- c(day_result$timing, day = i)
+
     #### progress bar
     if(i %in% qs){
       cat(paste0(names(qs)[max(which(i == qs))], " done "))
     }
   }
-  ## Timing
-  toc <- Sys.time()
-  print(toc - tic)
+  # end timer for main simulation
+  toc_sim <- Sys.time()
+  time_simulation <- as.numeric(difftime(toc_sim, tic_sim, units = "secs"))
 
+  ## --- Aggregate iteration timing ---
+  timing_df <- do.call(rbind, lapply(daily_timings, as.data.frame))
+  summary_timing <- timing_df |>
+    dplyr::summarise(
+      total_pre_tx = sum(pre_tx_update),
+      total_post_tx = sum(post_tx_update),
+      total_match = sum(match_phase),
+      total_transplant = sum(transplant_phase),
+      total_iteration_time = sum(total),
+      avg_alive_candidates = mean(alive_candidates),
+      avg_donors = mean(available_donors),
+      total_matches = sum(num_matches),
+      total_transplants = sum(num_transplants)
+    )
+
+  ## End-to-end runtime
+  toc_overall <- Sys.time()
+  total_runtime <- as.numeric(difftime(toc_overall, tic_overall, units = "secs"))
+
+  ## Print summary
+  cat("\n----- Simulation Runtime Summary -----\n")
+  cat("Old candidates generation: ", round(time_old_candidates, 2), " secs\n")
+  cat("New candidates generation: ", round(time_new_candidates, 2), " secs\n")
+  cat("New donors generation: ", round(time_new_donors, 2), " secs\n")
+  cat("Main simulation (all iterations): ", round(time_simulation, 2), " secs\n")
+  cat("Total runtime: ", round(total_runtime, 2), " secs\n")
+  cat("--------------------------------------\n")
+
+  ## Print decision log
+  # cat("\nLogic decisions made during run:\n")
+  # cat(paste0(" - ", decision_log, collapse = "\n"), "\n")
+
+  ## Build output
   og <- list(call = call1,
-             time_run = toc - tic,
+             time_run = toc_overall - tic_overall,
              all_candidates = cl,
              all_donors = new_donors)
 
   l <- append(og, test_i)
-
-  if(!include_matches){
-    l <- l[-length(l)]
-  }
-
-
-  if(return_params){
+  if (!include_matches) l <- l[-length(l)]
+  if (return_params) {
     pp <- list("params" = append(new_donors_p$params, new_candidates_p$params))
     l <- append(pp, l)
   }
 
+  ## store timing info
+  l$timing <- list(
+    old_candidates = time_old_candidates,
+    new_candidates = time_new_candidates,
+    new_donors = time_new_donors,
+    simulation = time_simulation,
+    total = total_runtime,
+    per_iteration_timing = timing_df,
+    per_iteration_timing_summary = summary_timing
+  )
+  l$decision_log <- decision_log
+
   class(l) <- "COMET"
 
   return(l)
-
 }
